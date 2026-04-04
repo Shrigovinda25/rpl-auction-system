@@ -1,17 +1,24 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
+// Full Firebase configuration for maximum stability
 const firebaseConfig = {
+  apiKey: "AIzaSyDnJ0KWlqwdYhuR2g4nvLheQxc56r6tk1g",
+  authDomain: "rpl-auction-abf32.firebaseapp.com",
   projectId: "rpl-auction-abf32",
+  storageBucket: "rpl-auction-abf32.firebasestorage.app",
+  messagingSenderId: "786517772604",
+  appId: "1:786517772604:web:35a665273ecdb93682b639",
+  measurementId: "G-FR1LLDCEVW",
   databaseURL: "https://rpl-auction-abf32-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const STATE_PATH = 'rpl_auction/state';
-const CONFIG_PATH = 'rpl_auction/config';
+const CONFIG_PATH = 'rpl_auction/config'; // Lowercase path as per standard
 
-// Hardcoded Player Database
+// Player Data
 const HARDCODED_PLAYERS = [
   { "name": "Navdeep patil", "sport": ["Cricket", "Volleyball"], "gender": "Male", "basePrice": 100, "image": "https://drive.google.com/thumbnail?id=1MaQDht_trzhXXFIQdPCF3GlorBUjHVUx&sz=w1000", "achievements": "Role: Batsman | I always give my 100% on field", "status": "Waiting" },
   { "name": "Daksh Tiwari", "sport": ["Cricket", "Tug of War"], "gender": "Male", "basePrice": 100, "image": "https://drive.google.com/thumbnail?id=1uQObdEbKC-aYgAHqKVYT3V_bRKcnVA9v&sz=w1000", "achievements": "Role: Bowler | Been to a cricket coaching as a bowler", "status": "Waiting" },
@@ -45,14 +52,7 @@ const defaultState = {
     { name: "Team 3", captain: "TBD", viceCaptain: "TBD", purse: 10000, players: [], maleCount: 0, femaleCount: 0 },
     { name: "Team 4", captain: "TBD", viceCaptain: "TBD", purse: 10000, players: [], maleCount: 0, femaleCount: 0 }
   ],
-  auctionState: {
-    isLive: false,
-    currentPlayerIndex: 0,
-    currentBid: 0,
-    leadingTeam: null,
-    selectedTeamIndex: 0,
-    status: "Waiting" 
-  }
+  auctionState: { isLive: false, currentPlayerIndex: 0, currentBid: 0, leadingTeam: null, selectedTeamIndex: 0, status: "Waiting" }
 };
 
 const defaultAuthConfig = {
@@ -62,6 +62,7 @@ const defaultAuthConfig = {
 let localCacheState = defaultState;
 let localAuthConfig = defaultAuthConfig;
 
+// Auction State Listener
 onValue(ref(db, STATE_PATH), (snapshot) => {
     const data = snapshot.val();
     if (data) {
@@ -72,12 +73,18 @@ onValue(ref(db, STATE_PATH), (snapshot) => {
     }
 });
 
-onValue(ref(db, CONFIG_PATH), (snapshot) => {
+// Intelligent Auth Config Sync (Handles both 'Config' and 'config' folders)
+onValue(ref(db, 'rpl_auction'), (snapshot) => {
     const data = snapshot.val();
-    if (data && data.password) {
-        localAuthConfig = data;
-    } else {
-        set(ref(db, CONFIG_PATH), defaultAuthConfig);
+    if (data) {
+        // Look for any key that is 'config' or 'Config'
+        const configNode = data.config || data.Config;
+        if (configNode && configNode.password) {
+            localAuthConfig = configNode;
+        } else if (!data.config && !data.Config) {
+            // First run initialization if no config exists anywhere
+            set(ref(db, CONFIG_PATH), defaultAuthConfig);
+        }
     }
 });
 

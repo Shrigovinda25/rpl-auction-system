@@ -37,11 +37,19 @@ function setupAuthListeners() {
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
             const config = getAuthConfig();
-            if (passInp.value.toLowerCase() === config.password.toLowerCase()) {
+            const cloudPass = (config && config.password) ? config.password.trim().toLowerCase() : "";
+            
+            // Check both boxes in case the user typed in either one
+            const val1 = userInp.value.trim().toLowerCase();
+            const val2 = passInp.value.trim().toLowerCase();
+
+            if (val1 === cloudPass || val2 === cloudPass) {
                 sessionStorage.setItem(SESSION_KEY, "true");
+                loginBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Access Granted';
+                loginBtn.classList.replace('bg-gradient-to-r', 'bg-emerald-600');
                 showDashboard();
             } else {
-                errorMsg.textContent = "Wrong password!";
+                errorMsg.textContent = "Wrong password! Please try again.";
                 errorMsg.classList.remove('hidden');
                 passInp.value = "";
                 setTimeout(() => errorMsg.classList.add('hidden'), 3000);
