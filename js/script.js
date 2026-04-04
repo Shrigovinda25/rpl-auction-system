@@ -56,7 +56,7 @@ const defaultState = {
 };
 
 const defaultAuthConfig = {
-  password: "shrigovinda8618104226"
+  password: "Shrigovinda8618104226"
 };
 
 let localCacheState = defaultState;

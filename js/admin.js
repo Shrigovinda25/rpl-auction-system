@@ -37,7 +37,7 @@ function setupAuthListeners() {
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
             const config = getAuthConfig();
-            if (passInp.value === config.password) {
+            if (passInp.value.toLowerCase() === config.password.toLowerCase()) {
                 sessionStorage.setItem(SESSION_KEY, "true");
                 showDashboard();
             } else {
