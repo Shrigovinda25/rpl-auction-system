@@ -212,50 +212,40 @@ function setupEventListeners() {
                 const state = getState();
                 let added = 0;
                 rows.forEach(row => {
-                    // Normalize keys to handle potential whitespace or newline issues from Excel
-                    // We'll create a lowercase, space-stripped version of the row for easier matching
                     const flatRow = {};
                     for (let key in row) {
+                        // Aggressively clean keys (remove weird leading commas, line breaks, and whitespace)
                         const cleanKey = key.trim().toLowerCase().replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ');
                         flatRow[cleanKey] = row[key];
                     }
 
                     const name = flatRow['player name'] || flatRow['name'] || '';
-                    if (!name) return;
+                    if (!name || name === 'Player Name') return; // Skip header clones
 
                     const rawSport = flatRow['select sport'] || flatRow['sport'] || flatRow['sports'] || 'Unknown';
-                    const sportArr = typeof rawSport === 'string'
-                        ? rawSport.split(/[;,]+/).map(s => s.trim()).filter(Boolean)
-                        : [String(rawSport)];
+                    const sportArr = Array.isArray(rawSport) 
+                        ? rawSport 
+                        : typeof rawSport === 'string'
+                          ? rawSport.split(/[;,]+/).map(s => s.trim()).filter(Boolean)
+                          : [String(rawSport)];
 
                     const rawBase = flatRow['base price'] || flatRow['baseprice'];
                     const basePrice = parseInt(rawBase) || 0;
 
                     let image = flatRow['player image'] || flatRow['image url'] || flatRow['imageurl'] || flatRow['image'] || null;
                     if (image && typeof image === 'string' && image.includes('drive.google.com')) {
-                        // Extract file ID to create a direct rendering URL for images
-                        const idMatch = image.match(/[?&]id=([a-zA-Z0-9_-]+)/);
-                        const fileMatch = image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-                        const fileId = idMatch ? idMatch[1] : (fileMatch ? fileMatch[1] : null);
-                        
-                        if (fileId) {
-                            // Use Google Drive thumbnail API which bypasses recent strict-origin blocking on embedded images
-                            image = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-                        }
+                        const idMatch = image.match(/[?&]id=([a-zA-Z0-9_-]+)/) || image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                        const fileId = idMatch ? idMatch[1] : null;
+                        if (fileId) image = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
                     }
 
-                    // The long achievement columns
-                    const achKey1 = 'achievements in the selected sports and why the team should pick you?';
-                    const achKey2 = 'achievements';
-                    let achievements = flatRow[achKey1] || flatRow[achKey2] || 'None';
-
-                    // Check for cricket role
-                    const roleKey = 'if you have selected cricket , what would you play as ?';
-                    const roleKey2 = 'if you have selected cricket, what would you play as?'; // variation without spaces
-                    const role = flatRow[roleKey] || flatRow[roleKey2];
+                    // Combined Achievements & Cricket Role
+                    const achKey = Object.keys(flatRow).find(k => k.includes('achievements')) || 'achievements';
+                    let achievements = flatRow[achKey] || 'None';
                     
-                    if (role && role.toString().trim() !== '') {
-                        achievements = `Role: ${role} | ${achievements}`;
+                    const roleKey = Object.keys(flatRow).find(k => k.includes('cricket') && k.includes('as ?')) || 'role';
+                    if (flatRow[roleKey]) {
+                        achievements = `Role: ${flatRow[roleKey]} | ${achievements}`;
                     }
 
                     state.players.push({
@@ -271,11 +261,11 @@ function setupEventListeners() {
                 });
 
                 saveState(state);
-                Swal.fire('Success', `${added} players uploaded from Excel.`, 'success');
+                Swal.fire('Success', `${added} players uploaded.`, 'success');
                 fileInput.value = '';
             } catch (err) {
-                console.error('Excel parse error:', err);
-                Swal.fire('Error', 'Failed to parse the Excel file. Please check the format.', 'error');
+                console.error('Excel/CSV parse error:', err);
+                Swal.fire('Error', 'Failed to parse the file. Please check the columns.', 'error');
             }
         };
         reader.readAsArrayBuffer(fileInput.files[0]);
@@ -511,21 +501,44 @@ function setupEventListeners() {
     const exportBtn = document.getElementById('btn-export');
     if (exportBtn) {
         exportBtn.addEventListener('click', () => {
-            const s = getState();
-            if (s.players.length === 0) {
-                Swal.fire('No Data', 'No players exist to export.', 'info');
-                return;
-            }
-            let csvContent = "data:text/csv;charset=utf-8,";
+            // Separate and sort by Gender
+            const males = s.players.filter(p => p.gender === "Male");
+            const females = s.players.filter(p => p.gender === "Female");
+
+            let csvContent = "\ufeff"; // BOM for Excel UTF-8 support
+            
+            // Male Section
+            csvContent += "SECTION,MALE PLAYERS\n";
             csvContent += "Player Name,Sport,Gender,Base Price,Sold Price,Team,Status\n";
-            s.players.forEach(p => {
-                const row = `"${p.name}","${p.sport}","${p.gender}",${p.basePrice},${p.soldPrice || 0},"${p.soldTo || 'None'}","${p.status}"`;
-                csvContent += row + "\n";
+            males.forEach(p => {
+                csvContent += `"${p.name}","${(p.sport || []).join('; ')}","${p.gender}",${p.basePrice},${p.soldPrice || 0},"${p.soldTo || 'None'}","${p.status}"\n`;
             });
-            const encodedUri = encodeURI(csvContent);
+
+            csvContent += "\nSECTION,FEMALE PLAYERS\n";
+            csvContent += "Player Name,Sport,Gender,Base Price,Sold Price,Team,Status\n";
+            females.forEach(p => {
+                csvContent += `"${p.name}","${(p.sport || []).join('; ')}","${p.gender}",${p.basePrice},${p.soldPrice || 0},"${p.soldTo || 'None'}","${p.status}"\n`;
+            });
+
+            // Summary Section
+            csvContent += "\nOVERALL SUMMARY\n";
+            const soldTotal = s.players.filter(p => p.status === "Selected").length;
+            const unsoldTotal = s.players.filter(p => p.status === "Not Selected").length;
+            const totalPurseSpent = s.players.reduce((sum, p) => sum + (p.soldPrice || 0), 0);
+
+            csvContent += `Total Players Registered: ,${s.players.length}\n`;
+            csvContent += `Total Players Sold: ,${soldTotal}\n`;
+            csvContent += `Total Players Not Selected: ,${unsoldTotal}\n`;
+            csvContent += `Total Male Players: ,${males.length}\n`;
+            csvContent += `Total Female Players: ,${females.length}\n`;
+            csvContent += `Total Purse Spent (RC): ,${totalPurseSpent}\n`;
+            csvContent += `Export Time: ,${new Date().toLocaleString()}\n`;
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "RPL_Auction_Results.csv");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `RPL_Auction_Final_Results_${new Date().toISOString().split('T')[0]}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
