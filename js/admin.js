@@ -1,8 +1,70 @@
+const AUTH_USER = "shrigovinda";
+const AUTH_PASS = "shrigovinda8618104226";
+const SESSION_KEY = "rpl_auth_session";
+
 document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
+    setupAuthListeners();
     initAdmin();
     // Re-render when state changes (e.g. from reset)
     window.addEventListener('stateUpdated', renderAdminData);
 });
+
+function checkAuth() {
+    const session = sessionStorage.getItem(SESSION_KEY);
+    if (session === "true") {
+        showDashboard();
+    }
+}
+
+function showDashboard() {
+    const authPortal = document.getElementById('auth-portal');
+    const adminDashboard = document.getElementById('admin-dashboard');
+    if (authPortal) authPortal.classList.add('hidden');
+    if (adminDashboard) {
+        adminDashboard.classList.remove('hidden');
+        setTimeout(() => {
+            adminDashboard.classList.remove('opacity-0');
+        }, 10);
+    }
+}
+
+function setupAuthListeners() {
+    const loginBtn = document.getElementById('btn-login');
+    const logoutBtn = document.getElementById('btn-logout');
+    const userInp = document.getElementById('admin-user');
+    const passInp = document.getElementById('admin-pass');
+    const errorMsg = document.getElementById('auth-error');
+
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            if (userInp.value === AUTH_USER && passInp.value === AUTH_PASS) {
+                sessionStorage.setItem(SESSION_KEY, "true");
+                showDashboard();
+            } else {
+                errorMsg.classList.remove('hidden');
+                passInp.value = "";
+                setTimeout(() => errorMsg.classList.add('hidden'), 3000);
+            }
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem(SESSION_KEY);
+            location.reload();
+        });
+    }
+
+    // Enter key support
+    [userInp, passInp].forEach(inp => {
+        if (inp) {
+            inp.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') loginBtn.click();
+            });
+        }
+    });
+}
 
 function initAdmin() {
     renderAdminData();
