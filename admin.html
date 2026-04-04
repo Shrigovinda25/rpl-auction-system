@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - RPL Auction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        cardBg: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-darkBg text-white min-h-screen">
+
+    <nav class="bg-cardBg border-b border-gray-700 p-4 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fas fa-gavel text-2xl text-blue-500"></i>
+                <h1
+                    class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400">
+                    RPL Auction Admin</h1>
+            </div>
+            <div class="space-x-4">
+                <span id="auction-status-badge"
+                    class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-sm font-semibold border border-red-500/30">Offline</span>
+                <button id="btn-export"
+                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm transition"><i
+                        class="fas fa-file-export mr-1"></i> Export Results</button>
+                <button onclick="resetState()"
+                    class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded text-sm transition"><i
+                        class="fas fa-trash mr-1"></i> Reset Global State</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- LEFT COLUMN: Controls & Bidding -->
+        <div class="space-y-6 lg:col-span-1">
+            <div class="bg-cardBg p-5 rounded-xl border border-gray-700 shadow max-h-[85vh] overflow-y-auto">
+                <h2 class="text-xl font-bold mb-4 border-b border-gray-600 pb-2"><i
+                        class="fas fa-gamepad text-blue-400 mr-2"></i>Auction Center</h2>
+
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <button id="btn-go-live"
+                        class="bg-emerald-600 hover:bg-emerald-500 text-white p-3 rounded font-bold shadow transition"><i
+                            class="fas fa-play mr-2"></i>Go Live</button>
+                    <button id="btn-pause"
+                        class="bg-yellow-600 hover:bg-yellow-500 text-white p-3 rounded font-bold shadow transition"><i
+                            class="fas fa-pause mr-2"></i>Pause</button>
+                    <button id="btn-next"
+                        class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded font-bold shadow transition col-span-2 disabled:opacity-50"><i
+                            class="fas fa-step-forward mr-2"></i>Next Player</button>
+                </div>
+
+                <div id="live-player-card" class="bg-gray-800 p-4 rounded-lg border border-gray-600 mb-4 hidden">
+                    <img id="live-player-img" src="" class="w-full h-40 object-cover rounded mb-3 bg-gray-700">
+                    <h3 id="live-player-name" class="text-lg font-bold text-center text-blue-300">Player Name</h3>
+                    <div class="text-sm text-gray-400 text-center mb-2">Base Px: <span id="live-player-base"
+                            class="text-white font-bold"></span> RC</div>
+
+                    <div class="mt-4 pt-4 border-t border-gray-700">
+                        <label class="block text-sm text-gray-400 mb-1">Set Bid Amount (RC)</label>
+                        <input type="number" id="bid-amount"
+                            class="w-full bg-gray-700 p-2 rounded text-white font-bold text-center text-lg focus:ring-2 focus:ring-blue-500 border border-gray-600">
+
+                        <!-- Quick Bid Buttons -->
+                        <div class="grid grid-cols-4 gap-2 mt-2">
+                            <button type="button" class="btn-quick-bid bg-blue-600/30 hover:bg-blue-500 text-blue-300 hover:text-white border border-blue-500/50 font-bold py-1.5 rounded transition text-sm shadow-sm" data-amount="50">+50</button>
+                            <button type="button" class="btn-quick-bid bg-blue-600/30 hover:bg-blue-500 text-blue-300 hover:text-white border border-blue-500/50 font-bold py-1.5 rounded transition text-sm shadow-sm" data-amount="100">+100</button>
+                            <button type="button" class="btn-quick-bid bg-purple-600/30 hover:bg-purple-500 text-purple-300 hover:text-white border border-purple-500/50 font-bold py-1.5 rounded transition text-sm shadow-sm" data-amount="500">+500</button>
+                            <button type="button" class="btn-quick-bid bg-purple-600/30 hover:bg-purple-500 text-purple-300 hover:text-white border border-purple-500/50 font-bold py-1.5 rounded transition text-sm shadow-sm" data-amount="1000">+1000</button>
+                        </div>
+
+                        <label class="block text-sm text-gray-400 mt-3 mb-2">Select Winning Team</label>
+                        <div id="bid-team-buttons" class="grid grid-cols-1 gap-2">
+                            <!-- Populated dynamically -->
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mt-4">
+                            <button id="btn-sell"
+                                class="bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded transition"><i
+                                    class="fas fa-check mr-1"></i> Selected</button>
+                            <button id="btn-unsold"
+                                class="bg-red-600 hover:bg-red-500 text-white font-bold py-2 rounded transition"><i
+                                    class="fas fa-times mr-1"></i> Not Selected</button>
+                        </div>
+
+                        <!-- Live Bid Preview Panel -->
+                        <div id="bid-preview-card" class="mt-4 hidden transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <div id="no-player-msg" class="text-center p-6 text-gray-500 italic">
+                    Auction is offline or no players remaining.
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMNS: Data Management -->
+        <div class="space-y-6 lg:col-span-2">
+
+            <!-- Player Management -->
+            <div class="bg-cardBg p-5 rounded-xl border border-gray-700 shadow">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-600 pb-2">
+                    <h2 class="text-xl font-bold"><i class="fas fa-users text-blue-400 mr-2"></i>Player Management</h2>
+                    <span id="player-count" class="bg-gray-700 px-3 py-1 rounded-full text-sm">0 Players</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Bulk Upload -->
+                    <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                        <h3 class="font-semibold text-emerald-400 mb-3"><i class="fas fa-file-excel mr-2"></i>Bulk Upload
+                            (Excel)</h3>
+                        <p class="text-xs text-gray-400 mb-2">Columns: Name, Sport, Gender, BasePrice, ImageURL,
+                            Achievements</p>
+                        <input type="file" id="excel-file" accept=".xlsx,.xls"
+                            class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 mb-2 transition">
+                        <button id="btn-upload-excel"
+                            class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded text-sm font-semibold transition">Upload
+                            Data</button>
+                    </div>
+
+                    <!-- Add Single Player -->
+                    <div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+                        <h3 class="font-semibold text-blue-400 mb-3"><i class="fas fa-user-plus mr-2"></i>Add Manual
+                            Player</h3>
+                        <form id="add-player-form" class="space-y-2">
+                            <input type="text" id="p-name" placeholder="Player Name *" required
+                                class="w-full bg-gray-700 p-2 rounded text-sm text-white">
+
+                            <!-- Multi-sport selector -->
+                            <div class="bg-gray-700 rounded p-2">
+                                <p class="text-xs text-gray-400 mb-1 font-semibold uppercase tracking-wide">Sports * <span class="text-gray-500 font-normal">(select all that apply)</span></p>
+                                <div id="sport-checkboxes" class="grid grid-cols-2 gap-1">
+                                    <label class="flex items-center gap-2 text-sm text-white cursor-pointer hover:bg-gray-600 rounded px-2 py-1">
+                                        <input type="checkbox" class="p-sport-cb accent-purple-500" value="Cricket"> Cricket
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-white cursor-pointer hover:bg-gray-600 rounded px-2 py-1">
+                                        <input type="checkbox" class="p-sport-cb accent-purple-500" value="Football"> Football
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-white cursor-pointer hover:bg-gray-600 rounded px-2 py-1">
+                                        <input type="checkbox" class="p-sport-cb accent-purple-500" value="Volleyball"> Volleyball
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-white cursor-pointer hover:bg-gray-600 rounded px-2 py-1">
+                                        <input type="checkbox" class="p-sport-cb accent-purple-500" value="Kabaddi"> Kabaddi
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-white cursor-pointer hover:bg-gray-600 rounded px-2 py-1">
+                                        <input type="checkbox" class="p-sport-cb accent-purple-500" value="Badminton"> Badminton
+                                    </label>
+                                    <label class="flex items-center gap-2 text-sm text-white cursor-pointer hover:bg-gray-600 rounded px-2 py-1">
+                                        <input type="checkbox" class="p-sport-cb accent-purple-500" value="Athletics"> Athletics
+                                    </label>
+                                </div>
+                            </div>
+
+                            <select id="p-gender" required
+                                class="w-full bg-gray-700 p-2 rounded text-sm text-white border-none">
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                            </select>
+                            <div class="flex space-x-2">
+                                <input type="number" id="p-price" placeholder="Base Price (RC) *" required
+                                    class="w-1/2 bg-gray-700 p-2 rounded text-sm text-white">
+                                <input type="url" id="p-img" placeholder="Image URL (optional)"
+                                    class="w-1/2 bg-gray-700 p-2 rounded text-sm text-white">
+                            </div>
+                            <input type="text" id="p-achievements" placeholder="Achievements (optional)"
+                                class="w-full bg-gray-700 p-2 rounded text-sm text-white">
+                            <button type="submit"
+                                class="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded text-sm font-semibold transition mt-2">Add
+                                Player</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="mt-6 max-h-64 overflow-y-auto w-full">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-gray-400 uppercase bg-gray-800 sticky top-0">
+                            <tr>
+                                <th class="px-4 py-2">Name</th>
+                                <th class="px-4 py-2">Info</th>
+                                <th class="px-4 py-2">Price</th>
+                                <th class="px-4 py-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="player-table-body" class="divide-y divide-gray-700">
+                            <!-- Injected by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Team Management -->
+            <div class="bg-cardBg p-5 rounded-xl border border-gray-700 shadow">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-600 pb-2">
+                    <h2 class="text-xl font-bold"><i class="fas fa-shield-alt text-purple-400 mr-2"></i>Team Management
+                    </h2>
+                    <button id="btn-add-team"
+                        class="text-sm bg-purple-600 hover:bg-purple-500 text-white px-3 py-1 rounded transition"><i
+                            class="fas fa-plus mr-1"></i>New Team</button>
+                </div>
+
+                <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <!-- Teams injected by JS -->
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+
+</html>

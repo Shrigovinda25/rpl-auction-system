@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Auction - RPL</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b1120',
+                        cardBg: '#1e293b'
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-darkBg text-white min-h-screen flex flex-col overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-900 via-gray-900 to-purple-900 py-4 shadow-2xl border-b border-gray-700">
+        <div class="max-w-screen-2xl mx-auto px-6 flex justify-between items-center">
+            <h1
+                class="text-3xl md:text-5xl font-black tracking-tight text-white uppercase drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                RPL <span class="text-blue-400">Auction 2026</span>
+            </h1>
+            <div id="connection-status" class="flex items-center space-x-2 text-xl font-bold">
+                <!-- Status Injected here -->
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main
+        class="flex-grow p-4 md:p-6 lg:p-8 max-w-screen-2xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+
+        <!-- Live Player Spotlight (Cols 1-8) -->
+        <div class="lg:col-span-8 bg-cardBg rounded-3xl shadow-2xl border border-gray-700 overflow-hidden relative group hidden"
+            id="player-spotlight">
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-transparent pointer-events-none"></div>
+
+            <div class="flex flex-col md:flex-row h-full">
+                <!-- Player Image -->
+                <div class="md:w-5/12 relative h-[300px] md:h-auto border-r border-gray-800/50">
+                    <img id="disp-img" src="" class="absolute inset-0 w-full h-full object-cover">
+                    <!-- Adjusted gradient to fade seamlessly into the right column -->
+                    <div
+                        class="absolute inset-0 bg-gradient-to-b md:bg-gradient-to-r from-transparent to-cardBg pointer-events-none">
+                    </div>
+                    <div class="absolute bottom-4 left-4 z-10 flex flex-wrap gap-1">
+                        <div id="disp-sport" class="flex flex-wrap gap-1"></div>
+                        <span id="disp-gender"
+                            class="bg-gray-800/80 text-gray-200 px-3 py-1 rounded shadow text-lg font-semibold tracking-wider backdrop-blur-sm ml-1"><i
+                                class="fas fa-mars"></i></span>
+                    </div>
+                </div>
+
+                <!-- Player Details -->
+                <div class="md:w-7/12 p-8 md:p-12 md:pr-32 flex flex-col justify-center relative z-10">
+                    <h2 id="disp-name"
+                        class="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 leading-tight uppercase tracking-tighter drop-shadow-lg break-words">
+                        Player Name
+                    </h2>
+
+                    <div class="mb-6">
+                        <h4 class="text-gray-400 uppercase text-sm tracking-widest font-bold mb-2">Key Achievements</h4>
+                        <p id="disp-achievements" class="text-xl md:text-2xl text-blue-200 leading-snug italic">
+                            Player achievements goes here...
+                        </p>
+                    </div>
+
+                    <div class="mt-auto">
+                        <h4 class="text-gray-400 uppercase text-xs tracking-widest font-bold mb-1">Base Price</h4>
+                        <p id="disp-base" class="text-4xl md:text-5xl font-mono text-white font-bold drop-shadow-md">0
+                            <span class="text-blue-500 text-2xl">RC</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Global Status Overlay -->
+            <div id="status-overlay" class="absolute top-6 right-6 z-20">
+                <!-- Status injected dynamically: Waiting/Selected/Sold -->
+            </div>
+        </div>
+
+        <div id="no-live-player"
+            class="lg:col-span-8 flex flex-col items-center justify-center text-center p-12 bg-cardBg rounded-3xl border border-gray-800">
+            <i class="fas fa-satellite-dish text-6xl text-gray-600 mb-6 animate-pulse-slow"></i>
+            <h2 class="text-3xl font-bold text-gray-400">Waiting for Live Auction</h2>
+            <p class="text-gray-500 mt-2 text-xl">The admin has not started the auction yet.</p>
+        </div>
+
+        <!-- Bidding Info Panel (Cols 9-12) -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+
+            <!-- Latest Action Card -->
+            <div id="bid-status-card"
+                class="bg-gray-800 rounded-3xl p-8 border border-gray-700 shadow-xl relative overflow-hidden flex-grow flex flex-col justify-center text-center">
+                <!-- Background animations logic goes here via JS -->
+                <div id="bid-bg-anim"
+                    class="absolute inset-0 opacity-20 pointer-events-none transition-colors duration-1000"></div>
+
+                <div class="relative z-10">
+                    <p class="uppercase tracking-widest text-gray-400 font-bold mb-2 text-sm" id="bid-label">Current
+                        Status</p>
+                    <h3 id="bid-headline" class="text-4xl md:text-5xl font-black mb-4 uppercase drop-shadow-lg">
+                        Waiting for Bids
+                    </h3>
+
+                    <div id="bid-price-ctn" class="hidden">
+                        <p class="text-gray-400 text-sm tracking-widest uppercase mb-1">Selected For</p>
+                        <p id="bid-price" class="text-6xl text-white font-mono font-bold drop-shadow-xl animate-pulse">0
+                            RC</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats/Misc Info -->
+            <div class="bg-gray-800 rounded-3xl p-6 border border-gray-700 shadow-xl hidden lg:block">
+                <div class="flex items-center justify-between text-gray-300">
+                    <div>
+                        <p class="text-xs uppercase tracking-widest text-gray-500">Total Players</p>
+                        <p id="stat-total-players" class="text-3xl font-bold">0</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs uppercase tracking-widest text-gray-500">Not Selected</p>
+                        <p id="stat-unsold" class="text-3xl font-bold text-red-400">0</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Bottom Team Grid -->
+    <div class="bg-gray-900 border-t border-gray-800 p-6 mt-auto">
+        <div class="max-w-screen-2xl mx-auto">
+            <h3 class="text-sm uppercase tracking-widest text-gray-500 font-bold mb-4">Franchise Purses</h3>
+            <div id="auction-teams-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Data populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Squad Modal -->
+    <div id="team-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden transition-opacity duration-300 opacity-0">
+        <div class="bg-gray-900 w-full max-w-4xl max-h-[85vh] rounded-3xl border border-white/10 shadow-2xl overflow-hidden flex flex-col transform scale-95 transition-transform duration-300">
+            <!-- Modal Header -->
+            <div class="p-6 border-b border-white/5 bg-gradient-to-r from-blue-900/40 to-purple-900/40 flex justify-between items-center">
+                <div class="flex items-center gap-4">
+                    <div id="modal-team-icon" class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-2xl font-black italic">T</div>
+                    <div>
+                        <h2 id="modal-team-name" class="text-3xl font-black uppercase tracking-tighter text-white">Team Name</h2>
+                        <div class="flex gap-4 mt-1">
+                            <span id="modal-captain" class="text-xs font-bold text-yellow-400 uppercase tracking-widest"><i class="fas fa-crown mr-1"></i>Captain: <span class="text-white">TBD</span></span>
+                            <span id="modal-vice-captain" class="text-xs font-bold text-blue-400 uppercase tracking-widest"><i class="fas fa-star mr-1"></i>VC: <span class="text-white">TBD</span></span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="closeTeamModal()" class="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="flex-grow overflow-y-auto p-6 md:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="modal-player-list">
+                    <!-- Players injected here -->
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-6 bg-gray-800/50 border-t border-white/5 flex justify-between items-center">
+                <div class="flex gap-6">
+                    <div class="text-center">
+                        <p class="text-[10px] uppercase text-gray-500 font-bold tracking-widest mb-1">Squad Size</p>
+                        <p id="modal-squad-count" class="text-xl font-bold text-white">0</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[10px] uppercase text-gray-500 font-bold tracking-widest mb-1">Remaining Purse</p>
+                        <p id="modal-purse" class="text-xl font-bold text-emerald-400">9000 RC</p>
+                    </div>
+                </div>
+                <button onclick="closeTeamModal()" class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg active:scale-95">BACK TO AUCTION</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/script.js"></script>
+    <script src="js/auction.js"></script>
+    <!-- Add Canvas Confetti for winning effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</body>
+
+</html>
