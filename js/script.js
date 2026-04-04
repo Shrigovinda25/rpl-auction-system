@@ -1,27 +1,17 @@
-/**
- * Global State Management and Real-time Synchronization (Firebase)
- */
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-// User provided Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDnJ0KWlqwdYhuR2g4nvLheQxc56r6tk1g",
-  authDomain: "rpl-auction-abf32.firebaseapp.com",
   projectId: "rpl-auction-abf32",
-  storageBucket: "rpl-auction-abf32.firebasestorage.app",
-  messagingSenderId: "786517772604",
-  appId: "1:786517772604:web:35a665273ecdb93682b639",
-  measurementId: "G-FR1LLDCEVW"
+  databaseURL: "https://rpl-auction-abf32-default-rtdb.asia-southeast1.firebasedatabase.app/"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const STATE_PATH = 'rpl_auction/state';
+const CONFIG_PATH = 'rpl_auction/config';
 
-// Hardcoded Player Database from Registration CSV
+// Hardcoded Player Database
 const HARDCODED_PLAYERS = [
   { "name": "Navdeep patil", "sport": ["Cricket", "Volleyball"], "gender": "Male", "basePrice": 100, "image": "https://drive.google.com/thumbnail?id=1MaQDht_trzhXXFIQdPCF3GlorBUjHVUx&sz=w1000", "achievements": "Role: Batsman | I always give my 100% on field", "status": "Waiting" },
   { "name": "Daksh Tiwari", "sport": ["Cricket", "Tug of War"], "gender": "Male", "basePrice": 100, "image": "https://drive.google.com/thumbnail?id=1uQObdEbKC-aYgAHqKVYT3V_bRKcnVA9v&sz=w1000", "achievements": "Role: Bowler | Been to a cricket coaching as a bowler", "status": "Waiting" },
@@ -65,44 +55,36 @@ const defaultState = {
   }
 };
 
-let localCacheState = defaultState;
+const defaultAuthConfig = {
+  password: "shrigovinda8618104226"
+};
 
-// Sync Listener: Automatically updates the UI when ANY device changes the state
+let localCacheState = defaultState;
+let localAuthConfig = defaultAuthConfig;
+
 onValue(ref(db, STATE_PATH), (snapshot) => {
     const data = snapshot.val();
     if (data) {
         localCacheState = data;
         window.dispatchEvent(new Event('stateUpdated'));
     } else {
-        // First run: Initialize default state to Firebase
         saveState(defaultState);
     }
 });
 
-/**
- * Retrieve the current global state (from real-time cache)
- */
-function getState() {
-    return localCacheState;
-}
+onValue(ref(db, CONFIG_PATH), (snapshot) => {
+    const data = snapshot.val();
+    if (data && data.password) {
+        localAuthConfig = data;
+    } else {
+        set(ref(db, CONFIG_PATH), defaultAuthConfig);
+    }
+});
 
-/**
- * Save state to Firebase Cloud (Syncs to all devices)
- */
-function saveState(state) {
+window.getState = () => localCacheState;
+window.getAuthConfig = () => localAuthConfig;
+window.saveState = (state) => {
     localCacheState = state;
-    set(ref(db, STATE_PATH), state)
-        .catch(err => console.error("Firebase Save Error:", err));
-}
-
-/**
- * Hard Reset (Admin functionality)
- */
-function resetState() {
-    saveState(defaultState);
-}
-
-// Expose to global scope for other scripts
-window.getState = getState;
-window.saveState = saveState;
-window.resetState = resetState;
+    set(ref(db, STATE_PATH), state).catch(console.error);
+};
+window.resetState = () => window.saveState(defaultState);

@@ -1,5 +1,3 @@
-const AUTH_USER = "shrigovinda";
-const AUTH_PASS = "shrigovinda8618104226";
 const SESSION_KEY = "rpl_auth_session";
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,10 +36,12 @@ function setupAuthListeners() {
 
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
-            if (userInp.value === AUTH_USER && passInp.value === AUTH_PASS) {
+            const config = getAuthConfig();
+            if (passInp.value === config.password) {
                 sessionStorage.setItem(SESSION_KEY, "true");
                 showDashboard();
             } else {
+                errorMsg.textContent = "Wrong password!";
                 errorMsg.classList.remove('hidden');
                 passInp.value = "";
                 setTimeout(() => errorMsg.classList.add('hidden'), 3000);
