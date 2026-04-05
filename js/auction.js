@@ -112,7 +112,7 @@ function renderAuctionUI() {
 
                 bidCardColors(bidBgAnim, 'bg-red-600');
                 bidLabel.textContent = "Auction Result";
-                bidHeadline.textContent = "PLAYER UNSOLD";
+                bidHeadline.textContent = "PLAYER NOT SELECTED";
                 bidHeadline.className = "text-4xl md:text-5xl font-black mb-4 uppercase drop-shadow-lg text-red-400";
                 bidPriceCtn.classList.add('hidden');
             }
