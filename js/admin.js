@@ -636,6 +636,52 @@ function setupEventListeners() {
             document.body.removeChild(link);
         });
     }
+
+    // Restoring Unsold (Not Selected) Players
+    const restoreBtn = document.getElementById('btn-restore-unsold');
+    if (restoreBtn) {
+        restoreBtn.addEventListener('click', () => {
+            const s = getState();
+            const unsoldPlayers = s.players.filter(p => p.status === "Not Selected");
+
+            if (unsoldPlayers.length === 0) {
+                Swal.fire('No Players', 'There are no "Not Selected" players to restore.', 'info');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Re-Auction Round?',
+                text: `Give a second chance to ${unsoldPlayers.length} players?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#7c3aed',
+                confirmButtonText: 'Yes, Restore Them'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Reset statuses
+                    s.players.forEach(p => {
+                        if (p.status === "Not Selected") {
+                            p.status = "Waiting";
+                        }
+                    });
+
+                    // Set index to the first of the newly reset players
+                    const firstWaiting = s.players.findIndex(p => p.status === "Waiting");
+                    if (firstWaiting !== -1) {
+                        s.auctionState.currentPlayerIndex = firstWaiting;
+                    }
+
+                    s.auctionState.status = "Waiting";
+                    s.auctionState.selectedTeamIndex = null;
+                    s.auctionState.leadingTeam = null;
+                    s.auctionState.currentBid = 0;
+                    
+                    saveState(s);
+                    Swal.fire('Restored!', 'Not Selected players are back in the pool.', 'success');
+                }
+            });
+        });
+    }
 }
 
 // Global exposes
