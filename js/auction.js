@@ -50,7 +50,7 @@ function renderAuctionUI() {
 
             document.getElementById('disp-gender').innerHTML = activePlayer.gender === 'Male' ? `<i class="fas fa-mars text-blue-300"></i> Male` : `<i class="fas fa-venus text-pink-300"></i> Female`;
             document.getElementById('disp-achievements').textContent = activePlayer.achievements;
-            document.getElementById('disp-base').innerHTML = `${activePlayer.basePrice} <span class="text-blue-400 text-2xl">RC</span>`;
+            document.getElementById('disp-base').innerHTML = `${activePlayer.basePrice} <img src="assets/currency-logo.png" class="inline-block h-8 w-8 align-middle ml-1" alt="RPL">`;
 
             // Status Overlay & Side Panel Logic
             const overlay = document.getElementById('status-overlay');
@@ -79,7 +79,7 @@ function renderAuctionUI() {
                     bidHeadline.className = "text-4xl md:text-5xl font-black mb-4 uppercase drop-shadow-lg text-blue-300 animate-pulse";
                     
                     bidPriceCtn.classList.remove('hidden');
-                    bidPrice.textContent = `${s.auctionState.currentBid} RC`;
+                    bidPrice.innerHTML = `${s.auctionState.currentBid} <img src="assets/currency-logo.png" class="inline-block h-12 w-12 align-middle ml-2" alt="RPL">`;
                     bidPrice.className = "text-6xl text-blue-400 font-mono font-bold drop-shadow-xl";
                 } else {
                     bidCardColors(bidBgAnim, 'bg-gray-700');
@@ -98,7 +98,7 @@ function renderAuctionUI() {
                 bidHeadline.className = "text-4xl md:text-5xl font-black mb-4 uppercase drop-shadow-lg text-emerald-300";
 
                 bidPriceCtn.classList.remove('hidden');
-                bidPrice.textContent = `${activePlayer.soldPrice} RC`;
+                bidPrice.innerHTML = `${activePlayer.soldPrice} <img src="assets/currency-logo.png" class="inline-block h-12 w-12 align-middle ml-2" alt="RPL">`;
                 bidPrice.classList.remove('text-red-400');
                 bidPrice.classList.add('text-emerald-400');
 
@@ -136,7 +136,7 @@ function renderAuctionUI() {
                     <i class="fas fa-search-plus text-gray-500 text-xs"></i>
                 </div>
                 <h4 class="font-bold text-lg text-gray-200 truncate">${t.name}</h4>
-                <p class="text-3xl font-mono font-black text-emerald-400 drop-shadow-md my-2">${t.purse} <span class="text-sm text-gray-400 uppercase">RC</span></p>
+                <p class="text-3xl font-mono font-black text-emerald-400 drop-shadow-md my-2">${t.purse} <img src="assets/currency-logo.png" class="inline-block h-6 w-6 align-middle ml-1" alt="RPL"></p>
                 <div class="flex justify-between text-xs text-gray-400 bg-gray-900 rounded p-2 mt-2">
                     <span title="Total Squad"><i class="fas fa-users mr-1"></i>${(t.players || []).length}</span>
                     <span title="Males" class="text-blue-300"><i class="fas fa-mars mr-1"></i>${t.maleCount || 0}</span>
@@ -199,7 +199,7 @@ window.showTeamSquad = function(index) {
     document.getElementById('modal-captain').querySelector('span').textContent = t.captain || 'TBD';
     document.getElementById('modal-vice-captain').querySelector('span').textContent = t.viceCaptain || 'TBD';
     document.getElementById('modal-squad-count').textContent = t.players.length;
-    document.getElementById('modal-purse').textContent = `${t.purse} RC`;
+    document.getElementById('modal-purse').innerHTML = `${t.purse} <img src="assets/currency-logo.png" class="inline-block h-6 w-6 align-middle ml-1" alt="RPL">`;
 
     // Player List
     playerList.innerHTML = '';
@@ -210,7 +210,7 @@ window.showTeamSquad = function(index) {
             playerList.innerHTML += `
                 <div class="bg-white/5 border border-white/5 p-3 rounded-xl flex justify-between items-center hover:bg-white/10 transition-colors">
                     <span class="font-bold text-gray-200">${p.name}</span>
-                    <span class="font-mono text-emerald-400 text-sm font-bold">${p.price} RC</span>
+                    <span class="font-mono text-emerald-400 text-sm font-bold">${p.price} <img src="assets/currency-logo.png" class="inline-block h-4 w-4 align-middle" alt="RPL"></span>
                 </div>
             `;
         });

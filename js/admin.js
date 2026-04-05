@@ -151,7 +151,7 @@ function renderAdminData() {
             btn.innerHTML = `
                 <div class="flex justify-between items-center pointer-events-none">
                     <span class="font-bold">${t.name}</span>
-                    <span class="text-xs ${isSelected ? 'text-blue-100' : 'text-gray-500'} font-mono">${t.purse} RC</span>
+                    <span class="text-xs ${isSelected ? 'text-blue-100' : 'text-gray-500'} font-mono">${t.purse} <img src="assets/currency-logo.png" class="inline-block h-3 w-3 align-middle" alt="RPL"></span>
                 </div>
             `;
             teamBtnCtn.appendChild(btn);
@@ -200,7 +200,7 @@ function renderAdminData() {
                     </div>
                     <div class="mt-2 p-2 bg-gray-900 rounded text-center">
                         <div class="text-sm text-gray-400">Purse</div>
-                        <div class="text-xl font-bold text-emerald-400 font-mono">${t.purse} RC</div>
+                        <div class="text-xl font-bold text-emerald-400 font-mono">${t.purse} <img src="assets/currency-logo.png" class="inline-block h-5 w-5 align-middle" alt="RPL"></div>
                     </div>
                     <div class="text-xs text-gray-500 mt-2 flex justify-between">
                         <span>Squad: ${(t.players || []).length}</span>
@@ -786,15 +786,15 @@ function updateBidPreview() {
             <div class="grid grid-cols-3 gap-2 text-center">
                 <div class="bg-black/30 rounded-lg p-2">
                     <div class="text-xs text-white/50 mb-1">Purse</div>
-                    <div class="text-base font-bold text-emerald-300 font-mono">${team.purse} RC</div>
+                    <div class="text-base font-bold text-emerald-300 font-mono">${team.purse} <img src="assets/currency-logo.png" class="inline-block h-4 w-4 align-middle" alt="RPL"></div>
                 </div>
                 <div class="bg-black/30 rounded-lg p-2">
                     <div class="text-xs text-white/50 mb-1">Bid</div>
-                    <div class="text-base font-bold ${isAffordable ? 'text-white' : 'text-red-400'} font-mono">${bidAmount > 0 ? bidAmount + ' RC' : '—'}</div>
+                    <div class="text-base font-bold ${isAffordable ? 'text-white' : 'text-red-400'} font-mono">${bidAmount > 0 ? bidAmount + ' <img src="assets/currency-logo.png" class="inline-block h-4 w-4 align-middle" alt="RPL">' : '—'}</div>
                 </div>
                 <div class="bg-black/30 rounded-lg p-2">
                     <div class="text-xs text-white/50 mb-1">Remaining</div>
-                    <div class="text-base font-bold ${remaining >= 0 ? 'text-emerald-300' : 'text-red-400'} font-mono">${bidAmount > 0 ? remaining + ' RC' : '—'}</div>
+                    <div class="text-base font-bold ${remaining >= 0 ? 'text-emerald-300' : 'text-red-400'} font-mono">${bidAmount > 0 ? remaining + ' <img src="assets/currency-logo.png" class="inline-block h-4 w-4 align-middle" alt="RPL">' : '—'}</div>
                 </div>
             </div>
         </div>
