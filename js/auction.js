@@ -72,7 +72,7 @@ function renderAuctionUI() {
             if (activePlayer.status === "Waiting") {
                 overlay.innerHTML = `<span class="bg-blue-600 border-2 border-blue-400 text-white shadow-[0_0_20px_rgba(37,99,235,0.6)] px-4 py-2 rounded-full text-xl font-bold uppercase tracking-wider backdrop-blur-sm">Accepting Bids</span>`;
 
-                if (s.auctionState.currentBid > activePlayer.basePrice) {
+                if (s.auctionState.selectedTeamIndex !== null && s.auctionState.selectedTeamIndex !== undefined) {
                     bidCardColors(bidBgAnim, 'bg-blue-600');
                     bidLabel.textContent = s.auctionState.leadingTeam ? `Current Bid from ${s.auctionState.leadingTeam}` : "Current Bid";
                     bidHeadline.textContent = "BID NOW!";
@@ -82,10 +82,10 @@ function renderAuctionUI() {
                     bidPrice.textContent = `${s.auctionState.currentBid} RC`;
                     bidPrice.className = "text-6xl text-blue-400 font-mono font-bold drop-shadow-xl";
                 } else {
-                    bidCardColors(bidBgAnim, 'bg-blue-600');
+                    bidCardColors(bidBgAnim, 'bg-gray-700');
                     bidLabel.textContent = "Current Status";
                     bidHeadline.textContent = "WAITING FOR BID";
-                    bidHeadline.className = "text-5xl font-black mb-4 uppercase drop-shadow-lg text-blue-300 animate-pulse";
+                    bidHeadline.className = "text-4xl md:text-5xl font-black mb-4 uppercase drop-shadow-lg text-gray-400";
                     bidPriceCtn.classList.add('hidden');
                 }
             }

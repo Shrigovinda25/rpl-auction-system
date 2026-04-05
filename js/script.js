@@ -47,12 +47,11 @@ const HARDCODED_PLAYERS = [
 const defaultState = {
   players: HARDCODED_PLAYERS,
   teams: [
-    { name: "Team 1", captain: "TBD", viceCaptain: "TBD", purse: 10000, players: [], maleCount: 0, femaleCount: 0 },
-    { name: "Team 2", captain: "TBD", viceCaptain: "TBD", purse: 10000, players: [], maleCount: 0, femaleCount: 0 },
-    { name: "Team 3", captain: "TBD", viceCaptain: "TBD", purse: 10000, players: [], maleCount: 0, femaleCount: 0 },
-    { name: "Team 4", captain: "TBD", viceCaptain: "TBD", purse: 10000, players: [], maleCount: 0, femaleCount: 0 }
+    { name: "Alpha", captain: "Shashank kurtakoti", viceCaptain: "Shrigovinda T Kulkarni", purse: 10000, players: [], maleCount: 0, femaleCount: 0 },
+    { name: "Beta", captain: "Priya H", viceCaptain: "Maitri M", purse: 10000, players: [], maleCount: 0, femaleCount: 0 },
+    { name: "Gamma", captain: "Aditya", viceCaptain: "Abhay Patil", purse: 10000, players: [], maleCount: 0, femaleCount: 0 }
   ],
-  auctionState: { isLive: false, currentPlayerIndex: 0, currentBid: 0, leadingTeam: null, selectedTeamIndex: 0, status: "Waiting" }
+  auctionState: { isLive: false, currentPlayerIndex: 0, currentBid: 0, leadingTeam: null, selectedTeamIndex: null, status: "Waiting" }
 };
 
 const defaultAuthConfig = {

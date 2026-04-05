@@ -85,7 +85,6 @@ function renderAdminData() {
     try {
         const s = getState();
         // Fallback for missing state property
-        if (s.auctionState.selectedTeamIndex === undefined) s.auctionState.selectedTeamIndex = 0;
         const selIdx = s.auctionState.selectedTeamIndex;
 
     // Status Badge
@@ -260,6 +259,17 @@ function setupEventListeners() {
         const state = getState();
         state.auctionState.selectedTeamIndex = idx;
         state.auctionState.leadingTeam = state.teams[idx]?.name || null;
+        
+        // If current bid is 0, start it at the player's base price when a team is first selected
+        if (state.auctionState.currentBid === 0) {
+            const player = state.players[state.auctionState.currentPlayerIndex];
+            if (player) {
+                state.auctionState.currentBid = player.basePrice;
+                const bidInp = document.getElementById('bid-amount');
+                if (bidInp) bidInp.value = player.basePrice;
+            }
+        }
+        
         saveState(state);
         updateBidPreview();
     });
@@ -385,6 +395,9 @@ function setupEventListeners() {
         }
 
         s.auctionState.status = "Waiting";
+        s.auctionState.selectedTeamIndex = null;
+        s.auctionState.leadingTeam = null;
+        s.auctionState.currentBid = 0;
         saveState(s);
     });
 
@@ -411,6 +424,9 @@ function setupEventListeners() {
                 s.auctionState.currentPlayerIndex++;
             }
             s.auctionState.status = s.players[s.auctionState.currentPlayerIndex].status;
+            s.auctionState.selectedTeamIndex = null;
+            s.auctionState.leadingTeam = null;
+            s.auctionState.currentBid = 0;
         } else {
             Swal.fire('Auctions over!', 'No more players in list', 'info');
         }
@@ -461,10 +477,14 @@ function setupEventListeners() {
 
         const bidInput = document.getElementById('bid-amount');
         const bidAmount = parseInt(bidInput.value);
-        const team = s.teams[s.auctionState.selectedTeamIndex || 0];
+        if (s.auctionState.selectedTeamIndex === null || s.auctionState.selectedTeamIndex === undefined) {
+            Swal.fire('No Team', 'Please select a team from the list first.', 'error');
+            return;
+        }
+        const team = s.teams[s.auctionState.selectedTeamIndex];
         
         if (!team) {
-            Swal.fire('No Team', 'Please select a team first.', 'error');
+            Swal.fire('No Team', 'Please select a valid team first.', 'error');
             return;
         }
 
@@ -561,7 +581,7 @@ function setupEventListeners() {
             confirmButtonText: 'Yes, reset everything!'
         }).then((result) => {
             if (result.isConfirmed) {
-                localStorage.removeItem(STORAGE_KEY);
+                window.resetState();
                 location.reload();
             }
         });
@@ -571,6 +591,7 @@ function setupEventListeners() {
     const exportBtn = document.getElementById('btn-export');
     if (exportBtn) {
         exportBtn.addEventListener('click', () => {
+            const s = getState();
             // Separate and sort by Gender
             const males = s.players.filter(p => p.gender === "Male");
             const females = s.players.filter(p => p.gender === "Female");
@@ -623,16 +644,27 @@ window.editTeam = async (index) => {
     const { value: formValues } = await Swal.fire({
         title: 'Edit Team details',
         html: `
-            <input id="swal-e-name" class="swal2-input" value="${t.name}">
-            <input id="swal-e-purse" type="number" class="swal2-input" value="${t.purse}">
+            <div class="space-y-2">
+                <input id="swal-e-name" class="swal2-input !mt-2" placeholder="Team Name" value="${t.name}">
+                <input id="swal-e-c" class="swal2-input !mt-2" placeholder="Captain" value="${t.captain}">
+                <input id="swal-e-vc" class="swal2-input !mt-2" placeholder="Vice Captain" value="${t.viceCaptain}">
+                <input id="swal-e-purse" type="number" class="swal2-input !mt-2" placeholder="Purse" value="${t.purse}">
+            </div>
         `,
         focusConfirm: false,
-        preConfirm: () => [document.getElementById('swal-e-name').value, parseInt(document.getElementById('swal-e-purse').value)]
+        preConfirm: () => [
+            document.getElementById('swal-e-name').value,
+            document.getElementById('swal-e-c').value,
+            document.getElementById('swal-e-vc').value,
+            parseInt(document.getElementById('swal-e-purse').value)
+        ]
     });
 
     if (formValues && formValues[0]) {
         t.name = formValues[0];
-        t.purse = formValues[1];
+        t.captain = formValues[1];
+        t.viceCaptain = formValues[2];
+        t.purse = formValues[3];
         saveState(s);
     }
 };
@@ -654,6 +686,7 @@ function autoAdvanceToNextPlayer(s) {
         s.auctionState.status = "Waiting";
         s.auctionState.currentBid = 0;
         s.auctionState.leadingTeam = null;
+        s.auctionState.selectedTeamIndex = null;
         // Reset bid input for next player
         const bidInput = document.getElementById('bid-amount');
         if (bidInput) {
