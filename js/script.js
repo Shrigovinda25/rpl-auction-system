@@ -61,11 +61,25 @@ const defaultAuthConfig = {
 let localCacheState = defaultState;
 let localAuthConfig = defaultAuthConfig;
 
+// Helper to sanitize state (Firebase doesn't store empty arrays)
+function normalizeState(s) {
+    if (!s) return defaultState;
+    if (!s.players) s.players = [];
+    if (!s.teams) s.teams = [];
+    s.teams.forEach(t => {
+        if (!t.players) t.players = [];
+        if (t.maleCount === undefined) t.maleCount = 0;
+        if (t.femaleCount === undefined) t.femaleCount = 0;
+    });
+    if (!s.auctionState) s.auctionState = defaultState.auctionState;
+    return s;
+}
+
 // Auction State Listener
 onValue(ref(db, STATE_PATH), (snapshot) => {
     const data = snapshot.val();
     if (data) {
-        localCacheState = data;
+        localCacheState = normalizeState(data);
         window.dispatchEvent(new Event('stateUpdated'));
     } else {
         saveState(defaultState);

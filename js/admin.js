@@ -203,8 +203,8 @@ function renderAdminData() {
                         <div class="text-xl font-bold text-emerald-400 font-mono">${t.purse} RC</div>
                     </div>
                     <div class="text-xs text-gray-500 mt-2 flex justify-between">
-                        <span>Squad: ${t.players.length}</span>
-                        <span>M:${t.maleCount} / F:${t.femaleCount}</span>
+                        <span>Squad: ${(t.players || []).length}</span>
+                        <span>M:${t.maleCount || 0} / F:${t.femaleCount || 0}</span>
                     </div>
                 </div>
             `;
@@ -501,9 +501,10 @@ function setupEventListeners() {
         
         // Deduct immediately
         team.purse -= bidAmount;
+        if (!team.players) team.players = [];
         team.players.push({ name: player.name, price: bidAmount });
-        if (player.gender === "Male") team.maleCount++;
-        if (player.gender === "Female") team.femaleCount++;
+        if (player.gender === "Male") team.maleCount = (team.maleCount || 0) + 1;
+        if (player.gender === "Female") team.femaleCount = (team.femaleCount || 0) + 1;
 
         player.status = "Selected";
         player.soldTo = team.name;

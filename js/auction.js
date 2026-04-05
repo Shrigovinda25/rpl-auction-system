@@ -138,9 +138,9 @@ function renderAuctionUI() {
                 <h4 class="font-bold text-lg text-gray-200 truncate">${t.name}</h4>
                 <p class="text-3xl font-mono font-black text-emerald-400 drop-shadow-md my-2">${t.purse} <span class="text-sm text-gray-400 uppercase">RC</span></p>
                 <div class="flex justify-between text-xs text-gray-400 bg-gray-900 rounded p-2 mt-2">
-                    <span title="Total Squad"><i class="fas fa-users mr-1"></i>${t.players.length}</span>
-                    <span title="Males" class="text-blue-300"><i class="fas fa-mars mr-1"></i>${t.maleCount}</span>
-                    <span title="Females" class="text-pink-300"><i class="fas fa-venus mr-1"></i>${t.femaleCount}</span>
+                    <span title="Total Squad"><i class="fas fa-users mr-1"></i>${(t.players || []).length}</span>
+                    <span title="Males" class="text-blue-300"><i class="fas fa-mars mr-1"></i>${t.maleCount || 0}</span>
+                    <span title="Females" class="text-pink-300"><i class="fas fa-venus mr-1"></i>${t.femaleCount || 0}</span>
                 </div>
             </div>
         `;
