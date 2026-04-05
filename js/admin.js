@@ -518,12 +518,12 @@ function setupEventListeners() {
 
         Swal.fire({
             title: 'SELECTED! 🎉',
-            html: `<b>${player.name}</b> selected for <b>${team.name}</b>. Advance in 3s...`,
+            html: `<b>${player.name}</b> selected for <b>${team.name}</b>. Advance in 2s...`,
             icon: 'success',
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 3000
+            timer: 2000
         });
 
         // Delay Advancement locally
@@ -532,7 +532,7 @@ function setupEventListeners() {
             const newState = getState();
             autoAdvanceToNextPlayer(newState);
             saveState(newState);
-        }, 3000);
+        }, 2000);
     });
 
     document.getElementById('btn-unsold').addEventListener('click', () => {
@@ -552,12 +552,12 @@ function setupEventListeners() {
 
         Swal.fire({
             title: 'Not Selected',
-            text: `${playerName} was not selected. Advance in 3s...`,
+            text: `${playerName} was not selected. Advance in 2s...`,
             icon: 'info',
             toast: true,
             position: 'top-end',
             showConfirmButton: false,
-            timer: 3000
+            timer: 2000
         });
 
         // Delay Advancement
@@ -566,7 +566,7 @@ function setupEventListeners() {
             const newState = getState();
             autoAdvanceToNextPlayer(newState);
             saveState(newState);
-        }, 3000);
+        }, 2000);
     });
 
     // Reset Global State
