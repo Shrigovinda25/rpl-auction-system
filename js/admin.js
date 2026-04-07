@@ -151,7 +151,7 @@ function renderAdminData() {
             btn.innerHTML = `
                 <div class="flex justify-between items-center pointer-events-none">
                     <div class="flex items-center gap-3">
-                        ${t.logo ? `<img src="${t.logo}" class="w-8 h-8 rounded-full border border-white/20 object-cover bg-white/10">` : `<div class="w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center text-[10px] font-black">${t.name.charAt(0)}</div>`}
+                        ${t.logo ? `<img src="${t.logo}" class="w-14 h-14 rounded-full border border-white/20 object-cover bg-white/10">` : `<div class="w-14 h-14 rounded-full bg-blue-600/20 flex items-center justify-center text-sm font-black">${t.name.charAt(0)}</div>`}
                         <span class="font-bold">${t.name}</span>
                     </div>
                     <span class="text-xs ${isSelected ? 'text-blue-100' : 'text-gray-500'} font-mono">${t.purse} RC</span>
@@ -196,7 +196,7 @@ function renderAdminData() {
                 <div class="bg-gray-800 p-4 rounded-xl border border-white/5 flex flex-col justify-between group hover:border-blue-500/30 transition-all shadow-lg">
                     <div class="flex gap-4 items-start mb-3">
                         <div class="flex-shrink-0 relative">
-                            ${t.logo ? `<img src="${t.logo}" class="w-12 h-12 rounded-xl border border-white/10 object-cover shadow-lg bg-white/5">` : `<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-white/10 flex items-center justify-center font-black text-blue-400">${t.name.charAt(0)}</div>`}
+                            ${t.logo ? `<img src="${t.logo}" class="w-20 h-20 rounded-xl border border-white/10 object-cover shadow-lg bg-white/5">` : `<div class="w-20 h-20 rounded-xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-white/10 flex items-center justify-center text-2xl font-black text-blue-400">${t.name.charAt(0)}</div>`}
                         </div>
                         <div class="flex-grow">
                             <h3 class="font-black text-sm flex justify-between items-center text-white uppercase tracking-tighter">
@@ -586,7 +586,6 @@ function setupEventListeners() {
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
-            confirmButtonColor: '#d33',
             cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, reset everything!'
         }).then((result) => {
@@ -788,7 +787,7 @@ function updateBidPreview() {
                 </span>
             </div>
             <div class="flex items-center gap-4 mb-3">
-                ${team.logo ? `<img src="${team.logo}" class="w-12 h-12 rounded-lg border border-white/20 object-cover shadow-lg bg-white/10">` : ''}
+                ${team.logo ? `<img src="${team.logo}" class="w-20 h-20 rounded-lg border border-white/20 object-cover shadow-lg bg-white/10">` : ''}
                 <div>
                     <h3 class="text-2xl font-black text-white drop-shadow-lg uppercase tracking-tighter leading-tight">${team.name}</h3>
                     <div class="flex gap-3 text-[10px] text-white/60">

@@ -96,6 +96,16 @@ function normalizeState(s) {
         if (!t.players) t.players = [];
         if (t.maleCount === undefined) t.maleCount = 0;
         if (t.femaleCount === undefined) t.femaleCount = 0;
+        // Ensure logos are preserved even if firebase state doesn't have them
+        // Foolproof logo preservation
+        const upperName = t.name.toUpperCase();
+        if (upperName.includes("ROBO")) {
+            t.logo = "assets/logos/robo_knights.jpeg";
+        } else if (upperName.includes("FLASHING")) {
+            t.logo = "assets/logos/flashing_bots.jpeg";
+        } else if (upperName.includes("TECH")) {
+            t.logo = "assets/logos/tech_titans.jpeg";
+        }
     });
     if (!s.auctionState) s.auctionState = defaultState.auctionState;
     return s;

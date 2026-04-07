@@ -77,7 +77,7 @@ function renderAuctionUI() {
                     bidCardColors(bidBgAnim, 'bg-blue-600');
                     bidLabel.innerHTML = `
                         <div class="flex items-center justify-center gap-2 mb-1">
-                            ${logoSrc ? `<img src="${logoSrc}" class="w-6 h-6 rounded-full border border-white/30 object-cover">` : ''}
+                            ${logoSrc ? `<img src="${logoSrc}" class="w-12 h-12 rounded-full border border-white/30 object-cover">` : ''}
                             <span>${s.auctionState.leadingTeam || "Current Bid"}</span>
                         </div>
                     `;
@@ -142,7 +142,7 @@ function renderAuctionUI() {
                     <i class="fas fa-search-plus text-gray-500 text-xs"></i>
                 </div>
                 <div class="flex items-center gap-3 mb-2">
-                    ${t.logo ? `<img src="${t.logo}" class="w-10 h-10 rounded-lg border border-white/10 object-cover shadow-md bg-white/5">` : `<div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center font-black text-emerald-400 border border-emerald-500/20">${t.name.charAt(0)}</div>`}
+                    ${t.logo ? `<img src="${t.logo}" class="w-16 h-16 rounded-xl border border-white/10 object-cover shadow-md bg-white/5">` : `<div class="w-16 h-16 rounded-xl bg-emerald-500/20 flex items-center justify-center font-black text-emerald-400 border border-emerald-500/20 text-xl">${t.name.charAt(0)}</div>`}
                     <h4 class="font-bold text-lg text-gray-200 truncate">${t.name}</h4>
                 </div>
                 <p class="text-3xl font-mono font-black text-emerald-400 drop-shadow-md my-1">${t.purse} <span class="text-sm text-gray-400 uppercase">RC</span></p>
@@ -206,10 +206,10 @@ window.showTeamSquad = function(index) {
     const iconEl = document.getElementById('modal-team-icon');
     if (t.logo) {
         iconEl.innerHTML = `<img src="${t.logo}" class="w-full h-full object-cover rounded-xl">`;
-        iconEl.className = "w-20 h-20 rounded-xl bg-white/10 p-1 shadow-2xl border border-white/20 overflow-hidden";
+        iconEl.className = "w-32 h-32 rounded-xl bg-white/10 p-1 shadow-2xl border border-white/20 overflow-hidden";
     } else {
         iconEl.textContent = t.name.charAt(0).toUpperCase();
-        iconEl.className = "w-20 h-20 rounded-xl bg-blue-600 flex items-center justify-center text-4xl font-black italic shadow-xl";
+        iconEl.className = "w-32 h-32 rounded-xl bg-blue-600 flex items-center justify-center text-6xl font-black italic shadow-xl";
     }
     document.getElementById('modal-team-name').textContent = t.name;
     document.getElementById('modal-captain').querySelector('span').textContent = t.captain || 'TBD';
