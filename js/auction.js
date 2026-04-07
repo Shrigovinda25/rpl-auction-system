@@ -73,8 +73,14 @@ function renderAuctionUI() {
                 overlay.innerHTML = `<span class="bg-blue-600 border-2 border-blue-400 text-white shadow-[0_0_20px_rgba(37,99,235,0.6)] px-4 py-2 rounded-full text-xl font-bold uppercase tracking-wider backdrop-blur-sm">Accepting Bids</span>`;
 
                 if (s.auctionState.selectedTeamIndex !== null && s.auctionState.selectedTeamIndex !== undefined) {
+                    const logoSrc = s.teams[s.auctionState.selectedTeamIndex]?.logo;
                     bidCardColors(bidBgAnim, 'bg-blue-600');
-                    bidLabel.textContent = s.auctionState.leadingTeam ? `Current Bid from ${s.auctionState.leadingTeam}` : "Current Bid";
+                    bidLabel.innerHTML = `
+                        <div class="flex items-center justify-center gap-2 mb-1">
+                            ${logoSrc ? `<img src="${logoSrc}" class="w-6 h-6 rounded-full border border-white/30 object-cover">` : ''}
+                            <span>${s.auctionState.leadingTeam || "Current Bid"}</span>
+                        </div>
+                    `;
                     bidHeadline.textContent = "BID NOW!";
                     bidHeadline.className = "text-4xl md:text-5xl font-black mb-4 uppercase drop-shadow-lg text-blue-300 animate-pulse";
                     
@@ -131,16 +137,19 @@ function renderAuctionUI() {
     tg.innerHTML = '';
     s.teams.forEach((t, i) => {
         tg.innerHTML += `
-            <div class="bg-gray-800 rounded-xl p-4 border-l-4 border-emerald-500 relative overflow-hidden cursor-pointer hover:bg-gray-700 transition-all hover:scale-[1.03] active:scale-95 group" onclick="showTeamSquad(${i})">
+            <div class="bg-gray-800 rounded-xl p-4 border-l-4 border-emerald-500 relative overflow-hidden cursor-pointer hover:bg-gray-700 transition-all hover:scale-[1.03] active:scale-95 group shadow-lg" onclick="showTeamSquad(${i})">
                 <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <i class="fas fa-search-plus text-gray-500 text-xs"></i>
                 </div>
-                <h4 class="font-bold text-lg text-gray-200 truncate">${t.name}</h4>
-                <p class="text-3xl font-mono font-black text-emerald-400 drop-shadow-md my-2">${t.purse} <span class="text-sm text-gray-400 uppercase">RC</span></p>
-                <div class="flex justify-between text-xs text-gray-400 bg-gray-900 rounded p-2 mt-2">
+                <div class="flex items-center gap-3 mb-2">
+                    ${t.logo ? `<img src="${t.logo}" class="w-10 h-10 rounded-lg border border-white/10 object-cover shadow-md bg-white/5">` : `<div class="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center font-black text-emerald-400 border border-emerald-500/20">${t.name.charAt(0)}</div>`}
+                    <h4 class="font-bold text-lg text-gray-200 truncate">${t.name}</h4>
+                </div>
+                <p class="text-3xl font-mono font-black text-emerald-400 drop-shadow-md my-1">${t.purse} <span class="text-sm text-gray-400 uppercase">RC</span></p>
+                <div class="flex justify-between text-[10px] text-gray-400 bg-gray-900/50 rounded-lg p-2 mt-2 border border-white/5">
                     <span title="Total Squad"><i class="fas fa-users mr-1"></i>${(t.players || []).length}</span>
-                    <span title="Males" class="text-blue-300"><i class="fas fa-mars mr-1"></i>${t.maleCount || 0}</span>
-                    <span title="Females" class="text-pink-300"><i class="fas fa-venus mr-1"></i>${t.femaleCount || 0}</span>
+                    <span title="Males" class="text-blue-400/80"><i class="fas fa-mars mr-1"></i>${t.maleCount || 0}</span>
+                    <span title="Females" class="text-pink-400/80"><i class="fas fa-venus mr-1"></i>${t.femaleCount || 0}</span>
                 </div>
             </div>
         `;
@@ -194,7 +203,14 @@ window.showTeamSquad = function(index) {
     const playerList = document.getElementById('modal-player-list');
     
     // Header Info
-    document.getElementById('modal-team-icon').textContent = t.name.charAt(0).toUpperCase();
+    const iconEl = document.getElementById('modal-team-icon');
+    if (t.logo) {
+        iconEl.innerHTML = `<img src="${t.logo}" class="w-full h-full object-cover rounded-xl">`;
+        iconEl.className = "w-20 h-20 rounded-xl bg-white/10 p-1 shadow-2xl border border-white/20 overflow-hidden";
+    } else {
+        iconEl.textContent = t.name.charAt(0).toUpperCase();
+        iconEl.className = "w-20 h-20 rounded-xl bg-blue-600 flex items-center justify-center text-4xl font-black italic shadow-xl";
+    }
     document.getElementById('modal-team-name').textContent = t.name;
     document.getElementById('modal-captain').querySelector('span').textContent = t.captain || 'TBD';
     document.getElementById('modal-vice-captain').querySelector('span').textContent = t.viceCaptain || 'TBD';

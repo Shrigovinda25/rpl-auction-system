@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Player Strategy Portal - RPL Auction</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        cardBg: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body class="bg-darkBg text-blue-100 min-h-screen custom-scrollbar">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 glass border-b border-white/5 py-4 px-6 md:px-12 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center font-black italic shadow-lg shadow-blue-600/30">R</div>
+            <h1 class="text-2xl font-black uppercase tracking-tighter text-white">Strategy <span class="text-blue-500">Portal</span></h1>
+        </div>
+        <div class="flex gap-4">
+            <a href="admin.html" class="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-white transition">Admin</a>
+            <a href="auction.html" class="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-white transition">Live Auction</a>
+        </div>
+    </nav>
+
+    <!-- Header & Filter -->
+    <header class="max-w-7xl mx-auto px-6 py-12 text-center relative">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full"></div>
+        <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter mb-4 relative z-10">Scout the <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Elite</span></h2>
+        <p class="text-gray-400 max-w-2xl mx-auto mb-10 font-medium">Analyze player profiles, achievements, and statistics to build your ultimate franchise. All data is synchronized with the live pool.</p>
+        
+        <div class="max-w-xl mx-auto relative z-10 group">
+            <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors"></i>
+            <input type="text" id="player-search" placeholder="Search by name, sport, or role..." 
+            class="w-full bg-black/40 border border-white/10 rounded-2xl py-5 pl-14 pr-6 focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all font-medium text-white placeholder:text-gray-600 shadow-2xl">
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 pb-24 space-y-20">
+        <!-- Female Section -->
+        <section class="space-y-8">
+            <div class="flex items-center gap-4 border-l-4 border-pink-500 pl-4 py-2">
+                <h3 class="text-2xl font-black text-white uppercase tracking-wider">Elite Female Athletes</h3>
+                <span id="female-count" class="text-xs font-bold bg-pink-500/10 text-pink-400 px-3 py-1 rounded-full border border-pink-500/20">0 SCOUTED</span>
+            </div>
+            
+            <div class="overflow-x-auto rounded-3xl border border-white/5 shadow-2xl bg-black/20">
+                <table class="w-full text-left border-collapse min-w-[800px]">
+                    <thead class="bg-white/5">
+                        <tr>
+                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Athlete Profile</th>
+                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">Disciplines</th>
+                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">Base Price</th>
+                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Scouting Report</th>
+                        </tr>
+                    </thead>
+                    <tbody id="female-table" class="divide-y divide-white/5">
+                        <!-- Dynamic Injection -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Male Section -->
+        <section class="space-y-8">
+            <div class="flex items-center gap-4 border-l-4 border-blue-500 pl-4 py-2">
+                <h3 class="text-2xl font-black text-white uppercase tracking-wider">Elite Male Athletes</h3>
+                <span id="male-count" class="text-xs font-bold bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20">0 SCOUTED</span>
+            </div>
+            
+            <div class="overflow-x-auto rounded-3xl border border-white/5 shadow-2xl bg-black/20">
+                <table class="w-full text-left border-collapse min-w-[800px]">
+                    <thead class="bg-white/5">
+                        <tr>
+                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Athlete Profile</th>
+                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">Disciplines</th>
+                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">Base Price</th>
+                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Scouting Report</th>
+                        </tr>
+                    </thead>
+                    <tbody id="male-table" class="divide-y divide-white/5">
+                        <!-- Dynamic Injection -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-gray-600">
+        <p class="text-xs font-black uppercase tracking-widest">RPL Auction 2026 • Strategy Portal</p>
+    </footer>
+
+    <!-- JS Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Reuse config for live updates
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnJ0KWlqwdYhuR2g4nvLheQxc56r6tk1g",
+            authDomain: "rpl-auction-abf32.firebaseapp.com",
+            projectId: "rpl-auction-abf32",
+            storageBucket: "rpl-auction-abf32.firebasestorage.app",
+            messagingSenderId: "786517772604",
+            appId: "1:786517772604:web:35a665273ecdb93682b639",
+            databaseURL: "https://rpl-auction-abf32-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        let players = [];
+        let initialShuffleDone = false;
+        let femaleOrder = [];
+        let maleOrder = [];
+
+        // Fisher-Yates shuffle
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // Data Management
+        onValue(ref(db, 'rpl_auction/state'), (snapshot) => {
+            const data = snapshot.val();
+            if (data && data.players) {
+                players = data.players;
+                
+                if (!initialShuffleDone) {
+                    femaleOrder = players.filter(p => p.gender === 'Female').map(p => p.name);
+                    maleOrder = players.filter(p => p.gender === 'Male').map(p => p.name);
+                    shuffleArray(femaleOrder);
+                    shuffleArray(maleOrder);
+                    initialShuffleDone = true;
+                }
+                
+                render();
+            }
+        });
+
+        // Search Logic
+        const searchInput = document.getElementById('player-search');
+        searchInput.addEventListener('input', render);
+
+        function render() {
+            const query = searchInput.value.toLowerCase();
+            const filtered = players.filter(p => 
+                p.name.toLowerCase().includes(query) || 
+                (Array.isArray(p.sport) ? p.sport.join(' ') : p.sport).toLowerCase().includes(query) ||
+                (p.achievements || '').toLowerCase().includes(query)
+            );
+
+            const femaleTable = document.getElementById('female-table');
+            const maleTable = document.getElementById('male-table');
+            
+            // Apply the shuffled order to the filtered results so they don't jump around
+            const femalePlayers = filtered.filter(p => p.gender === 'Female')
+                .sort((a,b) => femaleOrder.indexOf(a.name) - femaleOrder.indexOf(b.name));
+            const malePlayers = filtered.filter(p => p.gender === 'Male')
+                .sort((a,b) => maleOrder.indexOf(a.name) - maleOrder.indexOf(b.name));
+
+            femaleTable.innerHTML = femalePlayers.map(p => createRow(p, 'pink')).join('');
+            maleTable.innerHTML = malePlayers.map(p => createRow(p, 'blue')).join('');
+
+            document.getElementById('female-count').textContent = `${femalePlayers.length} SCOUTED`;
+            document.getElementById('male-count').textContent = `${malePlayers.length} SCOUTED`;
+        }
+
+        function createRow(p, accent) {
+            const avatar = p.image ? 
+                `<img src="${p.image}" class="w-10 h-10 rounded-full border border-white/10 object-cover bg-white/5 shadow-lg">` : 
+                `<div class="w-10 h-10 rounded-full bg-${accent}-500/20 border border-${accent}-500/20 flex items-center justify-center font-black text-${accent}-400 text-xs shadow-inner">${p.name.charAt(0)}</div>`;
+            
+            const sports = (Array.isArray(p.sport) ? p.sport : [p.sport])
+                .map(s => `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-${accent}-500/10 text-${accent}-300/80 border border-${accent}-500/20 uppercase tracking-tighter whitespace-nowrap">${s}</span>`)
+                .join('');
+
+            return `
+                <tr class="hover:bg-white/[0.02] transition-colors group">
+                    <td class="px-6 py-5">
+                        <div class="flex items-center gap-4">
+                            ${avatar}
+                            <div class="font-black text-white text-sm uppercase tracking-tighter">${p.name}</div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-5">
+                        <div class="flex flex-wrap justify-center gap-1.5 max-w-[200px] mx-auto">
+                            ${sports}
+                        </div>
+                    </td>
+                    <td class="px-6 py-5 text-center">
+                        <div class="font-mono text-sm font-bold text-white">${p.basePrice} <span class="text-blue-500 text-[10px] opacity-60">RC</span></div>
+                    </td>
+                    <td class="px-6 py-5 max-w-sm">
+                        <div class="text-xs text-gray-400 font-medium leading-relaxed italic group-hover:text-gray-300 transition-colors">
+                            ${p.achievements || 'No special report available.'}
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    </script>
+</body>
+
+</html>

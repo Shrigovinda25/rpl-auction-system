@@ -150,7 +150,10 @@ function renderAdminData() {
             btn.dataset.index = i; // For event delegation
             btn.innerHTML = `
                 <div class="flex justify-between items-center pointer-events-none">
-                    <span class="font-bold">${t.name}</span>
+                    <div class="flex items-center gap-3">
+                        ${t.logo ? `<img src="${t.logo}" class="w-8 h-8 rounded-full border border-white/20 object-cover bg-white/10">` : `<div class="w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center text-[10px] font-black">${t.name.charAt(0)}</div>`}
+                        <span class="font-bold">${t.name}</span>
+                    </div>
                     <span class="text-xs ${isSelected ? 'text-blue-100' : 'text-gray-500'} font-mono">${t.purse} RC</span>
                 </div>
             `;
@@ -190,13 +193,19 @@ function renderAdminData() {
         tGrid.innerHTML = '';
         s.teams.forEach((t, i) => {
             tGrid.innerHTML += `
-                <div class="bg-gray-800 p-4 rounded border border-gray-700 flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-lg flex justify-between items-center text-purple-300">
-                            ${t.name}
-                            <button onclick="editTeam(${i})" class="text-gray-400 hover:text-white"><i class="fas fa-edit text-xs"></i></button>
-                        </h3>
-                        <p class="text-xs text-gray-400 mb-2">C: ${t.captain} | VC: ${t.viceCaptain}</p>
+                <div class="bg-gray-800 p-4 rounded-xl border border-white/5 flex flex-col justify-between group hover:border-blue-500/30 transition-all shadow-lg">
+                    <div class="flex gap-4 items-start mb-3">
+                        <div class="flex-shrink-0 relative">
+                            ${t.logo ? `<img src="${t.logo}" class="w-12 h-12 rounded-xl border border-white/10 object-cover shadow-lg bg-white/5">` : `<div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600/20 to-purple-600/20 border border-white/10 flex items-center justify-center font-black text-blue-400">${t.name.charAt(0)}</div>`}
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-black text-sm flex justify-between items-center text-white uppercase tracking-tighter">
+                                ${t.name}
+                                <button onclick="editTeam(${i})" class="text-gray-500 hover:text-blue-400 transition-colors"><i class="fas fa-edit text-[10px]"></i></button>
+                            </h3>
+                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mt-0.5">C: ${t.captain}</p>
+                            <p class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">VC: ${t.viceCaptain}</p>
+                        </div>
                     </div>
                     <div class="mt-2 p-2 bg-gray-900 rounded text-center">
                         <div class="text-sm text-gray-400">Purse</div>
@@ -375,7 +384,7 @@ function setupEventListeners() {
         if (formValues && formValues[0]) {
             const state = getState();
             state.teams.push({
-                name: formValues[0], captain: formValues[1] || 'TBD', viceCaptain: formValues[2] || 'TBD',
+                name: formValues[0].toUpperCase(), captain: formValues[1] || 'TBD', viceCaptain: formValues[2] || 'TBD',
                 purse: formValues[3] || 10000, players: [], maleCount: 0, femaleCount: 0
             });
             saveState(state);
@@ -708,7 +717,7 @@ window.editTeam = async (index) => {
     });
 
     if (formValues && formValues[0]) {
-        t.name = formValues[0];
+        t.name = formValues[0].toUpperCase();
         t.captain = formValues[1];
         t.viceCaptain = formValues[2];
         t.purse = formValues[3];
@@ -778,10 +787,15 @@ function updateBidPreview() {
                     ${isAffordable ? '✓ Affordable' : (bidAmount > 0 ? '✗ Over Budget' : 'Enter Amount')}
                 </span>
             </div>
-            <h3 class="text-xl font-black text-white drop-shadow mb-1">${team.name}</h3>
-            <div class="flex gap-3 text-xs text-white/70 mb-3">
-                <span><i class="fas fa-crown text-yellow-400 mr-1"></i>Captain: <b class="text-white">${team.captain}</b></span>
-                <span><i class="fas fa-star text-blue-300 mr-1"></i>Vice-Captain: <b class="text-white">${team.viceCaptain}</b></span>
+            <div class="flex items-center gap-4 mb-3">
+                ${team.logo ? `<img src="${team.logo}" class="w-12 h-12 rounded-lg border border-white/20 object-cover shadow-lg bg-white/10">` : ''}
+                <div>
+                    <h3 class="text-2xl font-black text-white drop-shadow-lg uppercase tracking-tighter leading-tight">${team.name}</h3>
+                    <div class="flex gap-3 text-[10px] text-white/60">
+                        <span><i class="fas fa-crown text-yellow-400 mr-1"></i>${team.captain}</span>
+                        <span><i class="fas fa-star text-blue-300 mr-1"></i>${team.viceCaptain}</span>
+                    </div>
+                </div>
             </div>
             <div class="grid grid-cols-3 gap-2 text-center">
                 <div class="bg-black/30 rounded-lg p-2">
