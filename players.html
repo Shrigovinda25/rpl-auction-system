@@ -59,8 +59,8 @@
     <!-- Header & Filter -->
     <header class="max-w-7xl mx-auto px-6 py-12 text-center relative">
         <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 bg-blue-600/10 blur-[100px] rounded-full"></div>
-        <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter mb-4 relative z-10">Scout the <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Elite</span></h2>
-        <p class="text-gray-400 max-w-2xl mx-auto mb-10 font-medium">Analyze player profiles, achievements, and statistics to build your ultimate franchise. All data is synchronized with the live pool.</p>
+        <h2 class="text-4xl md:text-6xl font-black text-white uppercase tracking-tighter mb-4 relative z-10">Final <span class="bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Squads</span></h2>
+        <p class="text-gray-400 max-w-2xl mx-auto mb-10 font-medium">View the final squad compositions, player acquisitions, and sold prices from the RPL Auction.</p>
         
         <div class="max-w-xl mx-auto relative z-10 group">
             <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-blue-400 transition-colors"></i>
@@ -69,54 +69,8 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-6 pb-24 space-y-20">
-        <!-- Female Section -->
-        <section class="space-y-8">
-            <div class="flex items-center gap-4 border-l-4 border-pink-500 pl-4 py-2">
-                <h3 class="text-2xl font-black text-white uppercase tracking-wider">Elite Female Athletes</h3>
-                <span id="female-count" class="text-xs font-bold bg-pink-500/10 text-pink-400 px-3 py-1 rounded-full border border-pink-500/20">0 SCOUTED</span>
-            </div>
-            
-            <div class="overflow-x-auto rounded-3xl border border-white/5 shadow-2xl bg-black/20">
-                <table class="w-full text-left border-collapse min-w-[800px]">
-                    <thead class="bg-white/5">
-                        <tr>
-                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Athlete Profile</th>
-                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">Disciplines</th>
-                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">Base Price</th>
-                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Scouting Report</th>
-                        </tr>
-                    </thead>
-                    <tbody id="female-table" class="divide-y divide-white/5">
-                        <!-- Dynamic Injection -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <!-- Male Section -->
-        <section class="space-y-8">
-            <div class="flex items-center gap-4 border-l-4 border-blue-500 pl-4 py-2">
-                <h3 class="text-2xl font-black text-white uppercase tracking-wider">Elite Male Athletes</h3>
-                <span id="male-count" class="text-xs font-bold bg-blue-500/10 text-blue-400 px-3 py-1 rounded-full border border-blue-500/20">0 SCOUTED</span>
-            </div>
-            
-            <div class="overflow-x-auto rounded-3xl border border-white/5 shadow-2xl bg-black/20">
-                <table class="w-full text-left border-collapse min-w-[800px]">
-                    <thead class="bg-white/5">
-                        <tr>
-                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Athlete Profile</th>
-                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">Disciplines</th>
-                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center">Base Price</th>
-                            <th class="px-6 py-5 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Scouting Report</th>
-                        </tr>
-                    </thead>
-                    <tbody id="male-table" class="divide-y divide-white/5">
-                        <!-- Dynamic Injection -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+    <main id="main-container" class="max-w-7xl mx-auto px-6 pb-24 space-y-20">
+        <!-- Dynamic content injected here -->
     </main>
 
     <footer class="py-12 border-t border-white/5 text-center text-gray-600">
@@ -124,53 +78,50 @@
     </footer>
 
     <!-- JS Logic -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-        // Reuse config for live updates
-        const firebaseConfig = {
-            apiKey: "AIzaSyDnJ0KWlqwdYhuR2g4nvLheQxc56r6tk1g",
-            authDomain: "rpl-auction-abf32.firebaseapp.com",
-            projectId: "rpl-auction-abf32",
-            storageBucket: "rpl-auction-abf32.firebasestorage.app",
-            messagingSenderId: "786517772604",
-            appId: "1:786517772604:web:35a665273ecdb93682b639",
-            databaseURL: "https://rpl-auction-abf32-default-rtdb.asia-southeast1.firebasedatabase.app/"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script>
         let players = [];
-        let initialShuffleDone = false;
-        let femaleOrder = [];
-        let maleOrder = [];
 
-        // Fisher-Yates shuffle
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+        // Fetch and parse the CSV
+        fetch('RPL Auction Result.csv')
+            .then(response => response.text())
+            .then(csvText => {
+                Papa.parse(csvText, {
+                    complete: function (results) {
+                        const rows = results.data;
+                        const playersData = [];
+                        for (const row of rows) {
+                            // Basic validation to skip headers, sections, and empty rows
+                            if (row.length >= 7 && row[0] !== 'SECTION' && row[0] !== 'Player Name' && row[0] !== '' && !row[0].startsWith('Total') && !row[0].startsWith('Export') && !row[0].startsWith('OVERALL')) {
+                                playersData.push({
+                                    name: row[0],
+                                    sport: row[1].split(';').map(s => s.trim()),
+                                    gender: row[2],
+                                    basePrice: row[3],
+                                    soldPrice: row[4],
+                                    team: row[5],
+                                    status: row[6]
+                                });
+                            }
+                        }
+                        const predefinedCaptains = [
+                            { name: "Akshay Sandur (Captain)", sport: ["Cricket"], gender: "Male", basePrice: "-", soldPrice: "Retained", team: "ROBO KNIGHTS", status: "Selected" },
+                            { name: "Shashank Kurtakoti (Vice Captain)", sport: ["Cricket"], gender: "Male", basePrice: "-", soldPrice: "Retained", team: "ROBO KNIGHTS", status: "Selected" },
+                            { name: "Priya Hunswadkar (Captain)", sport: ["Cricket", "Tug of War", "Volleyball", "Batminton"], gender: "Female", basePrice: "-", soldPrice: "Retained", team: "FLASHING BOTS 🤖", status: "Selected" },
+                            { name: "Ayush Marigoudar (Vice Captain)", sport: ["Cricket", "Tug of War"], gender: "Male", basePrice: "-", soldPrice: "Retained", team: "FLASHING BOTS 🤖", status: "Selected" },
+                            { name: "Aditya B (Captain)", sport: ["Cricket", "Volleyball", "Batminton"], gender: "Male", basePrice: "-", soldPrice: "Retained", team: "TECH TITANS 🤖", status: "Selected" },
+                            { name: "Abhay Patil (Vice Captain)", sport: ["Cricket", "Volleyball", "Tug of War"], gender: "Male", basePrice: "-", soldPrice: "Retained", team: "TECH TITANS 🤖", status: "Selected" }
+                        ];
 
-        // Data Management
-        onValue(ref(db, 'rpl_auction/state'), (snapshot) => {
-            const data = snapshot.val();
-            if (data && data.players) {
-                players = data.players;
-                
-                if (!initialShuffleDone) {
-                    femaleOrder = players.filter(p => p.gender === 'Female').map(p => p.name);
-                    maleOrder = players.filter(p => p.gender === 'Male').map(p => p.name);
-                    shuffleArray(femaleOrder);
-                    shuffleArray(maleOrder);
-                    initialShuffleDone = true;
-                }
-                
-                render();
-            }
-        });
+                        players = [...predefinedCaptains, ...playersData];
+                        render();
+                    }
+                });
+            })
+            .catch(err => {
+                console.error("Failed to load CSV:", err);
+                document.getElementById('main-container').innerHTML = '<div class="text-center text-red-500 font-bold py-12">Failed to load auction results data. Please ensure "RPL Auction Result.csv" exists.</div>';
+            });
 
         // Search Logic
         const searchInput = document.getElementById('player-search');
@@ -180,55 +131,123 @@
             const query = searchInput.value.toLowerCase();
             const filtered = players.filter(p => 
                 p.name.toLowerCase().includes(query) || 
-                (Array.isArray(p.sport) ? p.sport.join(' ') : p.sport).toLowerCase().includes(query) ||
-                (p.achievements || '').toLowerCase().includes(query)
+                p.sport.join(' ').toLowerCase().includes(query) ||
+                p.team.toLowerCase().includes(query)
             );
 
-            const femaleTable = document.getElementById('female-table');
-            const maleTable = document.getElementById('male-table');
+            // Group by team
+            const teamsMap = {};
+            filtered.forEach(p => {
+                if(p.status === 'Selected') {
+                    if(!teamsMap[p.team]) teamsMap[p.team] = [];
+                    teamsMap[p.team].push(p);
+                }
+            });
+
+            // sort teams alphabetically
+            const teams = Object.keys(teamsMap).sort();
+
+            const container = document.getElementById('main-container');
+            container.innerHTML = '';
+
+            teams.forEach(team => {
+                const teamPlayers = teamsMap[team];
+                const males = teamPlayers.filter(p => p.gender === 'Male');
+                const females = teamPlayers.filter(p => p.gender === 'Female');
+
+                const totalSpend = teamPlayers.reduce((sum, p) => sum + (parseInt(p.soldPrice) || 0), 0);
+
+                const sectionHTML = `
+                <section class="space-y-8 bg-white/[0.02] p-8 rounded-3xl border border-white/10 mb-16 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 blur-[100px] rounded-full pointer-events-none"></div>
+                    <div class="border-b border-white/10 pb-6 mb-8 flex flex-col md:flex-row gap-4 justify-between md:items-center">
+                        <h2 class="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">${team}</h2>
+                        <div class="flex gap-3 flex-wrap">
+                            <span class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
+                                <i class="fas fa-users"></i> ${teamPlayers.length} ATHLETES
+                            </span>
+                            <span class="bg-green-500/20 text-green-300 border border-green-500/30 px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
+                                <i class="fas fa-coins"></i> ${totalSpend} RC TOTAL
+                            </span>
+                        </div>
+                    </div>
+
+                    ${renderGenderSection('Female', females, 'pink')}
+                    ${renderGenderSection('Male', males, 'blue')}
+                </section>
+                `;
+                container.insertAdjacentHTML('beforeend', sectionHTML);
+            });
             
-            // Apply the shuffled order to the filtered results so they don't jump around
-            const femalePlayers = filtered.filter(p => p.gender === 'Female')
-                .sort((a,b) => femaleOrder.indexOf(a.name) - femaleOrder.indexOf(b.name));
-            const malePlayers = filtered.filter(p => p.gender === 'Male')
-                .sort((a,b) => maleOrder.indexOf(a.name) - maleOrder.indexOf(b.name));
+            if(teams.length === 0) {
+               container.innerHTML = `<div class="text-center text-gray-500 font-bold py-12">NO RESULTS FOUND</div>`;
+            }
+        }
 
-            femaleTable.innerHTML = femalePlayers.map(p => createRow(p, 'pink')).join('');
-            maleTable.innerHTML = malePlayers.map(p => createRow(p, 'blue')).join('');
+        function renderGenderSection(gender, genderPlayers, accent) {
+            if(genderPlayers.length === 0) return '';
+            
+            // Sort by sold price (descending). 'Retained' players stay at top.
+            genderPlayers.sort((a, b) => {
+                const priceA = a.soldPrice === 'Retained' ? Infinity : (parseInt(a.soldPrice) || 0);
+                const priceB = b.soldPrice === 'Retained' ? Infinity : (parseInt(b.soldPrice) || 0);
+                return priceB - priceA;
+            });
 
-            document.getElementById('female-count').textContent = `${femalePlayers.length} SCOUTED`;
-            document.getElementById('male-count').textContent = `${malePlayers.length} SCOUTED`;
+            const rows = genderPlayers.map(p => createRow(p, accent)).join('');
+            
+            return `
+            <div class="space-y-4 mb-8">
+                <div class="flex items-center gap-4 border-l-4 border-${accent}-500 pl-4 py-2">
+                    <h3 class="text-xl font-black text-white uppercase tracking-wider">${gender} Squad</h3>
+                    <span class="text-xs font-bold bg-${accent}-500/10 text-${accent}-400 px-3 py-1 rounded-full border border-${accent}-500/20">${genderPlayers.length} PLAYERS</span>
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-white/5 shadow-xl bg-black/40">
+                    <table class="w-full text-left border-collapse min-w-[800px]">
+                        <thead class="bg-white/5">
+                            <tr>
+                                <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 w-1/4">Athlete Profile</th>
+                                <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center w-1/3">Disciplines</th>
+                                <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 text-center w-1/6">Base Price</th>
+                                <th class="px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] text-green-500 text-center w-1/6">Sold Price</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            `;
         }
 
         function createRow(p, accent) {
-            const avatar = p.image ? 
-                `<img src="${p.image}" class="w-10 h-10 rounded-full border border-white/10 object-cover bg-white/5 shadow-lg">` : 
-                `<div class="w-10 h-10 rounded-full bg-${accent}-500/20 border border-${accent}-500/20 flex items-center justify-center font-black text-${accent}-400 text-xs shadow-inner">${p.name.charAt(0)}</div>`;
+            const avatar = `<div class="w-10 h-10 rounded-full bg-${accent}-500/20 border border-${accent}-500/20 flex items-center justify-center font-black text-${accent}-400 text-xs shadow-inner flex-shrink-0">${p.name.charAt(0).toUpperCase()}</div>`;
             
-            const sports = (Array.isArray(p.sport) ? p.sport : [p.sport])
-                .map(s => `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-${accent}-500/10 text-${accent}-300/80 border border-${accent}-500/20 uppercase tracking-tighter whitespace-nowrap">${s}</span>`)
-                .join('');
+            const sports = p.sport.map(s => `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-white/5 text-gray-300 border border-white/10 uppercase tracking-tighter whitespace-nowrap">${s}</span>`).join('');
+
+            const isRetained = p.soldPrice === 'Retained';
+            const basePriceDisplay = p.basePrice === '-' ? '<span class="opacity-50">-</span>' : `${p.basePrice} <span class="text-blue-500/60 text-[10px]">RC</span>`;
+            const soldPriceDisplay = isRetained ? `<span class="text-yellow-400 font-bold uppercase tracking-widest text-xs">${p.soldPrice}</span>` : `${p.soldPrice} <span class="text-green-500/60 text-[10px]">RC</span>`;
 
             return `
-                <tr class="hover:bg-white/[0.02] transition-colors group">
-                    <td class="px-6 py-5">
+                <tr class="hover:bg-white/[0.04] transition-colors group">
+                    <td class="px-6 py-4">
                         <div class="flex items-center gap-4">
                             ${avatar}
-                            <div class="font-black text-white text-sm uppercase tracking-tighter">${p.name}</div>
+                            <div class="font-black ${isRetained ? 'text-yellow-100' : 'text-white'} text-sm uppercase tracking-tighter truncate" title="${p.name}">${p.name}</div>
                         </div>
                     </td>
-                    <td class="px-6 py-5">
-                        <div class="flex flex-wrap justify-center gap-1.5 max-w-[200px] mx-auto">
+                    <td class="px-6 py-4">
+                        <div class="flex flex-wrap justify-center gap-1.5 max-w-sm mx-auto">
                             ${sports}
                         </div>
                     </td>
-                    <td class="px-6 py-5 text-center">
-                        <div class="font-mono text-sm font-bold text-white">${p.basePrice} <span class="text-blue-500 text-[10px] opacity-60">RC</span></div>
+                    <td class="px-6 py-4 text-center">
+                        <div class="font-mono text-sm font-bold text-gray-400">${basePriceDisplay}</div>
                     </td>
-                    <td class="px-6 py-5 max-w-sm">
-                        <div class="text-xs text-gray-400 font-medium leading-relaxed italic group-hover:text-gray-300 transition-colors">
-                            ${p.achievements || 'No special report available.'}
-                        </div>
+                    <td class="px-6 py-4 text-center">
+                        <div class="font-mono text-sm font-black text-green-400">${soldPriceDisplay}</div>
                     </td>
                 </tr>
             `;

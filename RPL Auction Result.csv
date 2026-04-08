@@ -1,0 +1,73 @@
+SECTION,MALE PLAYERS
+Player Name,Sport,Gender,Base Price,Sold Price,Team,Status
+"Navdeep patil","Cricket; Volleyball","Male",100,350,"ROBO KNIGHTS","Selected"
+"Daksh Tiwari","Cricket; Tug of War","Male",100,300,"TECH TITANS 🤖","Selected"
+"Hitarth Panchal","Cricket; Volleyball; Batminton; Tug of War","Male",100,200,"ROBO KNIGHTS","Selected"
+"VINAYAK S NAREGAL","Cricket; Volleyball","Male",100,100,"TECH TITANS 🤖","Selected"
+"Ravindra Jainar","Cricket","Male",100,100,"ROBO KNIGHTS","Selected"
+"Chinmay Patil","Cricket; Volleyball; Batminton","Male",100,1200,"TECH TITANS 🤖","Selected"
+"Vijay Kumar B","Cricket; Volleyball","Male",100,300,"ROBO KNIGHTS","Selected"
+"Tanmay Hiremath","Cricket; Batminton","Male",100,1500,"ROBO KNIGHTS","Selected"
+"Anup Wadekar","Cricket; Volleyball; Tug of War","Male",100,1100,"FLASHING BOTS 🤖","Selected"
+"Fairoz","Cricket; Volleyball","Male",100,800,"TECH TITANS 🤖","Selected"
+"Malik Nadaf","Cricket","Male",100,100,"FLASHING BOTS 🤖","Selected"
+"Harsh Kampli","Cricket; Batminton; Tug of War","Male",100,300,"TECH TITANS 🤖","Selected"
+"Ishwar Sarawad","Cricket; Volleyball; Batminton","Male",100,300,"ROBO KNIGHTS","Selected"
+"Kartik p","Volleyball; Batminton; Tug of War","Male",100,100,"FLASHING BOTS 🤖","Selected"
+"Abhishek","Cricket; Volleyball; Tug of War","Male",100,100,"ROBO KNIGHTS","Selected"
+"Chidanand Karennavar","Cricket; Batminton","Male",100,150,"FLASHING BOTS 🤖","Selected"
+"Godwin Anthony","Cricket; Volleyball; Batminton","Male",100,450,"ROBO KNIGHTS","Selected"
+"DARSHAN","Cricket; Volleyball; Batminton; Tug of War","Male",100,800,"FLASHING BOTS 🤖","Selected"
+"Sumanth","Cricket","Male",100,100,"FLASHING BOTS 🤖","Selected"
+"Bharat","Cricket; Volleyball; Batminton","Male",100,100,"TECH TITANS 🤖","Selected"
+"G ROHIT","Cricket; Tug of War","Male",100,100,"FLASHING BOTS 🤖","Selected"
+"Abhishek","Cricket; Tug of War","Male",100,100,"TECH TITANS 🤖","Selected"
+"Sujal kamble","Volleyball; Batminton","Male",100,100,"FLASHING BOTS 🤖","Selected"
+"Shlok","Cricket; Volleyball; Batminton","Male",100,100,"TECH TITANS 🤖","Selected"
+"Abidali Mujawar","Cricket; Volleyball; Tug of War","Male",100,1100,"TECH TITANS 🤖","Selected"
+"Tabrez","Cricket; Volleyball","Male",100,250,"TECH TITANS 🤖","Selected"
+"Vijay chipati","Cricket; Tug of War","Male",100,100,"TECH TITANS 🤖","Selected"
+"Shrigovinda T Kulkarni","Cricket; Batminton","Male",100,1300,"ROBO KNIGHTS","Selected"
+"Prajwal S M","Cricket; Volleyball; Batminton","Male",100,1350,"ROBO KNIGHTS","Selected"
+"Vicky Reddy","Cricket; Volleyball; Tug of War","Male",100,1700,"TECH TITANS 🤖","Selected"
+"Shivakumar N","Cricket; Volleyball","Male",100,1350,"FLASHING BOTS 🤖","Selected"
+"Sumant Khannur","Cricket; Tug of War","Male",100,100,"FLASHING BOTS 🤖","Selected"
+"SUSHRUT","Cricket; Volleyball; Batminton; Tug of War","Male",100,1250,"FLASHING BOTS 🤖","Selected"
+"Shreyas kajagar","Cricket","Male",100,1000,"ROBO KNIGHTS","Selected"
+"Rohit P","Cricket","Male",100,100,"ROBO KNIGHTS","Selected"
+"Nisar","Cricket; Volleyball","Male",100,2300,"TECH TITANS 🤖","Selected"
+"Virupaksh","Volleyball; Tug of War","Male",100,1500,"FLASHING BOTS 🤖","Selected"
+"Rohit P","Cricket","Male",100,0,"None","Not Selected"
+"Nisar","Cricket; Volleyball","Male",100,0,"None","Not Selected"
+"Virupaksh","Volleyball; Tug of War","Male",100,0,"None","Not Selected"
+"Shashank A","Cricket","Male",100,100,"TECH TITANS 🤖","Selected"
+"Basu Anna","Cricket","Male",100,100,"ROBO KNIGHTS","Selected"
+"Pavan Anna","Cricket","Male",100,100,"TECH TITANS 🤖","Selected"
+"Nagaraj ","Cricket","Male",100,600,"ROBO KNIGHTS","Selected"
+"Sanket G","Cricket; Tug of War","Male",100,500,"FLASHING BOTS 🤖","Selected"
+"Manju ","Cricket","Male",100,500,"ROBO KNIGHTS","Selected"
+"Ritesh K","Cricket; Volleyball; Tug of War","Male",100,100,"FLASHING BOTS 🤖","Selected"
+"Rohit M","Volleyball; Tug of War","Male",100,100,"FLASHING BOTS 🤖","Selected"
+
+SECTION,FEMALE PLAYERS
+Player Name,Sport,Gender,Base Price,Sold Price,Team,Status
+"Minal Dhamnekar","Cricket; Tug of War","Female",100,100,"TECH TITANS 🤖","Selected"
+"Srushti G Joshi","Batminton; Tug of War","Female",100,200,"TECH TITANS 🤖","Selected"
+"Bhoomika Hotagi","Cricket","Female",100,300,"ROBO KNIGHTS","Selected"
+"Maitri","Cricket; Volleyball; Tug of War","Female",100,500,"FLASHING BOTS 🤖","Selected"
+"Farha Naaz Kundagol","Cricket; Volleyball; Batminton","Female",100,500,"TECH TITANS 🤖","Selected"
+"Varsha","Cricket; Batminton; Tug of War","Female",100,550,"ROBO KNIGHTS","Selected"
+"Abhinaya S","Batminton","Female",100,150,"ROBO KNIGHTS","Selected"
+"Raksha B","Cricket","Female",100,100,"ROBO KNIGHTS","Selected"
+"Ilaf Z H","Cricket; Batminton","Female",100,1250,"FLASHING BOTS 🤖","Selected"
+"T Sanjana","Cricket; Tug of War","Female",100,100,"FLASHING BOTS 🤖","Selected"
+"Lakshmi Saunshi","Batminton","Female",100,100,"TECH TITANS 🤖","Selected"
+
+OVERALL SUMMARY
+Total Players Registered: ,59
+Total Players Sold: ,56
+Total Players Not Selected: ,3
+Total Male Players: ,48
+Total Female Players: ,11
+Total Purse Spent (RC): ,28200
+Export Time: ,4/8/2026, 6:47:41 PM
