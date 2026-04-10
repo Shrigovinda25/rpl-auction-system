@@ -77,7 +77,14 @@ const defaultState = {
     { name: "FLASHING BOTS 🤖", captain: "Priya Hunswadkar", viceCaptain: "Ayush Marigoudar", purse: 10000, players: [], maleCount: 0, femaleCount: 0, logo: "assets/logos/flashing_bots.jpeg" },
     { name: "TECH TITANS 🤖", captain: "Aditya B", viceCaptain: "Abhay Patil", purse: 10000, players: [], maleCount: 0, femaleCount: 0, logo: "assets/logos/tech_titans.jpeg" }
   ],
-  auctionState: { isLive: false, currentPlayerIndex: 0, currentBid: 0, leadingTeam: null, selectedTeamIndex: null, status: "Waiting" }
+  auctionState: { isLive: false, currentPlayerIndex: 0, currentBid: 0, leadingTeam: null, selectedTeamIndex: null, status: "Waiting" },
+  matches: [],
+  tournamentRankings: {
+      "Cricket": { "1st": null, "2nd": null, "3rd": null },
+      "Badminton": { "1st": null, "2nd": null, "3rd": null },
+      "Volleyball": { "1st": null, "2nd": null, "3rd": null },
+      "Tug of War": { "1st": null, "2nd": null, "3rd": null }
+  }
 };
 
 const defaultAuthConfig = {
@@ -108,6 +115,8 @@ function normalizeState(s) {
         }
     });
     if (!s.auctionState) s.auctionState = defaultState.auctionState;
+    if (!s.matches) s.matches = [];
+    if (!s.tournamentRankings) s.tournamentRankings = defaultState.tournamentRankings;
     return s;
 }
 

@@ -66,7 +66,7 @@
         <nav class="bg-cardBg border-b border-gray-800 p-4 sticky top-0 z-50 shadow-xl">
             <div class="max-w-7xl mx-auto flex justify-between items-center px-4">
                 <div class="flex items-center space-x-3">
-                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black italic text-sm">R</div>
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black italic text-sm text-white">R</div>
                     <h1 class="text-xl font-black uppercase tracking-tighter text-white">RPL Admin</h1>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -78,166 +78,256 @@
                         <i class="fas fa-trash text-red-500"></i> Reset
                     </button>
                     <button id="btn-logout" class="w-8 h-8 rounded-full bg-white/5 hover:bg-red-500/20 hover:text-red-400 flex items-center justify-center transition-colors">
-                        <i class="fas fa-sign-out-alt text-xs"></i>
+                        <i class="fas fa-sign-out-alt text-xs text-white"></i>
                     </button>
                 </div>
             </div>
         </nav>
 
-        <div class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-            <!-- LEFT COLUMN: Controls & Bidding -->
-            <div class="space-y-6 lg:col-span-1">
-                <div class="bg-cardBg p-5 rounded-2xl border border-white/5 shadow-2xl max-h-[85vh] overflow-y-auto">
-                    <h2 class="text-xs font-black uppercase tracking-[0.2em] mb-4 pb-2 border-b border-white/5 text-gray-500">Auction Center</h2>
-
-                    <div class="grid grid-cols-2 gap-3 mb-6">
-                        <button id="btn-go-live" class="bg-emerald-600 hover:bg-emerald-500 text-white p-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex flex-col items-center gap-2">
-                            <i class="fas fa-play text-xs"></i><span>Go Live</span>
-                        </button>
-                        <button id="btn-pause" class="bg-yellow-600 hover:bg-yellow-500 text-white p-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-lg shadow-yellow-600/20 transition-all active:scale-95 flex flex-col items-center gap-2">
-                            <i class="fas fa-pause text-xs"></i><span>Pause</span>
-                        </button>
-                        <button id="btn-next" class="bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-xl font-black text-sm uppercase tracking-widest shadow-lg shadow-blue-600/20 transition-all active:scale-95 col-span-2 flex items-center justify-center gap-3">
-                            <i class="fas fa-step-forward text-xs"></i><span>Next Player</span>
-                        </button>
-                        <button id="btn-restore-unsold" class="bg-purple-600 hover:bg-purple-500 text-white p-3 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-purple-600/20 transition-all active:scale-95 col-span-2 flex items-center justify-center gap-2 border border-purple-400/20">
-                            <i class="fas fa-undo text-[8px]"></i><span>Re-Auction Not Selected</span>
-                        </button>
-                    </div>
-
-                    <div id="live-player-card" class="bg-black/40 p-5 rounded-2xl border border-white/5 mb-4 hidden animate-slide-up">
-                        <div class="relative mb-4 group">
-                            <img id="live-player-img" src="" class="w-full h-48 object-cover rounded-xl bg-gray-800 shadow-inner">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-xl"></div>
-                            <h3 id="live-player-name" class="absolute bottom-3 left-4 text-xl font-black text-white uppercase tracking-tighter">Player Name</h3>
-                        </div>
-                        
-                        <div class="flex justify-between items-end mb-6 bg-white/5 p-3 rounded-xl">
-                            <div>
-                                <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Base Price</p>
-                                <p class="text-xl font-black text-white font-mono"><span id="live-player-base">0</span> <span class="text-blue-500 text-xs">RC</span></p>
-                            </div>
-                            <div class="text-right">
-                                <p class="text-[10px] font-black uppercase tracking-widest text-gray-500 mb-1">Status</p>
-                                <span class="text-[10px] font-black uppercase tracking-widest text-blue-400">Accepting Bids</span>
-                            </div>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2 ml-1">Current Bid (RC)</label>
-                                <input type="number" id="bid-amount" class="w-full bg-black/60 p-4 rounded-xl text-white font-black text-center text-3xl focus:ring-4 focus:ring-blue-500/20 border border-white/10 placeholder:text-gray-800 font-mono" placeholder="0000">
-                            </div>
-
-                            <div class="grid grid-cols-4 gap-2">
-                                <button type="button" class="btn-quick-bid bg-white/5 hover:bg-white/10 text-white font-black py-2 rounded-lg transition text-[10px] border border-white/5 whitespace-nowrap" data-amount="50">+50</button>
-                                <button type="button" class="btn-quick-bid bg-white/5 hover:bg-white/10 text-white font-black py-2 rounded-lg transition text-[10px] border border-white/5 whitespace-nowrap" data-amount="100">+100</button>
-                                <button type="button" class="btn-quick-bid bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white font-black py-2 rounded-lg transition text-[10px] border border-blue-500/20" data-amount="500">+500</button>
-                                <button type="button" class="btn-quick-bid bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white font-black py-2 rounded-lg transition text-[10px] border border-blue-500/20" data-amount="1000">+1000</button>
-                            </div>
-
-                            <div>
-                                <label class="block text-[10px] font-black uppercase tracking-widest text-gray-500 mb-2 ml-1">Winning Franchise</label>
-                                <div id="bid-team-buttons" class="grid grid-cols-1 gap-2"></div>
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-3 pt-2">
-                                <button id="btn-sell" class="bg-green-600 hover:bg-green-500 text-white font-black py-4 rounded-xl transition-all shadow-lg active:scale-95 uppercase tracking-widest text-xs">Selected</button>
-                                <button id="btn-unsold" class="bg-red-600 hover:bg-red-500 text-white font-black py-4 rounded-xl transition-all shadow-lg active:scale-95 uppercase tracking-widest text-xs">Not Selected</button>
-                            </div>
-
-                            <div id="bid-preview-card" class="mt-4 hidden animate-fade-in"></div>
-                        </div>
-                    </div>
-
-                    <div id="no-player-msg" class="text-center py-12 px-6 bg-black/20 rounded-2xl border border-dashed border-white/5">
-                        <i class="fas fa-satellite text-gray-700 text-3xl mb-4"></i>
-                        <p class="text-xs font-bold text-gray-600 uppercase tracking-widest">Auction Standby</p>
-                        <p class="text-[10px] text-gray-700 mt-1 italic">Click 'Go Live' or 'Next Player' to begin.</p>
-                    </div>
-                </div>
+        <!-- Tab Navigation -->
+        <div class="max-w-7xl mx-auto px-4 mt-6">
+            <div class="flex flex-wrap gap-2 overflow-x-auto pb-2 border-b border-white/5">
+                <button class="nav-tab active px-6 py-4 border-b-2 border-blue-500 text-white font-black text-xs uppercase tracking-widest transition-all flex items-center gap-2" data-tab="tab-schedule">
+                    <i class="fas fa-calendar-alt text-amber-500"></i><span>Schedule Match</span>
+                </button>
+                <button class="nav-tab px-6 py-4 text-gray-500 hover:text-white font-black text-xs uppercase tracking-widest transition-all flex items-center gap-2" data-tab="tab-ongoing">
+                    <i class="fas fa-satellite-dish text-emerald-500"></i><span>Ongoing Matches</span>
+                </button>
             </div>
+        </div>
 
-            <!-- RIGHT COLUMNS: Data Management -->
-            <div class="space-y-6 lg:col-span-2">
+        <div class="max-w-7xl mx-auto p-4 md:p-6 pb-20">
 
-                <!-- Player Management -->
-                <div class="bg-cardBg p-6 rounded-2xl border border-white/5 shadow-2xl">
-                    <div class="flex justify-between items-center mb-6 pb-2 border-b border-white/5">
-                        <h2 class="text-xs font-black uppercase tracking-[0.2em] text-gray-500">Player Rosters</h2>
-                        <span id="player-count" class="text-[10px] font-black uppercase tracking-widest text-blue-500 bg-blue-500/10 px-3 py-1 rounded-full">0 REGISTERED</span>
-                    </div>
+            <!-- Tab Pane: Rosters -->
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Bulk Upload -->
-                        <div class="bg-black/20 p-5 rounded-2xl border border-white/5">
-                            <h3 class="text-xs font-black text-emerald-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <i class="fas fa-file-csv"></i> Data Ingestion
-                            </h3>
-                            <input type="file" id="excel-file" accept=".xlsx,.xls,.csv" class="block w-full text-[10px] text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:bg-white/5 file:text-white hover:file:bg-white/10 mb-4 transition border border-dashed border-white/10 p-2 rounded-xl">
-                            <button id="btn-upload-excel" class="w-full bg-emerald-600/10 hover:bg-emerald-600 text-emerald-400 hover:text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Process Dataset</button>
-                        </div>
 
-                        <!-- Add Single Player -->
-                        <div class="bg-black/20 p-5 rounded-2xl border border-white/5">
-                            <h3 class="text-xs font-black text-blue-500 uppercase tracking-widest mb-4 flex items-center gap-2">
-                                <i class="fas fa-user-plus"></i> Manual Addition
-                            </h3>
-                            <form id="add-player-form" class="space-y-3 font-medium">
-                                <input type="text" id="p-name" placeholder="Full Name *" required class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-[11px] text-white placeholder:text-gray-700">
-                                <div class="bg-black/40 border border-white/5 rounded-xl p-3">
-                                    <p class="text-[9px] font-black text-gray-600 uppercase tracking-widest mb-2">Sports Discipline</p>
-                                    <div id="sport-checkboxes" class="grid grid-cols-2 gap-2">
-                                        <label class="flex items-center gap-2 text-[10px] text-gray-400 cursor-pointer hover:text-white"><input type="checkbox" class="p-sport-cb accent-blue-500" value="Cricket"> Cricket</label>
-                                        <label class="flex items-center gap-2 text-[10px] text-gray-400 cursor-pointer hover:text-white"><input type="checkbox" class="p-sport-cb accent-blue-500" value="Volleyball"> Volleyball</label>
-                                        <label class="flex items-center gap-2 text-[10px] text-gray-400 cursor-pointer hover:text-white"><input type="checkbox" class="p-sport-cb accent-blue-500" value="Batminton"> Batminton</label>
-                                        <label class="flex items-center gap-2 text-[10px] text-gray-400 cursor-pointer hover:text-white"><input type="checkbox" class="p-sport-cb accent-blue-500" value="Tug of War"> Tug of War</label>
+            <!-- Tab Pane: Schedule Match -->
+            <div id="tab-schedule" class="tab-pane">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-12 space-y-6">
+
+                        <!-- Inline Match Logger -->
+                        <div class="bg-cardBg p-8 rounded-3xl border border-white/10 shadow-2xl">
+                            <div class="mb-8 pb-6 border-b border-white/5">
+                                <h2 class="text-3xl font-black uppercase tracking-tighter text-white">Log Match Result</h2>
+                                <p class="text-xs font-bold text-gray-500 mt-1 uppercase tracking-widest">RPL Tournament Operations Hub</p>
+                            </div>
+
+                            <!-- Sport Selection -->
+                            <div class="mb-8">
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Select Sport</label>
+                                <div id="sport-selector" class="flex flex-wrap gap-3">
+                                    <button type="button" class="sport-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-blue-500/50 hover:text-white" data-sport="Cricket">
+                                        <i class="fas fa-baseball-ball mr-2 text-emerald-400"></i>Cricket
+                                    </button>
+                                    <button type="button" class="sport-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-blue-500/50 hover:text-white" data-sport="Badminton">
+                                        <i class="fas fa-table-tennis mr-2 text-pink-400"></i>Badminton
+                                    </button>
+                                    <button type="button" class="sport-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-blue-500/50 hover:text-white" data-sport="Volleyball">
+                                        <i class="fas fa-volleyball-ball mr-2 text-orange-400"></i>Volleyball
+                                    </button>
+                                    <button type="button" class="sport-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-blue-500/50 hover:text-white" data-sport="Tug of War">
+                                        <i class="fas fa-fist-raised mr-2 text-red-400"></i>Tug of War
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Stage Selection -->
+                            <div class="mb-8">
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Match Stage</label>
+                                <div id="stage-selector" class="flex flex-wrap gap-3">
+                                    <button type="button" class="stage-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-amber-500/50 hover:text-white" data-stage="League">League</button>
+                                    <button type="button" class="stage-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-amber-500/50 hover:text-white" data-stage="Semi-Final">Semi-Final</button>
+                                    <button type="button" class="stage-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-amber-500/50 hover:text-white" data-stage="Final">Final</button>
+                                </div>
+                            </div>
+                                      <!-- Teams & Player Names (No scores) -->
+                            <div class="mb-8">
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Teams & Players</label>
+                                <div class="grid grid-cols-[1fr_auto_1fr] gap-4 items-start">
+                                    <!-- Team A -->
+                                    <div class="space-y-3">
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-blue-400 text-center border-b border-blue-500/20 pb-2">Team A Selection</p>
+                                        <div id="teamA-selector" class="flex flex-col gap-2">
+                                            <!-- Team buttons rendered by JS -->
+                                        </div>
+                                        <input type="text" id="playerA-name" placeholder="Team A Player Name(s)" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-blue-500 transition-all mt-2">
+                                    </div>
+
+                                    <!-- VS Divider -->
+                                    <div class="flex flex-col items-center justify-center h-full pt-10">
+                                        <span class="text-gray-600 font-black text-2xl italic opacity-50">VS</span>
+                                    </div>
+
+                                    <!-- Team B -->
+                                    <div class="space-y-3">
+                                        <p class="text-[9px] font-black uppercase tracking-widest text-pink-400 text-center border-b border-pink-500/20 pb-2">Team B Selection</p>
+                                        <div id="teamB-selector" class="flex flex-col gap-2">
+                                            <!-- Team buttons rendered by JS -->
+                                        </div>
+                                        <input type="text" id="playerB-name" placeholder="Team B Player Name(s)" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-pink-500 transition-all mt-2">
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2">
-                                    <select id="p-gender" required class="bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-[11px] text-white">
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
-                                    <input type="number" id="p-price" placeholder="Base (RC) *" required class="bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-[11px] text-white">
+                            </div>
+
+                            <!-- Details -->
+                            <div class="mb-8">
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-3">Match Extra Details (Optional)</label>
+                                
+                                <!-- Badminton Specific Categories -->
+                                <div id="badminton-options" class="hidden mb-3">
+                                    <div class="flex flex-wrap gap-2 border border-white/10 p-3 rounded-2xl bg-black/20" id="badminton-category-selector">
+                                        <button type="button" class="badminton-cat-btn px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:bg-blue-600 hover:text-white hover:border-blue-400" data-category="Boys Singles">Boys Singles</button>
+                                        <button type="button" class="badminton-cat-btn px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:bg-pink-600 hover:text-white hover:border-pink-400" data-category="Girls Singles">Girls Singles</button>
+                                        <button type="button" class="badminton-cat-btn px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:bg-blue-600 hover:text-white hover:border-blue-400" data-category="Boys Doubles">Boys Doubles</button>
+                                        <button type="button" class="badminton-cat-btn px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:bg-pink-600 hover:text-white hover:border-pink-400" data-category="Girls Doubles">Girls Doubles</button>
+                                        <button type="button" class="badminton-cat-btn px-3 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:bg-purple-600 hover:text-white hover:border-purple-400" data-category="Mixed Doubles">Mixed Doubles</button>
+                                    </div>
                                 </div>
-                                <input type="text" id="p-img" placeholder="Image URL (optional)" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-[11px] text-white placeholder:text-gray-700">
-                                <input type="text" id="p-achievements" placeholder="Achievements (optional)" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-[11px] text-white placeholder:text-gray-700">
-                                <button type="submit" class="w-full bg-blue-600/10 hover:bg-blue-600 text-blue-400 hover:text-white py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">Add Player</button>
-                            </form>
+
+                                <input type="text" id="match-details" placeholder="e.g. Navdeep vs Aditya" class="w-full bg-black/40 border border-white/5 rounded-2xl px-5 py-4 text-sm text-white font-bold focus:border-blue-500 transition-all">
+                            </div>
+
+                            <!-- Submit -->
+                            <button id="btn-submit-match" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black font-black py-5 rounded-2xl shadow-xl shadow-amber-500/20 transition-all active:scale-[0.98] uppercase tracking-widest text-sm flex items-center justify-center gap-3">
+                                <i class="fas fa-calendar-check"></i> Add to Ongoing Calendar
+                            </button>
+                        </div>
+
+                        <!-- Match Feed & Rankings Side by Side -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <!-- Match Feed -->
+                            <div class="lg:col-span-2">
+                                <div class="bg-cardBg p-6 rounded-2xl border border-white/5 shadow-2xl">
+                                    <h3 class="text-xs font-black uppercase tracking-[0.2em] text-gray-600 mb-6">Scheduled Fixtures Tracker</h3>
+                                    <div id="admin-matches-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <!-- Matches render here, should primarily show what's scheduled minus what's done -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Rankings Control -->
+                            <div class="lg:col-span-1">
+                                <div class="bg-black/30 p-6 rounded-2xl border border-white/5 h-full">
+                                    <div class="flex items-center gap-3 mb-6">
+                                        <div class="w-10 h-10 bg-yellow-500/10 rounded-xl flex items-center justify-center text-yellow-500"><i class="fas fa-trophy"></i></div>
+                                        <h3 class="text-sm font-black text-white uppercase tracking-widest">Trophy Standings</h3>
+                                    </div>
+                                    <p class="text-xs text-gray-500 mb-6 leading-relaxed">Update final sport rankings to automatically calculate overall RPL Trophy points.</p>
+                                    <button id="btn-set-rankings" class="w-full bg-yellow-600/10 hover:bg-yellow-600 text-yellow-500 hover:text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs border border-yellow-500/20 transition-all flex items-center justify-center gap-2">
+                                        <i class="fas fa-medal"></i> Update Final Rankings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Pane: Ongoing Live Matches Leaderboard -->
+            <div id="tab-ongoing" class="tab-pane hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div class="lg:col-span-12 space-y-6">
+                        <div class="bg-cardBg p-8 rounded-3xl border border-white/10 shadow-3xl">
+                            <div class="mb-8 pb-6 border-b border-white/5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                <div>
+                                    <h2 class="text-3xl font-black uppercase tracking-tighter text-emerald-400 animate-pulse">Live Matches</h2>
+                                    <p class="text-xs font-bold text-gray-500 mt-1 uppercase tracking-widest">Auto updates leaderboards and Match Feed via Firebase</p>
+                                </div>
+                                <div class="text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-full border border-emerald-500/20">
+                                    <i class="fas fa-broadcast-tower mr-2"></i>Live Broadcasting
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <!-- Match List to activate -->
+                                <div class="lg:col-span-1 border-r border-white/5 pr-6 h-[600px] overflow-y-auto custom-scrollbar">
+                                    <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4 sticky top-0 bg-cardBg py-2 z-10 border-b border-white/5">Select Match to Stream</h3>
+                                    <div id="ongoing-matches-selector" class="space-y-3">
+                                        <!-- Render scheduled matches here -->
+                                    </div>
+                                </div>
+
+                                <!-- Live Scoreboard Controls (Right side!) -->
+                                <div class="lg:col-span-2">
+                                    <div id="live-scoreboard-panel" class="hidden">
+                                        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-6 text-center border-b border-white/5 pb-4">Live Score Controller</h3>
+                                        
+                                        <div class="bg-black/40 rounded-3xl p-8 border border-white/10 relative overflow-hidden shadow-2xl">
+                                            <!-- Decorative bg -->
+                                            <div class="absolute inset-0 bg-grid-white/[0.02] bg-[size:40px_40px] pointer-events-none"></div>
+
+                                            <div class="text-center mb-8 relative z-10">
+                                                <div id="live-sport-badge" class="inline-block px-3 py-1 bg-white/10 text-white rounded-lg text-[10px] font-black uppercase tracking-widest mb-2 border border-white/10">Sport</div>
+                                                <h4 id="live-match-details" class="text-primary font-bold text-sm text-gray-400">Match Details</h4>
+                                            </div>
+
+                                            <div class="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+                                                
+                                                <!-- Team A Box -->
+                                                <div class="flex-1 w-full bg-blue-900/20 border border-blue-500/20 rounded-2xl p-6 text-center shadow-lg shadow-blue-900/10 transition-all hover:bg-blue-900/30 group">
+                                                    <h5 id="live-teamA-name" class="text-xs font-black uppercase tracking-widest text-blue-400 mb-1">Team A</h5>
+                                                    <p id="live-playerA-name" class="text-[10px] text-gray-500 mb-6 font-bold truncate">Player Name</p>
+                                                    <div class="flex items-center justify-center gap-4">
+                                                        <button class="live-score-btn w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white font-black text-xl transition-colors shrink-0" data-action="decrement" data-target="A">-</button>
+                                                        <div id="live-score-teamA" class="text-5xl font-black font-mono text-white w-20 tracking-tighter shrink-0 pt-2 pb-2">0</div>
+                                                        <button class="live-score-btn w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white font-black text-2xl transition-colors shrink-0 shadow-lg shadow-blue-500/20" data-action="increment" data-target="A">+</button>
+                                                    </div>
+                                                </div>
+
+                                                <!-- VS -->
+                                                <div class="flex flex-col items-center">
+                                                    <span class="text-2xl font-black italic text-white/20 bg-black w-14 h-14 rounded-full flex items-center justify-center border border-white/5 shadow-inner">VS</span>
+                                                </div>
+
+                                                <!-- Team B Box -->
+                                                <div class="flex-1 w-full bg-pink-900/20 border border-pink-500/20 rounded-2xl p-6 text-center shadow-lg shadow-pink-900/10 transition-all hover:bg-pink-900/30 group">
+                                                    <h5 id="live-teamB-name" class="text-xs font-black uppercase tracking-widest text-pink-400 mb-1">Team B</h5>
+                                                    <p id="live-playerB-name" class="text-[10px] text-gray-500 mb-6 font-bold truncate">Player Name</p>
+                                                    <div class="flex items-center justify-center gap-4">
+                                                        <button class="live-score-btn w-12 h-12 rounded-xl bg-pink-500/10 text-pink-400 hover:bg-pink-500 hover:text-white font-black text-xl transition-colors shrink-0" data-action="decrement" data-target="B">-</button>
+                                                        <div id="live-score-teamB" class="text-5xl font-black font-mono text-white w-20 tracking-tighter shrink-0 pt-2 pb-2">0</div>
+                                                        <button class="live-score-btn w-12 h-12 rounded-xl bg-pink-500/20 text-pink-400 hover:bg-pink-500 hover:text-white font-black text-2xl transition-colors shrink-0 shadow-lg shadow-pink-500/20" data-action="increment" data-target="B">+</button>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+                                            <!-- Controls -->
+                                            <div class="mt-10 pt-8 border-t border-white/10 flex flex-col md:flex-row gap-4 justify-between items-center relative z-10">
+                                                <div class="space-y-2 w-full md:w-auto">
+                                                    <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Match Winner Override</label>
+                                                    <select id="live-winner-select" class="w-full md:w-48 bg-black/60 border border-white/10 rounded-xl px-4 py-3 text-xs text-white font-bold focus:border-emerald-500 focus:ring-emerald-500/20 outline-none">
+                                                        <option value="auto">Auto (Higher score)</option>
+                                                        <option value="Draw">Draw Match</option>
+                                                    </select>
+                                                </div>
+                                                
+                                                <button id="btn-complete-live-match" class="w-full md:w-auto bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-black font-black px-8 py-4 rounded-xl shadow-xl shadow-emerald-500/20 transition-all active:scale-[0.98] uppercase tracking-widest text-xs flex items-center justify-center gap-2">
+                                                    <i class="fas fa-flag-checkered"></i> Declare Match Finished
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="live-empty-state" class="h-full flex flex-col items-center justify-center opacity-50 py-20 border-2 border-dashed border-white/5 rounded-3xl">
+                                        <i class="fas fa-tv text-5xl text-gray-600 mb-6"></i>
+                                        <p class="text-sm font-black text-gray-500 uppercase tracking-widest text-center">Select a match from the list <br/>to start live scoring.</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                    <div class="mt-8 border border-white/5 rounded-2xl overflow-x-auto">
-                        <table class="w-full text-left border-collapse min-w-[500px]">
-                            <thead class="bg-white/5">
-                                <tr>
-                                    <th class="px-5 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 whitespace-nowrap">Player</th>
-                                    <th class="px-5 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 whitespace-nowrap">Info</th>
-                                    <th class="px-5 py-4 text-[10px] font-black uppercase tracking-widest text-gray-500 text-right whitespace-nowrap">Price</th>
-                                </tr>
-                            </thead>
-                            <tbody id="player-table-body" class="divide-y divide-white/5 uppercase font-medium"></tbody>
-                        </table>
-                    </div>
                 </div>
-
-                <!-- Team Management -->
-                <div class="bg-cardBg p-6 rounded-2xl border border-white/5 shadow-2xl">
-                    <div class="flex justify-between items-center mb-6 pb-2 border-b border-white/5">
-                        <h2 class="text-xs font-black uppercase tracking-[0.2em] text-gray-500">Franchise Management</h2>
-                        <button id="btn-add-team" class="text-[10px] font-black uppercase tracking-widest bg-purple-600/10 text-purple-400 hover:bg-purple-600 hover:text-white px-4 py-2 rounded-lg transition border border-purple-500/20">+ Create Franchise</button>
-                    </div>
-                    <div id="teams-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-                </div>
-
             </div>
+
         </div>
     </div>
 
+    <!-- Modals & Logic -->
     <script type="module" src="js/script.js?v=2026version"></script>
-    <script src="js/admin.js?v=2026version"></script>
+    <script defer src="js/admin.js?v=2026version"></script>
 </body>
 
 </html>

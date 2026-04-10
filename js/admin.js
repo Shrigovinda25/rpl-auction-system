@@ -3,10 +3,40 @@ const SESSION_KEY = "rpl_auth_session";
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
     setupAuthListeners();
+    setupTabNavigation();
     initAdmin();
     // Re-render when state changes (e.g. from reset)
     window.addEventListener('stateUpdated', renderAdminData);
 });
+
+/**
+ * Tab Navigation — switches between tab panes
+ */
+function setupTabNavigation() {
+    const tabs = document.querySelectorAll('.nav-tab');
+    const panes = document.querySelectorAll('.tab-pane');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const targetId = tab.dataset.tab;
+
+            // Deactivate all tabs
+            tabs.forEach(t => {
+                t.classList.remove('active', 'border-b-2', 'border-blue-500', 'text-white');
+                t.classList.add('text-gray-500');
+            });
+
+            // Activate clicked tab
+            tab.classList.add('active', 'border-b-2', 'border-blue-500', 'text-white');
+            tab.classList.remove('text-gray-500');
+
+            // Hide all panes, show target
+            panes.forEach(p => p.classList.add('hidden'));
+            const targetPane = document.getElementById(targetId);
+            if (targetPane) targetPane.classList.remove('hidden');
+        });
+    });
+}
 
 function checkAuth() {
     const session = sessionStorage.getItem(SESSION_KEY);
@@ -89,50 +119,52 @@ function renderAdminData() {
 
     // Status Badge
     const badge = document.getElementById('auction-status-badge');
+    if (badge) {
+        badge.textContent = s.auctionState.isLive ? "LIVE" : "PAUSED";
+        badge.className = s.auctionState.isLive
+            ? "px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-sm font-semibold border border-emerald-500/30"
+            : "px-3 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-sm font-semibold border border-yellow-500/30";
+    }
+
+    // Auction Hall elements (only render if they exist on the page)
     const liveCtn = document.getElementById('live-player-card');
     const msgCtn = document.getElementById('no-player-msg');
 
-    if (s.auctionState.isLive) {
-        badge.textContent = "LIVE";
-        badge.className = "px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-sm font-semibold border border-emerald-500/30";
-        document.getElementById('btn-go-live').classList.add('opacity-50', 'cursor-not-allowed');
-        document.getElementById('btn-pause').classList.remove('opacity-50', 'cursor-not-allowed');
+    if (liveCtn && msgCtn) {
+        if (s.auctionState.isLive) {
+            const goLiveBtn = document.getElementById('btn-go-live');
+            const pauseBtn = document.getElementById('btn-pause');
+            if (goLiveBtn) goLiveBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            if (pauseBtn) pauseBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 
-        const activePlayer = s.players[s.auctionState.currentPlayerIndex];
-        if (activePlayer) {
-            liveCtn.classList.remove('hidden');
-            msgCtn.classList.add('hidden');
+            const activePlayer = s.players[s.auctionState.currentPlayerIndex];
+            if (activePlayer) {
+                liveCtn.classList.remove('hidden');
+                msgCtn.classList.add('hidden');
 
-            document.getElementById('live-player-img').src = activePlayer.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(activePlayer.name)}&background=random&size=200`;
-            document.getElementById('live-player-name').textContent = activePlayer.name;
-            document.getElementById('live-player-base').textContent = activePlayer.basePrice;
-            const bidInput = document.getElementById('bid-amount');
-            if (bidInput && !bidInput.dataset.userEditing) {
-                bidInput.value = activePlayer.basePrice;
+                document.getElementById('live-player-img').src = activePlayer.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(activePlayer.name)}&background=random&size=200`;
+                document.getElementById('live-player-name').textContent = activePlayer.name;
+                document.getElementById('live-player-base').textContent = activePlayer.basePrice;
+                const bidInput = document.getElementById('bid-amount');
+                if (bidInput && !bidInput.dataset.userEditing) {
+                    bidInput.value = activePlayer.basePrice;
+                }
+                if (typeof updateBidPreview === 'function') updateBidPreview();
+                liveCtn.classList.remove('opacity-60', 'pointer-events-none');
+            } else {
+                liveCtn.classList.add('hidden');
+                msgCtn.classList.remove('hidden');
+                msgCtn.innerHTML = '<i class="fas fa-check-circle text-emerald-500 text-3xl mb-4"></i><p class="text-xs font-bold text-gray-600 uppercase tracking-widest">Auction Finished!</p>';
             }
-            if (typeof updateBidPreview === 'function') updateBidPreview();
-
-            // Buttons are no longer disabled for the admin as per user request
-            // but we still track status for internal logic
-            const isWaiting = s.auctionState.status === "Waiting";
-            
-            // We only show the opacity effect on the projected card, 
-            // but let's keep the admin display clear.
-            liveCtn.classList.remove('opacity-60', 'pointer-events-none');
-
         } else {
+            const goLiveBtn = document.getElementById('btn-go-live');
+            const pauseBtn = document.getElementById('btn-pause');
+            if (goLiveBtn) goLiveBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            if (pauseBtn) pauseBtn.classList.add('opacity-50', 'cursor-not-allowed');
             liveCtn.classList.add('hidden');
             msgCtn.classList.remove('hidden');
-            msgCtn.textContent = "Auction Finished!";
+            msgCtn.innerHTML = '<i class="fas fa-satellite text-gray-700 text-3xl mb-4"></i><p class="text-xs font-bold text-gray-600 uppercase tracking-widest">Auction Standby</p><p class="text-[10px] text-gray-700 mt-1 italic">Click \'Go Live\' to begin session.</p>';
         }
-    } else {
-        badge.textContent = "PAUSED";
-        badge.className = "px-3 py-1 bg-yellow-500/20 text-yellow-500 rounded-full text-sm font-semibold border border-yellow-500/30";
-        document.getElementById('btn-go-live').classList.remove('opacity-50', 'cursor-not-allowed');
-        document.getElementById('btn-pause').classList.add('opacity-50', 'cursor-not-allowed');
-        liveCtn.classList.add('hidden');
-        msgCtn.classList.remove('hidden');
-        msgCtn.textContent = "Auction is paused. Click 'Go Live' to project.";
     }
 
     // Populate Teams Buttons
@@ -162,9 +194,12 @@ function renderAdminData() {
     }
 
     // Populate Player counts & tables
-    const pCountEl = document.getElementById('player-count');
-    if (pCountEl) pCountEl.textContent = `${s.players.length} Players`;
+    const pCountEl = document.getElementById('player-count-stat');
+    if (pCountEl) pCountEl.textContent = s.players.length;
     
+    const tCountEl = document.getElementById('team-count-stat');
+    if (tCountEl) tCountEl.textContent = s.teams.length;
+
     const pTbody = document.getElementById('player-table-body');
     if (pTbody) {
         pTbody.innerHTML = '';
@@ -173,14 +208,16 @@ function renderAdminData() {
             if (p.status === "Selected") statusBadge = `<span class="px-2 py-1 text-xs rounded bg-emerald-500/20 text-emerald-400">Selected</span>`;
             if (p.status === "Not Selected") statusBadge = `<span class="px-2 py-1 text-xs rounded bg-red-500/20 text-red-400">Not Selected</span>`;
 
+            // Use 'sp' (not 's') to avoid shadowing the outer state variable
             const sports = Array.isArray(p.sport) ? p.sport : [p.sport];
-            const sportTags = sports.map(s => `<span class="px-1.5 py-0.5 text-xs rounded bg-purple-500/20 text-purple-300 mr-1">${s}</span>`).join('');
+            const sportTags = sports.map(sp => `<span class="px-1.5 py-0.5 text-xs rounded bg-purple-500/20 text-purple-300 mr-1">${sp}</span>`).join('');
 
+            const isActive = idx === s.auctionState.currentPlayerIndex && s.auctionState.isLive;
             pTbody.innerHTML += `
-                <tr class="${idx === s.auctionState.currentPlayerIndex && s.auctionState.isLive ? 'bg-gray-700' : 'bg-gray-800'} border-b border-gray-700">
-                    <td class="px-4 py-3 font-semibold">${p.name}</td>
+                <tr class="${isActive ? 'bg-blue-900/30 border-blue-500/30' : 'hover:bg-white/5'} border-b border-gray-700 transition-colors">
+                    <td class="px-4 py-3 font-semibold text-sm ${isActive ? 'text-blue-200' : 'text-white'}">${p.name} ${isActive ? '<span class="ml-1 text-[9px] bg-blue-500 text-white px-1.5 rounded font-black uppercase">ON AIR</span>' : ''}</td>
                     <td class="px-4 py-3 text-gray-400 text-xs">${sportTags} • ${p.gender}</td>
-                    <td class="px-4 py-3">${p.basePrice}</td>
+                    <td class="px-4 py-3 font-mono text-sm">${p.basePrice} RC</td>
                     <td class="px-4 py-3">${statusBadge}</td>
                 </tr>
             `;
@@ -222,6 +259,9 @@ function renderAdminData() {
     } catch (e) {
         console.error("Error rendering admin data:", e);
     }
+
+    // Render Admin Matches
+    if (typeof renderTournamentAdmin === 'function') renderTournamentAdmin();
 }
 
 /**
@@ -229,246 +269,261 @@ function renderAdminData() {
  */
 function setupEventListeners() {
     // Add Single Player
-    document.getElementById('add-player-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const state = getState();
-
-        // Collect all checked sports
-        const checkedSports = [...document.querySelectorAll('.p-sport-cb:checked')].map(cb => cb.value);
-        if (checkedSports.length === 0) {
-            Swal.fire('Select Sports', 'Please select at least one sport for this player.', 'warning');
-            return;
-        }
-
-        const p = {
-            name: document.getElementById('p-name').value,
-            sport: checkedSports,       // Array of sports
-            gender: document.getElementById('p-gender').value,
-            basePrice: parseInt(document.getElementById('p-price').value),
-            image: document.getElementById('p-img').value || null,
-            achievements: document.getElementById('p-achievements').value || "None",
-            status: "Waiting"
-        };
-        state.players.push(p);
-        saveState(state);
-
-        // Reset form including all checkboxes
-        document.getElementById('add-player-form').reset();
-        document.querySelectorAll('.p-sport-cb').forEach(cb => cb.checked = false);
-
-        Swal.fire({ title: 'Added!', text: 'Player manually added', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-    });
-
-    // Team Selection Event Delegation
-    document.getElementById('bid-team-buttons').addEventListener('click', (e) => {
-        const btn = e.target.closest('.team-selector-btn');
-        if (!btn) return;
-        
-        const idx = parseInt(btn.dataset.index);
-        const state = getState();
-        state.auctionState.selectedTeamIndex = idx;
-        state.auctionState.leadingTeam = state.teams[idx]?.name || null;
-        
-        // If current bid is 0, start it at the player's base price when a team is first selected
-        if (state.auctionState.currentBid === 0) {
-            const player = state.players[state.auctionState.currentPlayerIndex];
-            if (player) {
-                state.auctionState.currentBid = player.basePrice;
-                const bidInp = document.getElementById('bid-amount');
-                if (bidInp) bidInp.value = player.basePrice;
-            }
-        }
-        
-        saveState(state);
-        updateBidPreview();
-    });
-
-    // Excel Upload
-    document.getElementById('btn-upload-excel').addEventListener('click', () => {
-        const fileInput = document.getElementById('excel-file');
-        if (!fileInput.files[0]) {
-            Swal.fire('Error', 'Please select an Excel file first.', 'error'); return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
-
-                const state = getState();
-                let added = 0;
-                rows.forEach(row => {
-                    const flatRow = {};
-                    for (let key in row) {
-                        // Aggressively clean keys (remove weird leading commas, line breaks, and whitespace)
-                        const cleanKey = key.trim().toLowerCase().replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ');
-                        flatRow[cleanKey] = row[key];
-                    }
-
-                    const name = flatRow['player name'] || flatRow['name'] || '';
-                    if (!name || name === 'Player Name') return; // Skip header clones
-
-                    const rawSport = flatRow['select sport'] || flatRow['sport'] || flatRow['sports'] || 'Unknown';
-                    const sportArr = Array.isArray(rawSport) 
-                        ? rawSport 
-                        : typeof rawSport === 'string'
-                          ? rawSport.split(/[;,]+/).map(s => s.trim()).filter(Boolean)
-                          : [String(rawSport)];
-
-                    const rawBase = flatRow['base price'] || flatRow['baseprice'];
-                    const basePrice = parseInt(rawBase) || 0;
-
-                    let image = flatRow['player image'] || flatRow['image url'] || flatRow['imageurl'] || flatRow['image'] || null;
-                    if (image && typeof image === 'string' && image.includes('drive.google.com')) {
-                        const idMatch = image.match(/[?&]id=([a-zA-Z0-9_-]+)/) || image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-                        const fileId = idMatch ? idMatch[1] : null;
-                        if (fileId) image = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-                    }
-
-                    // Combined Achievements & Cricket Role
-                    const achKey = Object.keys(flatRow).find(k => k.includes('achievements')) || 'achievements';
-                    let achievements = flatRow[achKey] || 'None';
-                    
-                    const roleKey = Object.keys(flatRow).find(k => k.includes('cricket') && k.includes('as ?')) || 'role';
-                    if (flatRow[roleKey]) {
-                        achievements = `Role: ${flatRow[roleKey]} | ${achievements}`;
-                    }
-
-                    state.players.push({
-                        name: name,
-                        sport: sportArr,
-                        gender: flatRow['gender'] || 'Male',
-                        basePrice: basePrice,
-                        image: image,
-                        achievements: achievements,
-                        status: 'Waiting'
-                    });
-                    added++;
-                });
-
-                saveState(state);
-                Swal.fire('Success', `${added} players uploaded.`, 'success');
-                fileInput.value = '';
-            } catch (err) {
-                console.error('Excel/CSV parse error:', err);
-                Swal.fire('Error', 'Failed to parse the file. Please check the columns.', 'error');
-            }
-        };
-        reader.readAsArrayBuffer(fileInput.files[0]);
-    });
-
-    // Add Team
-    document.getElementById('btn-add-team').addEventListener('click', async () => {
-        const { value: formValues } = await Swal.fire({
-            title: 'Add New Team',
-            html: `
-                <input id="swal-t-name" class="swal2-input" placeholder="Team Name">
-                <input id="swal-t-c" class="swal2-input" placeholder="Captain">
-                <input id="swal-t-vc" class="swal2-input" placeholder="Vice Captain">
-                <input id="swal-t-purse" type="number" class="swal2-input" placeholder="Starting Purse" value="10000">
-            `,
-            focusConfirm: false,
-            preConfirm: () => {
-                return [
-                    document.getElementById('swal-t-name').value,
-                    document.getElementById('swal-t-c').value,
-                    document.getElementById('swal-t-vc').value,
-                    parseInt(document.getElementById('swal-t-purse').value)
-                ]
-            }
-        });
-
-        if (formValues && formValues[0]) {
+    const addPlayerForm = document.getElementById('add-player-form');
+    if (addPlayerForm) {
+        addPlayerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
             const state = getState();
-            state.teams.push({
-                name: formValues[0].toUpperCase(), captain: formValues[1] || 'TBD', viceCaptain: formValues[2] || 'TBD',
-                purse: formValues[3] || 10000, players: [], maleCount: 0, femaleCount: 0
-            });
+
+            // Collect all checked sports
+            const checkedSports = [...document.querySelectorAll('.p-sport-cb:checked')].map(cb => cb.value);
+            if (checkedSports.length === 0) {
+                Swal.fire('Select Sports', 'Please select at least one sport for this player.', 'warning');
+                return;
+            }
+
+            const p = {
+                name: document.getElementById('p-name').value,
+                sport: checkedSports,       // Array of sports
+                gender: document.getElementById('p-gender').value,
+                basePrice: parseInt(document.getElementById('p-price').value),
+                image: document.getElementById('p-img').value || null,
+                achievements: document.getElementById('p-achievements').value || "None",
+                status: "Waiting"
+            };
+            state.players.push(p);
             saveState(state);
-            Swal.fire('Added', 'Team added successfully', 'success');
-        }
-    });
 
-    // Auction Controls
-    document.getElementById('btn-go-live').addEventListener('click', () => {
-        const s = getState();
-        s.auctionState.isLive = true;
+            // Reset form including all checkboxes
+            document.getElementById('add-player-form').reset();
+            document.querySelectorAll('.p-sport-cb').forEach(cb => cb.checked = false);
 
-        // Find first player who is "Waiting" if current is already decided
-        if (s.players[s.auctionState.currentPlayerIndex]?.status !== "Waiting") {
-            const nextWaiting = s.players.findIndex(p => p.status === "Waiting");
-            if (nextWaiting !== -1) s.auctionState.currentPlayerIndex = nextWaiting;
-        }
+            Swal.fire({ title: 'Added!', text: 'Player manually added', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+        });
+    }
 
-        s.auctionState.status = "Waiting";
-        s.auctionState.selectedTeamIndex = null;
-        s.auctionState.leadingTeam = null;
-        s.auctionState.currentBid = 0;
-        saveState(s);
-    });
-
-    document.getElementById('btn-pause').addEventListener('click', () => {
-        const s = getState();
-        s.auctionState.isLive = false;
-        saveState(s);
-    });
-
-    document.getElementById('btn-next').addEventListener('click', () => {
-        const s = getState();
-        if (s.auctionState.currentPlayerIndex < s.players.length - 1) {
-            // Find next waiting player
-            let found = false;
-            for (let i = s.auctionState.currentPlayerIndex + 1; i < s.players.length; i++) {
-                if (s.players[i].status === "Waiting") {
-                    s.auctionState.currentPlayerIndex = i;
-                    found = true;
-                    break;
+    // Team Selection Event Delegation (Auction Hall only)
+    const bidTeamBtns = document.getElementById('bid-team-buttons');
+    if (bidTeamBtns) {
+        bidTeamBtns.addEventListener('click', (e) => {
+            const btn = e.target.closest('.team-selector-btn');
+            if (!btn) return;
+            
+            const idx = parseInt(btn.dataset.index);
+            const state = getState();
+            state.auctionState.selectedTeamIndex = idx;
+            state.auctionState.leadingTeam = state.teams[idx]?.name || null;
+            
+            // If current bid is 0, start it at the player's base price when a team is first selected
+            if (state.auctionState.currentBid === 0) {
+                const player = state.players[state.auctionState.currentPlayerIndex];
+                if (player) {
+                    state.auctionState.currentBid = player.basePrice;
+                    const bidInp = document.getElementById('bid-amount');
+                    if (bidInp) bidInp.value = player.basePrice;
                 }
             }
-            if (!found) {
-                // Just go next anyway if they want to review
-                s.auctionState.currentPlayerIndex++;
+            
+            saveState(state);
+            updateBidPreview();
+        });
+    }
+
+    // Excel Upload
+    const btnUploadExcel = document.getElementById('btn-upload-excel');
+    if (btnUploadExcel) {
+        btnUploadExcel.addEventListener('click', () => {
+            const fileInput = document.getElementById('excel-file');
+            if (!fileInput.files[0]) {
+                Swal.fire('Error', 'Please select an Excel file first.', 'error'); return;
             }
-            s.auctionState.status = s.players[s.auctionState.currentPlayerIndex].status;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+
+                    const state = getState();
+                    let added = 0;
+                    rows.forEach(row => {
+                        const flatRow = {};
+                        for (let key in row) {
+                            // Aggressively clean keys (remove weird leading commas, line breaks, and whitespace)
+                            const cleanKey = key.trim().toLowerCase().replace(/[\n\r]+/g, ' ').replace(/\s+/g, ' ');
+                            flatRow[cleanKey] = row[key];
+                        }
+
+                        const name = flatRow['player name'] || flatRow['name'] || '';
+                        if (!name || name === 'Player Name') return; // Skip header clones
+
+                        const rawSport = flatRow['select sport'] || flatRow['sport'] || flatRow['sports'] || 'Unknown';
+                        const sportArr = Array.isArray(rawSport) 
+                            ? rawSport 
+                            : typeof rawSport === 'string'
+                              ? rawSport.split(/[;,]+/).map(s => s.trim()).filter(Boolean)
+                              : [String(rawSport)];
+
+                        const rawBase = flatRow['base price'] || flatRow['baseprice'];
+                        const basePrice = parseInt(rawBase) || 0;
+
+                        let image = flatRow['player image'] || flatRow['image url'] || flatRow['imageurl'] || flatRow['image'] || null;
+                        if (image && typeof image === 'string' && image.includes('drive.google.com')) {
+                            const idMatch = image.match(/[?&]id=([a-zA-Z0-9_-]+)/) || image.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+                            const fileId = idMatch ? idMatch[1] : null;
+                            if (fileId) image = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+                        }
+
+                        // Combined Achievements & Cricket Role
+                        const achKey = Object.keys(flatRow).find(k => k.includes('achievements')) || 'achievements';
+                        let achievements = flatRow[achKey] || 'None';
+                        
+                        const roleKey = Object.keys(flatRow).find(k => k.includes('cricket') && k.includes('as ?')) || 'role';
+                        if (flatRow[roleKey]) {
+                            achievements = `Role: ${flatRow[roleKey]} | ${achievements}`;
+                        }
+
+                        state.players.push({
+                            name: name,
+                            sport: sportArr,
+                            gender: flatRow['gender'] || 'Male',
+                            basePrice: basePrice,
+                            image: image,
+                            achievements: achievements,
+                            status: 'Waiting'
+                        });
+                        added++;
+                    });
+
+                    saveState(state);
+                    Swal.fire('Success', `${added} players uploaded.`, 'success');
+                    fileInput.value = '';
+                } catch (err) {
+                    console.error('Excel/CSV parse error:', err);
+                    Swal.fire('Error', 'Failed to parse the file. Please check the columns.', 'error');
+                }
+            };
+            reader.readAsArrayBuffer(fileInput.files[0]);
+        });
+    }
+
+    // Add Team
+    const btnAddTeam = document.getElementById('btn-add-team');
+    if (btnAddTeam) {
+        btnAddTeam.addEventListener('click', async () => {
+            const { value: formValues } = await Swal.fire({
+                title: 'Add New Team',
+                html: `
+                    <input id="swal-t-name" class="swal2-input" placeholder="Team Name">
+                    <input id="swal-t-c" class="swal2-input" placeholder="Captain">
+                    <input id="swal-t-vc" class="swal2-input" placeholder="Vice Captain">
+                    <input id="swal-t-purse" type="number" class="swal2-input" placeholder="Starting Purse" value="10000">
+                `,
+                focusConfirm: false,
+                preConfirm: () => {
+                    return [
+                        document.getElementById('swal-t-name').value,
+                        document.getElementById('swal-t-c').value,
+                        document.getElementById('swal-t-vc').value,
+                        parseInt(document.getElementById('swal-t-purse').value)
+                    ]
+                }
+            });
+
+            if (formValues && formValues[0]) {
+                const state = getState();
+                state.teams.push({
+                    name: formValues[0].toUpperCase(), captain: formValues[1] || 'TBD', viceCaptain: formValues[2] || 'TBD',
+                    purse: formValues[3] || 10000, players: [], maleCount: 0, femaleCount: 0
+                });
+                saveState(state);
+                Swal.fire('Added', 'Team added successfully', 'success');
+            }
+        });
+    }
+
+    // Auction Controls (only bind if elements exist — Auction Hall may be removed)
+    const goLiveBtn = document.getElementById('btn-go-live');
+    const pauseBtn = document.getElementById('btn-pause');
+    const nextBtn = document.getElementById('btn-next');
+    const bidAmountInput = document.getElementById('bid-amount');
+    const sellBtn = document.getElementById('btn-sell');
+    const unsoldBtn = document.getElementById('btn-unsold');
+
+    if (goLiveBtn) {
+        goLiveBtn.addEventListener('click', () => {
+            const s = getState();
+            s.auctionState.isLive = true;
+            if (s.players[s.auctionState.currentPlayerIndex]?.status !== "Waiting") {
+                const nextWaiting = s.players.findIndex(p => p.status === "Waiting");
+                if (nextWaiting !== -1) s.auctionState.currentPlayerIndex = nextWaiting;
+            }
+            s.auctionState.status = "Waiting";
             s.auctionState.selectedTeamIndex = null;
             s.auctionState.leadingTeam = null;
             s.auctionState.currentBid = 0;
-        } else {
-            Swal.fire('Auctions over!', 'No more players in list', 'info');
-        }
-        saveState(s);
-    });
+            saveState(s);
+        });
+    }
 
-    // Live Bid Preview: update when amount or team changes
-    document.getElementById('bid-amount').addEventListener('input', (e) => {
-        e.target.dataset.userEditing = 'true';
-        updateBidPreview();
-        
-        // Push live bid to state for auction screen
-        const s = getState();
-        s.auctionState.currentBid = parseInt(e.target.value) || 0;
-        saveState(s);
-    });
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', () => {
+            const s = getState();
+            s.auctionState.isLive = false;
+            saveState(s);
+        });
+    }
 
-    // Team selection is now handled by buttons in renderAdminData()
-    // No need for 'change' listener on bid-team-select as it's gone
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            const s = getState();
+            if (s.auctionState.currentPlayerIndex < s.players.length - 1) {
+                let found = false;
+                for (let i = s.auctionState.currentPlayerIndex + 1; i < s.players.length; i++) {
+                    if (s.players[i].status === "Waiting") {
+                        s.auctionState.currentPlayerIndex = i;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    s.auctionState.currentPlayerIndex++;
+                }
+                s.auctionState.status = s.players[s.auctionState.currentPlayerIndex].status;
+                s.auctionState.selectedTeamIndex = null;
+                s.auctionState.leadingTeam = null;
+                s.auctionState.currentBid = 0;
+            } else {
+                Swal.fire('Auctions over!', 'No more players in list', 'info');
+            }
+            saveState(s);
+        });
+    }
+
+    if (bidAmountInput) {
+        bidAmountInput.addEventListener('input', (e) => {
+            e.target.dataset.userEditing = 'true';
+            updateBidPreview();
+            const s = getState();
+            s.auctionState.currentBid = parseInt(e.target.value) || 0;
+            saveState(s);
+        });
+    }
 
     // Quick Bid Buttons
     document.querySelectorAll('.btn-quick-bid').forEach(btn => {
         btn.addEventListener('click', () => {
             const bidInput = document.getElementById('bid-amount');
+            if (!bidInput) return;
             const currentVal = parseInt(bidInput.value) || 0;
             const increment = parseInt(btn.dataset.amount) || 0;
             
-            // Set amount and flag as user editing
             bidInput.value = currentVal + increment;
             bidInput.dataset.userEditing = 'true';
             updateBidPreview();
 
-            // Push live bid/team to state for auction screen
             const s = getState();
             s.auctionState.currentBid = parseInt(bidInput.value);
             s.auctionState.leadingTeam = s.teams[s.auctionState.selectedTeamIndex]?.name || null;
@@ -476,8 +531,9 @@ function setupEventListeners() {
         });
     });
 
-    // Handle Bids
-    document.getElementById('btn-sell').addEventListener('click', () => {
+    // Handle Bids (only if Auction Hall elements exist)
+    if (sellBtn) {
+    sellBtn.addEventListener('click', () => {
         if (isAdvancing) return; // Prevent double trigger
         const s = getState();
         const pIdx = s.auctionState.currentPlayerIndex;
@@ -543,8 +599,10 @@ function setupEventListeners() {
             saveState(newState);
         }, 2000);
     });
+    } // end if (sellBtn)
 
-    document.getElementById('btn-unsold').addEventListener('click', () => {
+    if (unsoldBtn) {
+    unsoldBtn.addEventListener('click', () => {
         if (isAdvancing) return;
         const s = getState();
         const pIdx = s.auctionState.currentPlayerIndex;
@@ -577,6 +635,7 @@ function setupEventListeners() {
             saveState(newState);
         }, 2000);
     });
+    } // end if (unsoldBtn)
 
     // Reset Global State
     document.getElementById('btn-reset-state').addEventListener('click', () => {
@@ -690,6 +749,9 @@ function setupEventListeners() {
             });
         });
     }
+
+    // Tournament Events
+    setupTournamentListeners();
 }
 
 // Global exposes
@@ -813,3 +875,473 @@ function updateBidPreview() {
         </div>
     `;
 }
+
+/**
+ * Tournament Management Logic
+ */
+function renderTournamentAdmin() {
+    const s = getState();
+    const matchList = document.getElementById('admin-matches-list');
+    if (!matchList) return;
+
+    matchList.innerHTML = '';
+    const matches = s.matches || [];
+    
+    const ongoingSelector = document.getElementById('ongoing-matches-selector');
+    
+    if (matchList) matchList.innerHTML = '';
+    if (ongoingSelector) ongoingSelector.innerHTML = '';
+
+    const matches = s.matches || [];
+    
+    if (matches.length === 0) {
+        if (matchList) matchList.innerHTML = '<p class="text-[10px] text-gray-500 italic p-4 text-center border border-dashed border-white/5 rounded-xl">No active matches logged.</p>';
+        if (ongoingSelector) ongoingSelector.innerHTML = '<p class="text-[10px] text-gray-500 italic p-4 text-center border border-dashed border-white/5 rounded-xl">No matches found to stream.</p>';
+        return;
+    }
+
+    matches.forEach((m, idx) => {
+        let scText = m.score ? `<span class="bg-gray-700 px-2 py-0.5 rounded text-white font-mono">${m.score}</span>` : '<span class="text-gray-500 italic">Not Started</span>';
+        let winText = m.winner ? `<span class="text-emerald-400 font-bold ml-2">(${m.winner} Won)</span>` : '';
+        const isFinished = !!m.winner;
+
+        // Common Header
+        const matchInfo = `
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-[9px] font-black uppercase text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded">${m.sport} • ${m.stage}</span>
+                <button onclick="deleteMatch(${idx})" class="text-red-500 hover:text-red-400 p-1 opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash text-xs"></i></button>
+            </div>
+            <div class="flex flex-col gap-1">
+                <div class="flex justify-between items-center text-xs font-bold text-gray-300">
+                    <span class="truncate w-full text-blue-400">${m.team1}</span>
+                    <span class="text-gray-600 mx-2 text-[10px] italic w-[20px] text-center">VS</span>
+                    <span class="truncate w-full text-right text-pink-400">${m.team2}</span>
+                </div>
+                <!-- optional players -->
+                ${m.playerA || m.playerB ? `
+                <div class="flex justify-between items-center text-[9px] font-medium text-gray-500 mt-1">
+                    <span class="truncate w-full">${m.playerA || ''}</span>
+                    <span class="truncate w-full text-right">${m.playerB || ''}</span>
+                </div>` : ''}
+            </div>
+            <div class="text-[10px] text-gray-500 mt-2">${m.details || 'No details'}</div>
+            <div class="flex items-center text-[10px] justify-between mt-2 pt-2 border-t border-white/5">
+                <div>Score: ${scText} ${winText}</div>
+            </div>
+        `;
+
+        if (matchList) {
+            matchList.innerHTML += `
+                <div class="bg-black/30 p-4 rounded-2xl border border-white/5 flex flex-col relative group hover:border-amber-500/30 transition shadow-lg">
+                    ${matchInfo}
+                </div>
+            `;
+        }
+
+        // Only show unfinished matches in the ongoing selector, or style finished ones distinctly
+        if (ongoingSelector) {
+            ongoingSelector.innerHTML += `
+                <div class="bg-cardBg p-4 rounded-2xl border ${isFinished ? 'border-white/5 opacity-50' : 'border-emerald-500/30'} flex flex-col relative group hover:border-emerald-500 transition shadow-lg cursor-pointer" onclick="activateLiveMatch(${idx})">
+                    ${matchInfo}
+                    ${!isFinished ? `
+                    <div class="mt-3">
+                        <button class="w-full py-2 bg-emerald-500/10 text-emerald-400 rounded-lg text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all"><i class="fas fa-play mr-1"></i> Start Live Scoring</button>
+                    </div>` : `
+                    <div class="mt-3">
+                        <div class="w-full py-2 bg-white/5 text-gray-500 rounded-lg text-[9px] font-black uppercase tracking-widest text-center">Match Finished</div>
+                    </div>`}
+                </div>
+            `;
+        }
+    });
+}
+
+function setupTournamentListeners() {
+    // --- State for inline match form ---
+    let selectedSport = null;
+    let selectedStage = null;
+    let selectedTeamA = null;
+    let selectedTeamB = null;
+    let selectedWinner = 'auto';
+
+    const ACTIVE_SPORT = 'bg-blue-600 border-blue-400 text-white shadow-lg shadow-blue-900/40';
+    const INACTIVE_SPORT = 'bg-white/5 border-white/10 text-gray-400';
+    const ACTIVE_STAGE = 'bg-amber-600 border-amber-400 text-white shadow-lg shadow-amber-900/40';
+    const INACTIVE_STAGE = 'bg-white/5 border-white/10 text-gray-400';
+    const ACTIVE_TEAM_A = 'bg-blue-600 border-blue-400 text-white shadow-lg';
+    const INACTIVE_TEAM = 'bg-white/5 border-white/10 text-gray-400';
+    const ACTIVE_TEAM_B = 'bg-pink-600 border-pink-400 text-white shadow-lg';
+    const ACTIVE_WINNER = 'bg-emerald-600 border-emerald-400 text-white shadow-lg';
+    const INACTIVE_WINNER = 'bg-white/5 border-white/10 text-gray-400';
+
+    function splitClasses(str) { return str.split(' ').filter(Boolean); }
+
+    // Render team buttons into Team A & Team B selectors
+    function renderTeamButtons() {
+        const freshState = getState();
+        const teams = freshState.teams && freshState.teams.length > 0
+            ? freshState.teams
+            : [{ name: "ROBO KNIGHTS" }, { name: "FLASHING BOTS \ud83e\udd16" }, { name: "TECH TITANS \ud83e\udd16" }];
+
+        const teamAContainer = document.getElementById('teamA-selector');
+        const teamBContainer = document.getElementById('teamB-selector');
+        const winnerTeamsContainer = document.getElementById('dynamic-winner-teams');
+        if (!teamAContainer || !teamBContainer) return;
+
+        teamAContainer.innerHTML = '';
+        teamBContainer.innerHTML = '';
+        if (winnerTeamsContainer) winnerTeamsContainer.innerHTML = '';
+
+        teams.forEach(t => {
+            const logoHtml = t.logo ? `<img src="${t.logo}" class="w-6 h-6 rounded-full inline-block mr-2 align-middle border border-white/20 bg-white/10">` : '';
+
+            const btnA = document.createElement('button');
+            btnA.type = 'button';
+            btnA.className = `teamA-btn p-3 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-all active:scale-95 text-center ${INACTIVE_TEAM}`;
+            btnA.dataset.team = t.name;
+            btnA.innerHTML = `<span class="pointer-events-none">${logoHtml}${t.name}</span>`;
+            teamAContainer.appendChild(btnA);
+
+            const btnB = document.createElement('button');
+            btnB.type = 'button';
+            btnB.className = `teamB-btn p-3 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-all active:scale-95 text-center ${INACTIVE_TEAM}`;
+            btnB.dataset.team = t.name;
+            btnB.innerHTML = `<span class="pointer-events-none">${logoHtml}${t.name}</span>`;
+            teamBContainer.appendChild(btnB);
+
+            if (winnerTeamsContainer) {
+                const btnW = document.createElement('button');
+                btnW.type = 'button';
+                btnW.className = `winner-btn p-3 rounded-xl font-black text-[10px] uppercase tracking-widest border transition-all active:scale-95 text-center ${INACTIVE_WINNER}`;
+                btnW.dataset.winner = t.name;
+                btnW.innerHTML = `<span class="pointer-events-none">${logoHtml}${t.name}</span>`;
+                winnerTeamsContainer.appendChild(btnW);
+            }
+        });
+    }
+
+    // Initial render & re-render on state update
+    renderTeamButtons();
+    window.addEventListener('stateUpdated', renderTeamButtons);
+
+    // Set "Auto" winner as default active
+    document.querySelectorAll('.winner-btn').forEach(btn => {
+        if (btn.dataset.winner === 'auto') {
+            btn.classList.remove(...splitClasses(INACTIVE_WINNER));
+            btn.classList.add(...splitClasses(ACTIVE_WINNER));
+        }
+    });
+
+    // --- Sport Buttons ---
+    document.getElementById('sport-selector')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.sport-btn');
+        if (!btn) return;
+        selectedSport = btn.dataset.sport;
+        document.querySelectorAll('.sport-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_SPORT)); b.classList.add(...splitClasses(INACTIVE_SPORT)); });
+        btn.classList.remove(...splitClasses(INACTIVE_SPORT));
+        btn.classList.add(...splitClasses(ACTIVE_SPORT));
+
+        // Toggle Badminton specific options
+        const badOptions = document.getElementById('badminton-options');
+        if (badOptions) {
+            if (selectedSport === 'Badminton') badOptions.classList.remove('hidden');
+            else badOptions.classList.add('hidden');
+        }
+    });
+
+    // --- Badminton Category Buttons ---
+    document.getElementById('badminton-category-selector')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.badminton-cat-btn');
+        if (!btn) return;
+        const cat = btn.dataset.category;
+        const detailsInput = document.getElementById('match-details');
+        if (detailsInput) {
+            // Check if there is already text, if so replace or prepend
+            if (!detailsInput.value) {
+                detailsInput.value = cat;
+            } else if (!detailsInput.value.includes(cat)) {
+                detailsInput.value = cat + ' - ' + detailsInput.value;
+            }
+        }
+    });
+
+    // --- Stage Buttons ---
+    document.getElementById('stage-selector')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.stage-btn');
+        if (!btn) return;
+        selectedStage = btn.dataset.stage;
+        document.querySelectorAll('.stage-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_STAGE)); b.classList.add(...splitClasses(INACTIVE_STAGE)); });
+        btn.classList.remove(...splitClasses(INACTIVE_STAGE));
+        btn.classList.add(...splitClasses(ACTIVE_STAGE));
+    });
+
+    // --- Team A Buttons ---
+    document.getElementById('teamA-selector')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.teamA-btn');
+        if (!btn) return;
+        selectedTeamA = btn.dataset.team;
+        document.querySelectorAll('.teamA-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_TEAM_A)); b.classList.add(...splitClasses(INACTIVE_TEAM)); });
+        btn.classList.remove(...splitClasses(INACTIVE_TEAM));
+        btn.classList.add(...splitClasses(ACTIVE_TEAM_A));
+    });
+
+    // --- Team B Buttons ---
+    document.getElementById('teamB-selector')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.teamB-btn');
+        if (!btn) return;
+        selectedTeamB = btn.dataset.team;
+        document.querySelectorAll('.teamB-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_TEAM_B)); b.classList.add(...splitClasses(INACTIVE_TEAM)); });
+        btn.classList.remove(...splitClasses(INACTIVE_TEAM));
+        btn.classList.add(...splitClasses(ACTIVE_TEAM_B));
+    });
+
+    // --- Winner Buttons ---
+    document.getElementById('winner-selector')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('.winner-btn');
+        if (!btn) return;
+        selectedWinner = btn.dataset.winner;
+        document.querySelectorAll('.winner-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_WINNER)); b.classList.add(...splitClasses(INACTIVE_WINNER)); });
+        btn.classList.remove(...splitClasses(INACTIVE_WINNER));
+        btn.classList.add(...splitClasses(ACTIVE_WINNER));
+    });
+
+    // --- Submit Match (Schedule Only) ---
+    const submitBtn = document.getElementById('btn-submit-match');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', () => {
+            if (!selectedSport) { Swal.fire('Select Sport', 'Please select a sport first.', 'warning'); return; }
+            if (!selectedStage) { Swal.fire('Select Stage', 'Please select a match stage.', 'warning'); return; }
+            if (!selectedTeamA || !selectedTeamB) { Swal.fire('Select Teams', 'Please select both Team A and Team B.', 'warning'); return; }
+            if (selectedTeamA === selectedTeamB) { Swal.fire('Same Team', 'Team A and Team B must be different!', 'error'); return; }
+
+            const playerA = document.getElementById('playerA-name').value || '';
+            const playerB = document.getElementById('playerB-name').value || '';
+            let details = document.getElementById('match-details').value;
+
+            // Optional: combine details with player names if provided
+            const combinedDetails = [details, playerA ? `Team A: ${playerA}` : '', playerB ? `Team B: ${playerB}` : ''].filter(Boolean).join(' | ');
+
+            const s = getState();
+            if (!s.matches) s.matches = [];
+            // Create match object without final score/winner
+            s.matches.push({ 
+                sport: selectedSport, 
+                stage: selectedStage, 
+                team1: selectedTeamA, 
+                team2: selectedTeamB, 
+                playerA: playerA,
+                playerB: playerB,
+                score: null, 
+                winner: null, 
+                details: combinedDetails 
+            });
+            saveState(s);
+            Swal.fire({ title: 'Match Scheduled!', text: `${selectedTeamA} vs ${selectedTeamB} \u2014 ${selectedSport}`, icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
+
+            // Reset form
+            selectedSport = null; selectedStage = null; selectedTeamA = null; selectedTeamB = null;
+            document.querySelectorAll('.sport-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_SPORT)); b.classList.add(...splitClasses(INACTIVE_SPORT)); });
+            document.querySelectorAll('.stage-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_STAGE)); b.classList.add(...splitClasses(INACTIVE_STAGE)); });
+            document.querySelectorAll('.teamA-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_TEAM_A)); b.classList.add(...splitClasses(INACTIVE_TEAM)); });
+            document.querySelectorAll('.teamB-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_TEAM_B)); b.classList.add(...splitClasses(INACTIVE_TEAM)); });
+            
+            document.getElementById('playerA-name').value = '';
+            document.getElementById('playerB-name').value = '';
+            document.getElementById('match-details').value = '';
+        });
+    }
+
+    setupLiveMatchListeners();
+    const setRankBtn = document.getElementById('btn-set-rankings');
+    if (setRankBtn) {
+        setRankBtn.addEventListener('click', async () => {
+            const s = getState();
+            const ranks = s.tournamentRankings || {};
+            // Always read fresh teams list
+            const freshTeams = s.teams && s.teams.length > 0
+                ? s.teams.map(t => t.name)
+                : ["ROBO KNIGHTS", "FLASHING BOTS 🤖", "TECH TITANS 🤖"];
+            const teamOptions = ['<option value="">None</option>'].concat(freshTeams.map(t => `<option value="${t}">${t}</option>`)).join('');
+            
+            const buildSportSelects = (sportName) => {
+                const r = ranks[sportName] || {};
+                return `
+                    <div class="bg-black/20 p-3 rounded-xl border border-white/10 mb-3">
+                        <div class="text-xs font-bold text-yellow-500 mb-2 uppercase">${sportName}</div>
+                        <div class="flex gap-2">
+                            <select id="rank-${sportName}-1" class="swal2-input !mt-0 w-1/3 text-[10px]"><option value="" disabled>1st Place</option>${teamOptions.replace(`value="${r['1st']}"`, `value="${r['1st']}" selected`)}</select>
+                            <select id="rank-${sportName}-2" class="swal2-input !mt-0 w-1/3 text-[10px]"><option value="" disabled>2nd Place</option>${teamOptions.replace(`value="${r['2nd']}"`, `value="${r['2nd']}" selected`)}</select>
+                            <select id="rank-${sportName}-3" class="swal2-input !mt-0 w-1/3 text-[10px]"><option value="" disabled>3rd Place</option>${teamOptions.replace(`value="${r['3rd']}"`, `value="${r['3rd']}" selected`)}</select>
+                        </div>
+                    </div>
+                `;
+            };
+
+            const { value: formValues } = await Swal.fire({
+                title: 'Assign Final Sport Rankings',
+                html: `
+                    <div class="text-left max-h-[60vh] overflow-y-auto pr-2">
+                        ${buildSportSelects('Cricket')}
+                        ${buildSportSelects('Badminton')}
+                        ${buildSportSelects('Volleyball')}
+                        ${buildSportSelects('Tug of War')}
+                    </div>
+                `,
+                width: '700px',
+                focusConfirm: false,
+                preConfirm: () => {
+                    const getRanks = (sport) => ({
+                        "1st": document.getElementById(`rank-${sport}-1`).value,
+                        "2nd": document.getElementById(`rank-${sport}-2`).value,
+                        "3rd": document.getElementById(`rank-${sport}-3`).value,
+                    });
+                    return {
+                        "Cricket": getRanks("Cricket"),
+                        "Badminton": getRanks("Badminton"),
+                        "Volleyball": getRanks("Volleyball"),
+                        "Tug of War": getRanks("Tug of War")
+                    };
+                }
+            });
+
+            if (formValues) {
+                const s = getState();
+                s.tournamentRankings = formValues;
+                saveState(s);
+                Swal.fire({ title: 'Rankings Updated!', text: 'RPL points will now reflect the new placements.', icon: 'success' });
+            }
+        });
+    }
+}
+
+let activeLiveMatchIndex = null;
+let currentScoreA = 0;
+let currentScoreB = 0;
+
+function setupLiveMatchListeners() {
+    // --- Live Score Controller Logic ---
+    document.querySelectorAll('.live-score-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            if (activeLiveMatchIndex === null) return;
+            const target = btn.dataset.target; // 'A' or 'B'
+            const action = btn.dataset.action; // 'increment' or 'decrement'
+
+            if (target === 'A') {
+                if (action === 'increment') currentScoreA++;
+                if (action === 'decrement' && currentScoreA > 0) currentScoreA--;
+                document.getElementById('live-score-teamA').textContent = currentScoreA;
+            } else {
+                if (action === 'increment') currentScoreB++;
+                if (action === 'decrement' && currentScoreB > 0) currentScoreB--;
+                document.getElementById('live-score-teamB').textContent = currentScoreB;
+            }
+
+            // Optional: Live save to Firebase to instantly reflect on public leaderboard
+            const s = getState();
+            if (s.matches && s.matches[activeLiveMatchIndex]) {
+                s.matches[activeLiveMatchIndex].score = `${currentScoreA} - ${currentScoreB}`;
+                saveStateSilent(s); // Avoid re-triggering massive UI rebuilds just for score increments
+            }
+        });
+    });
+
+    // --- Complete Match Logic ---
+    const btnComplete = document.getElementById('btn-complete-live-match');
+    if (btnComplete) {
+        btnComplete.addEventListener('click', () => {
+            if (activeLiveMatchIndex === null) return;
+            
+            const s = getState();
+            const m = s.matches[activeLiveMatchIndex];
+            
+            const winnerSelect = document.getElementById('live-winner-select').value;
+            let finalWinner = '';
+            
+            if (winnerSelect === 'auto') {
+                if (currentScoreA > currentScoreB) finalWinner = m.team1;
+                else if (currentScoreB > currentScoreA) finalWinner = m.team2;
+                else finalWinner = 'Draw';
+            } else {
+                finalWinner = winnerSelect;
+            }
+
+            m.score = `${currentScoreA} - ${currentScoreB}`;
+            m.winner = finalWinner;
+
+            saveState(s);
+            
+            Swal.fire({ title: 'Match Finished!', text: `Winner: ${finalWinner}`, icon: 'success' });
+            
+            activeLiveMatchIndex = null;
+            renderAdminMatches(); // Force re-render of selectors
+            document.getElementById('live-scoreboard-panel').classList.add('hidden');
+            document.getElementById('live-empty-state').classList.remove('hidden');
+        });
+    }
+}
+
+// A silent version of saveState that pushes to Firebase but doesn't force a full local re-render event
+function saveStateSilent(stateObject) {
+    if (window.dbSet && window.dbRef && window.db) {
+        window.dbSet(window.dbRef(window.db, 'rpl_state'), stateObject).catch(console.error);
+    }
+}
+
+window.activateLiveMatch = (idx) => {
+    const s = getState();
+    const m = s.matches[idx];
+    if (!m) return;
+    
+    activeLiveMatchIndex = idx;
+    
+    // Parse existing score if any
+    currentScoreA = 0;
+    currentScoreB = 0;
+    if (m.score) {
+        const parts = m.score.split('-');
+        if (parts.length === 2) {
+            currentScoreA = parseInt(parts[0].trim()) || 0;
+            currentScoreB = parseInt(parts[1].trim()) || 0;
+        }
+    }
+    
+    document.getElementById('live-sport-badge').textContent = `${m.sport} • ${m.stage}`;
+    document.getElementById('live-match-details').textContent = m.details || 'No Extra Details';
+    document.getElementById('live-teamA-name').textContent = m.team1;
+    document.getElementById('live-teamB-name').textContent = m.team2;
+    document.getElementById('live-playerA-name').textContent = m.playerA || 'Player A';
+    document.getElementById('live-playerB-name').textContent = m.playerB || 'Player B';
+    
+    document.getElementById('live-score-teamA').textContent = currentScoreA;
+    document.getElementById('live-score-teamB').textContent = currentScoreB;
+
+    // Populate Winner Select dropdown dynamically
+    const liveWinnerSelect = document.getElementById('live-winner-select');
+    liveWinnerSelect.innerHTML = `
+        <option value="auto">Auto (Higher score)</option>
+        <option value="Draw">Draw Match</option>
+        <option value="${m.team1}">${m.team1}</option>
+        <option value="${m.team2}">${m.team2}</option>
+    `;
+    
+    document.getElementById('live-scoreboard-panel').classList.remove('hidden');
+    document.getElementById('live-empty-state').classList.add('hidden');
+};
+
+window.deleteMatch = (idx) => {
+    Swal.fire({
+        title: 'Delete Match?',
+        text: "Remove this match from the schedule?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Delete'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const s = getState();
+            s.matches.splice(idx, 1);
+            saveState(s);
+        }
+    });
+};
+

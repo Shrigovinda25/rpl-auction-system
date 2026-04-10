@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament - RPL Auction 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f172a',
+                        cardBg: '#1e293b'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-darkBg text-white min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-cardBg border-b border-gray-800 p-4 sticky top-0 z-50 shadow-xl">
+        <div class="max-w-7xl mx-auto flex justify-between items-center px-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center font-black italic text-sm text-black">R</div>
+                <h1 class="text-xl font-black uppercase tracking-tighter text-white">RPL Tournament <span class="text-amber-500 hidden md:inline">2026</span></h1>
+            </div>
+            <div class="flex space-x-4">
+                <a href="index.html" class="text-xs font-bold text-gray-400 hover:text-white transition uppercase tracking-widest flex items-center gap-2"><i class="fas fa-home"></i><span class="hidden md:inline"> Home</span></a>
+                <a href="players.html" class="text-xs font-bold text-gray-400 hover:text-white transition uppercase tracking-widest flex items-center gap-2"><i class="fas fa-users"></i><span class="hidden md:inline"> Strategy</span></a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- LEFT COLUMN: Live Matches & Rules -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Overall Rules & Target -->
+            <div class="bg-gradient-to-br from-amber-600/20 to-orange-800/20 p-6 rounded-2xl border border-amber-500/20 shadow-2xl relative overflow-hidden">
+                <i class="fas fa-trophy absolute -bottom-10 -right-10 text-9xl text-amber-500/10 rotate-12"></i>
+                <div class="relative z-10">
+                    <h2 class="text-3xl font-black uppercase tracking-tighter text-amber-400 mb-2">🏆 RPL Trophy Winning Scenarios</h2>
+                    <p class="text-amber-200/60 font-medium mb-6">Target 230+ points to win RPL. Play Smart. Play Hard.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                            <div class="text-xl font-black text-white">280 Points</div>
+                            <div class="text-amber-400 text-[10px] font-black uppercase tracking-widest mt-1">Cricket 🥇 + All Wins</div>
+                            <div class="text-[9px] text-gray-400 mt-2">Guaranteed Champion 💯</div>
+                        </div>
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                            <div class="text-xl font-black text-white">250 Points</div>
+                            <div class="text-amber-400 text-[10px] font-black uppercase tracking-widest mt-1">No Cricket Win</div>
+                            <div class="text-[9px] text-gray-400 mt-2">Still Very Strong 🔥</div>
+                        </div>
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/5 border-emerald-500/30">
+                            <div class="text-xl font-black text-emerald-400">230+ Points</div>
+                            <div class="text-emerald-500 text-[10px] font-black uppercase tracking-widest mt-1">Strong Combo (2-3 wins)</div>
+                            <div class="text-[9px] text-gray-400 mt-2">Safe Winning Zone ✅</div>
+                        </div>
+                        <div class="bg-black/30 p-4 rounded-xl border border-white/5">
+                            <div class="text-xl font-black text-red-400">&lt; 190 Points</div>
+                            <div class="text-red-500 text-[10px] font-black uppercase tracking-widest mt-1">Below Target</div>
+                            <div class="text-[9px] text-gray-400 mt-2">Very difficult to win</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rules Tabs -->
+            <div class="bg-cardBg p-6 rounded-2xl border border-white/5 shadow-2xl">
+                <h2 class="text-xs font-black uppercase tracking-[0.2em] mb-4 text-gray-500">Tournament Format & Rules</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-sm font-black text-white uppercase tracking-widest mb-3 border-b border-white/10 pb-2"><i class="fas fa-sitemap text-blue-400 mr-2"></i>League Format</h3>
+                        <ul class="text-xs text-gray-400 space-y-2 list-disc pl-4 font-medium">
+                            <li>Round Robin between Team A, B, and C.</li>
+                            <li><strong class="text-emerald-400">Win:</strong> 2 points | <strong class="text-red-400">Loss:</strong> 0 points</li>
+                            <li><strong class="text-blue-400">1st Place:</strong> Direct Final 🏆</li>
+                            <li><strong class="text-amber-400">2nd vs 3rd:</strong> Semi-Final -> Winner to Final</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm font-black text-white uppercase tracking-widest mb-3 border-b border-white/10 pb-2"><i class="fas fa-table-tennis text-pink-400 mr-2"></i>Badminton Rules</h3>
+                        <ul class="text-xs text-gray-400 space-y-2 list-disc pl-4 font-medium">
+                            <li><strong>Format:</strong> Best of 5 Matches. First to 3 wins ties.</li>
+                            <li><strong>Matches:</strong> Boys Singles, Girls Singles, Boys Doubles, Girls Doubles, Mixed Doubles.</li>
+                            <li><strong>Players:</strong> Min 4-6 players. One player -> 1 Singles + 1 Doubles only.</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-sm font-black text-white uppercase tracking-widest mb-3 border-b border-white/10 pb-2"><i class="fas fa-volleyball-ball text-orange-400 mr-2"></i>Volleyball Rules</h3>
+                        <ul class="text-xs text-gray-400 space-y-2 list-disc pl-4 font-medium">
+                            <li><strong>League/Semi:</strong> 15 points (single set)</li>
+                            <li><strong>Final:</strong> 25 points</li>
+                            <li><strong>Players:</strong> 6 Playing. Squad: 7-9 players.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm font-black text-white uppercase tracking-widest mb-3 border-b border-white/10 pb-2"><i class="fas fa-baseball-ball text-emerald-400 mr-2"></i>Cricket Rules</h3>
+                        <ul class="text-xs text-gray-400 space-y-2 list-disc pl-4 font-medium">
+                            <li><strong>League:</strong> 8 overs</li>
+                            <li><strong>Semi-Final / Final:</strong> 10 overs</li>
+                            <li><strong>Players:</strong> Playing XI -> 11 players. Squad: 11-14.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Matches Feed -->
+            <div class="bg-cardBg p-6 rounded-2xl border border-white/5 shadow-2xl">
+                <h2 class="text-lg font-black uppercase tracking-tighter mb-6 text-white flex items-center gap-3">
+                    <span class="w-8 h-8 rounded-full bg-blue-600/20 flex items-center justify-center"><i class="fas fa-bolt text-blue-400 text-sm"></i></span>
+                    Live Match Results
+                </h2>
+                
+                <div id="tournament-matches" class="space-y-4">
+                    <!-- Matches populated via JS -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: Points Tables -->
+        <div class="lg:col-span-1 space-y-6">
+            
+            <!-- Overall RPL Trophy Points -->
+            <div class="bg-cardBg p-6 rounded-2xl border border-amber-500/30 shadow-2xl shadow-amber-500/5 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-600"></div>
+                <h2 class="text-sm font-black uppercase tracking-widest mb-1 text-amber-500"><i class="fas fa-crown mr-2"></i>RPL Trophy Table</h2>
+                <p class="text-[10px] text-gray-500 mb-6 uppercase tracking-widest">Live Points Standings</p>
+                
+                <div id="trophy-standings" class="space-y-3">
+                    <!-- Standings populated via JS -->
+                </div>
+            </div>
+
+            <!-- Trophy Points System Reference -->
+            <div class="bg-cardBg p-5 rounded-2xl border border-white/5 shadow-xl">
+                <h2 class="text-xs font-black uppercase tracking-[0.2em] mb-4 text-gray-500">Points System</h2>
+                <table class="w-full text-left text-xs font-medium text-gray-300 uppercase tracking-widest">
+                    <thead class="border-b border-white/10 text-gray-500">
+                        <tr>
+                            <th class="pb-2">Sport</th>
+                            <th class="pb-2 text-center text-amber-400"><i class="fas fa-medal"></i> 1st</th>
+                            <th class="pb-2 text-center text-gray-300"><i class="fas fa-medal"></i> 2nd</th>
+                            <th class="pb-2 text-center text-orange-400"><i class="fas fa-medal"></i> 3rd</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr><td class="py-3">Cricket</td><td class="text-center font-bold text-white">100</td><td class="text-center">70</td><td class="text-center">50</td></tr>
+                        <tr><td class="py-3">Badminton</td><td class="text-center font-bold text-white">70</td><td class="text-center">50</td><td class="text-center">30</td></tr>
+                        <tr><td class="py-3">Volleyball</td><td class="text-center font-bold text-white">70</td><td class="text-center">50</td><td class="text-center">30</td></tr>
+                        <tr><td class="py-3 text-[10px]">Tug of War</td><td class="text-center font-bold text-white">40</td><td class="text-center">25</td><td class="text-center">15</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tie Breakers -->
+            <div class="bg-black/30 p-5 rounded-2xl border border-white/5 border-dashed">
+                <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3"><i class="fas fa-balance-scale mr-2 text-gray-400"></i>Tie Breakers</h3>
+                <ul class="text-[10px] text-gray-400 space-y-1 font-medium list-inside list-decimal">
+                    <li>Cricket Rank 🏏 / Net Run Rate</li>
+                    <li>Total Wins 🥇</li>
+                    <li>Head-to-Head ⚔️</li>
+                    <li>Fair Play 🎯 / Points Diff</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase & Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDnJ0KWlqwdYhuR2g4nvLheQxc56r6tk1g",
+            authDomain: "rpl-auction-abf32.firebaseapp.com",
+            projectId: "rpl-auction-abf32",
+            storageBucket: "rpl-auction-abf32.firebasestorage.app",
+            messagingSenderId: "786517772604",
+            appId: "1:786517772604:web:35a665273ecdb93682b639",
+            databaseURL: "https://rpl-auction-abf32-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const POINT_TEMPLATE = {
+            "Cricket": { "1st": 100, "2nd": 70, "3rd": 50 },
+            "Badminton": { "1st": 70, "2nd": 50, "3rd": 30 },
+            "Volleyball": { "1st": 70, "2nd": 50, "3rd": 30 },
+            "Tug of War": { "1st": 40, "2nd": 25, "3rd": 15 }
+        };
+
+        const THEME_COLORS = {
+            "ROBO KNIGHTS": "text-blue-400 bg-blue-500/10 border-blue-500/20",
+            "FLASHING BOTS 🤖": "text-pink-400 bg-pink-500/10 border-pink-500/20",
+            "TECH TITANS 🤖": "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+        };
+        const THEME_ACCENTS = {
+            "ROBO KNIGHTS": "from-blue-600 to-blue-900 border-blue-400/30",
+            "FLASHING BOTS 🤖": "from-pink-600 to-purple-900 border-pink-400/30",
+            "TECH TITANS 🤖": "from-emerald-600 to-teal-900 border-emerald-400/30"
+        };
+
+        let state = null;
+        
+        onValue(ref(db, 'rpl_auction/state'), (snapshot) => {
+            state = snapshot.val();
+            if (state) {
+                renderStandings();
+                renderMatches();
+            }
+        });
+
+        function renderStandings() {
+            const container = document.getElementById('trophy-standings');
+            if(!container || !state || !state.teams) return;
+
+            // Calculate current RPL scores
+            let scores = {};
+            state.teams.forEach(t => scores[t.name] = 0);
+
+            const rankings = state.tournamentRankings || {};
+            Object.keys(rankings).forEach(sport => {
+                const results = rankings[sport];
+                if (!results) return;
+                
+                ["1st", "2nd", "3rd"].forEach(place => {
+                    const team = results[place];
+                    if (team && scores[team] !== undefined && POINT_TEMPLATE[sport]) {
+                        scores[team] += POINT_TEMPLATE[sport][place];
+                    }
+                });
+            });
+
+            const sortedTeams = Object.keys(scores).map(t => ({ name: t, pts: scores[t] })).sort((a,b) => b.pts - a.pts);
+
+            container.innerHTML = '';
+            sortedTeams.forEach((item, idx) => {
+                const isFirst = idx === 0 && item.pts > 0;
+                const teamData = state.teams.find(t => t.name === item.name);
+                const logo = teamData && teamData.logo ? `<img src="${teamData.logo}" class="w-10 h-10 rounded-lg object-cover shadow-lg bg-white/10 hidden sm:block">` : `<div class="w-10 h-10 rounded-lg bg-white/10 hidden sm:flex items-center justify-center font-bold text-xl">${item.name.charAt(0)}</div>`;
+                const accent = THEME_ACCENTS[item.name] || 'from-gray-700 to-gray-900 border-gray-600';
+
+                container.innerHTML += `
+                    <div class="relative bg-gradient-to-r ${accent} p-4 rounded-xl border flex items-center justify-between overflow-hidden shadow-lg transform transition hover:scale-[1.02]">
+                        ${isFirst ? '<div class="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-bl-full"></div><i class="fas fa-crown absolute top-2 right-2 text-white/20 text-2xl rotate-12"></i>' : ''}
+                        
+                        <div class="flex items-center gap-4 relative z-10">
+                            <div class="text-xl font-black text-white/50 w-6 text-center">#${idx + 1}</div>
+                            ${logo}
+                            <div>
+                                <h3 class="font-black uppercase tracking-tighter text-white sm:text-base leading-tight">${item.name}</h3>
+                            </div>
+                        </div>
+                        <div class="text-right relative z-10">
+                            <div class="text-2xl font-black text-white font-mono">${item.pts} <span class="text-[10px] text-white/60 tracking-widest uppercase">PTS</span></div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderMatches() {
+            const container = document.getElementById('tournament-matches');
+            if(!container || !state) return;
+
+            const matches = state.matches || [];
+            if (matches.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 bg-black/20 rounded-2xl border border-dashed border-white/5">
+                        <i class="fas fa-calendar-times text-3xl text-gray-600 mb-2"></i>
+                        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">No Matches Logged</h3>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            // Display newest first
+            [...matches].reverse().forEach(m => {
+                const t1Style = THEME_COLORS[m.team1] || 'text-gray-400 bg-gray-500/10 border-gray-500/20';
+                const t2Style = THEME_COLORS[m.team2] || 'text-gray-400 bg-gray-500/10 border-gray-500/20';
+
+                let scoreTag = m.score 
+                    ? `<div class="bg-gray-800 text-white font-mono px-3 py-1 rounded-md border border-white/10 font-bold tracking-widest shadow-inner">${m.score}</div>` 
+                    : `<div class="text-[10px] uppercase font-bold text-gray-500 tracking-widest py-1 border border-dashed border-gray-600 px-2 rounded">Pending</div>`;
+                
+                let winBadge = m.winner 
+                    && m.winner !== 'Draw' 
+                    && m.winner !== ''
+                    ? `<span class="bg-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border border-emerald-500/20 mt-2 block w-max mx-auto"><i class="fas fa-check mr-1"></i>${m.winner}</span>`
+                    : '';
+                if(m.winner === 'Draw') winBadge = `<span class="bg-gray-500/20 text-gray-400 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border border-gray-500/20 mt-2 block w-max mx-auto">Draw</span>`;
+
+                container.innerHTML += `
+                    <div class="bg-black/30 p-5 rounded-2xl border border-white/5 hover:border-white/10 transition group">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-[9px] font-black uppercase text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20"><i class="fas fa-caret-right mr-1"></i>${m.sport}</span>
+                            <span class="text-[9px] font-black uppercase text-blue-400 tracking-widest">${m.stage}</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-center">
+                            <div class="font-black uppercase tracking-tighter sm:text-lg text-sm border p-2 rounded-xl ${t1Style} shadow-lg break-words">
+                                ${m.team1}
+                            </div>
+                            
+                            <div class="flex flex-col items-center justify-center">
+                                <span class="text-[10px] text-gray-600 font-black mb-2 uppercase italic leading-none">VS</span>
+                                ${scoreTag}
+                            </div>
+                            
+                            <div class="font-black uppercase tracking-tighter sm:text-lg text-sm border p-2 rounded-xl ${t2Style} shadow-lg break-words">
+                                ${m.team2}
+                            </div>
+                        </div>
+                        
+                        ${winBadge}
+                        ${m.details ? `<div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-gray-400 text-center font-medium italic"><i class="fas fa-info-circle mr-1 opacity-50"></i>${m.details}</div>` : ''}
+                    </div>
+                `;
+            });
+        }
+    </script>
+</body>
+</html>
