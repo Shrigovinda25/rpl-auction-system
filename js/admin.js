@@ -261,7 +261,7 @@ function renderAdminData() {
     }
 
     // Render Admin Matches
-    if (typeof renderTournamentAdmin === 'function') renderTournamentAdmin();
+    if (typeof renderAdminMatches === 'function') renderAdminMatches();
 }
 
 /**
@@ -879,19 +879,14 @@ function updateBidPreview() {
 /**
  * Tournament Management Logic
  */
-function renderTournamentAdmin() {
-    const s = getState();
+function renderAdminMatches() {
     const matchList = document.getElementById('admin-matches-list');
-    if (!matchList) return;
-
-    matchList.innerHTML = '';
-    const matches = s.matches || [];
-    
     const ongoingSelector = document.getElementById('ongoing-matches-selector');
     
     if (matchList) matchList.innerHTML = '';
     if (ongoingSelector) ongoingSelector.innerHTML = '';
 
+    const s = getState();
     const matches = s.matches || [];
     
     if (matches.length === 0) {
@@ -1043,9 +1038,15 @@ function setupTournamentListeners() {
 
         // Toggle Badminton specific options
         const badOptions = document.getElementById('badminton-options');
-        if (badOptions) {
-            if (selectedSport === 'Badminton') badOptions.classList.remove('hidden');
-            else badOptions.classList.add('hidden');
+        const playerSection = document.getElementById('match-players-section');
+
+        if (selectedSport === 'Badminton') {
+            if (badOptions) badOptions.classList.remove('hidden');
+            if (playerSection) playerSection.classList.remove('hidden');
+        } else {
+            if (badOptions) badOptions.classList.add('hidden');
+            // Hide player name inputs for other sports as requested ("only team name is enough")
+            if (playerSection) playerSection.classList.add('hidden');
         }
     });
 
@@ -1053,15 +1054,35 @@ function setupTournamentListeners() {
     document.getElementById('badminton-category-selector')?.addEventListener('click', (e) => {
         const btn = e.target.closest('.badminton-cat-btn');
         if (!btn) return;
+        
+        // Reset styles first
+        document.querySelectorAll('.badminton-cat-btn').forEach(b => {
+             b.classList.add('bg-white/5', 'border-white/10', 'text-gray-400');
+             b.classList.remove('bg-blue-600', 'bg-pink-600', 'bg-purple-600', 'text-white', 'border-blue-400', 'border-pink-400', 'border-purple-400');
+        });
+
         const cat = btn.dataset.category;
+        
+        // Highlight logic
+        if (cat.includes('Mixed')) btn.classList.add('bg-purple-600', 'text-white', 'border-purple-400');
+        else if (cat.includes('Girls')) btn.classList.add('bg-pink-600', 'text-white', 'border-pink-400');
+        else btn.classList.add('bg-blue-600', 'text-white', 'border-blue-400');
+        btn.classList.remove('bg-white/5', 'border-white/10', 'text-gray-400');
+
         const detailsInput = document.getElementById('match-details');
-        if (detailsInput) {
-            // Check if there is already text, if so replace or prepend
-            if (!detailsInput.value) {
-                detailsInput.value = cat;
-            } else if (!detailsInput.value.includes(cat)) {
-                detailsInput.value = cat + ' - ' + detailsInput.value;
-            }
+        if (detailsInput) detailsInput.value = cat;
+
+        // Toggle Doubles Inputs
+        const isDoubles = cat.toLowerCase().includes('doubles');
+        const pA2 = document.getElementById('playerA2-name');
+        const pB2 = document.getElementById('playerB2-name');
+        
+        if (isDoubles) {
+            pA2?.classList.remove('hidden');
+            pB2?.classList.remove('hidden');
+        } else {
+            pA2?.classList.add('hidden');
+            pB2?.classList.add('hidden');
         }
     });
 
@@ -1114,29 +1135,41 @@ function setupTournamentListeners() {
             if (!selectedTeamA || !selectedTeamB) { Swal.fire('Select Teams', 'Please select both Team A and Team B.', 'warning'); return; }
             if (selectedTeamA === selectedTeamB) { Swal.fire('Same Team', 'Team A and Team B must be different!', 'error'); return; }
 
-            const playerA = document.getElementById('playerA-name').value || '';
-            const playerB = document.getElementById('playerB-name').value || '';
-            let details = document.getElementById('match-details').value;
+            const playerA1 = document.getElementById('playerA-name').value || '';
+            const playerA2 = document.getElementById('playerA2-name').value || '';
+            const playerB1 = document.getElementById('playerB-name').value || '';
+            const playerB2 = document.getElementById('playerB2-name').value || '';
+            let details = document.getElementById('match-details').value || '';
 
-            // Optional: combine details with player names if provided
-            const combinedDetails = [details, playerA ? `Team A: ${playerA}` : '', playerB ? `Team B: ${playerB}` : ''].filter(Boolean).join(' | ');
+            // Format player strings
+            let teamAStr = playerA1;
+            if (playerA2) teamAStr += ` & ${playerA2}`;
+            
+            let teamBStr = playerB1;
+            if (playerB2) teamBStr += ` & ${playerB2}`;
+
+            // Final Details construction
+            let finalDetails = details;
+            if (selectedSport === 'Badminton' && (teamAStr || teamBStr)) {
+                finalDetails += ` (${teamAStr || 'TBD'} vs ${teamBStr || 'TBD'})`;
+            }
 
             const s = getState();
             if (!s.matches) s.matches = [];
-            // Create match object without final score/winner
+            // Create match object
             s.matches.push({ 
                 sport: selectedSport, 
                 stage: selectedStage, 
                 team1: selectedTeamA, 
                 team2: selectedTeamB, 
-                playerA: playerA,
-                playerB: playerB,
+                playerA: teamAStr,
+                playerB: teamBStr,
                 score: null, 
                 winner: null, 
-                details: combinedDetails 
+                details: finalDetails 
             });
             saveState(s);
-            Swal.fire({ title: 'Match Scheduled!', text: `${selectedTeamA} vs ${selectedTeamB} \u2014 ${selectedSport}`, icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 2500 });
+            Swal.fire({ title: 'Match Scheduled!', text: `${selectedTeamA} vs ${selectedTeamB} \u2014 ${selectedSport}`, icon: 'success', shadow: true, timer: 3000 });
 
             // Reset form
             selectedSport = null; selectedStage = null; selectedTeamA = null; selectedTeamB = null;
@@ -1146,8 +1179,14 @@ function setupTournamentListeners() {
             document.querySelectorAll('.teamB-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_TEAM_B)); b.classList.add(...splitClasses(INACTIVE_TEAM)); });
             
             document.getElementById('playerA-name').value = '';
+            document.getElementById('playerA2-name').value = '';
             document.getElementById('playerB-name').value = '';
+            document.getElementById('playerB2-name').value = '';
             document.getElementById('match-details').value = '';
+            document.getElementById('playerA2-name').classList.add('hidden');
+            document.getElementById('playerB2-name').classList.add('hidden');
+            document.getElementById('badminton-options').classList.add('hidden');
+            document.getElementById('match-players-section').classList.add('hidden');
         });
     }
 
@@ -1280,12 +1319,7 @@ function setupLiveMatchListeners() {
     }
 }
 
-// A silent version of saveState that pushes to Firebase but doesn't force a full local re-render event
-function saveStateSilent(stateObject) {
-    if (window.dbSet && window.dbRef && window.db) {
-        window.dbSet(window.dbRef(window.db, 'rpl_state'), stateObject).catch(console.error);
-    }
-}
+
 
 window.activateLiveMatch = (idx) => {
     const s = getState();

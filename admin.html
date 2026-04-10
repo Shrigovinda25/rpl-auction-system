@@ -141,8 +141,8 @@
                                     <button type="button" class="stage-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-amber-500/50 hover:text-white" data-stage="Final">Final</button>
                                 </div>
                             </div>
-                                      <!-- Teams & Player Names (No scores) -->
-                            <div class="mb-8">
+                                      <!-- Teams & Player Names (Dynamic) -->
+                            <div class="mb-8" id="match-players-section">
                                 <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Teams & Players</label>
                                 <div class="grid grid-cols-[1fr_auto_1fr] gap-4 items-start">
                                     <!-- Team A -->
@@ -151,7 +151,10 @@
                                         <div id="teamA-selector" class="flex flex-col gap-2">
                                             <!-- Team buttons rendered by JS -->
                                         </div>
-                                        <input type="text" id="playerA-name" placeholder="Team A Player Name(s)" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-blue-500 transition-all mt-2">
+                                        <div id="playerA-container" class="space-y-2 mt-2">
+                                            <input type="text" id="playerA-name" placeholder="Team A Player 1" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-blue-500 transition-all">
+                                            <input type="text" id="playerA2-name" placeholder="Team A Player 2 (Doubles)" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-blue-500 transition-all hidden">
+                                        </div>
                                     </div>
 
                                     <!-- VS Divider -->
@@ -165,7 +168,10 @@
                                         <div id="teamB-selector" class="flex flex-col gap-2">
                                             <!-- Team buttons rendered by JS -->
                                         </div>
-                                        <input type="text" id="playerB-name" placeholder="Team B Player Name(s)" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-pink-500 transition-all mt-2">
+                                        <div id="playerB-container" class="space-y-2 mt-2">
+                                            <input type="text" id="playerB-name" placeholder="Team B Player 1" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-pink-500 transition-all">
+                                            <input type="text" id="playerB2-name" placeholder="Team B Player 2 (Doubles)" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-pink-500 transition-all hidden">
+                                        </div>
                                     </div>
                                 </div>
                             </div>

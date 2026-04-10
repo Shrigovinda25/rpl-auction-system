@@ -152,4 +152,8 @@ window.saveState = (state) => {
     localCacheState = state;
     set(ref(db, STATE_PATH), state).catch(console.error);
 };
+window.saveStateSilent = (state) => {
+    // Just a wrapper to keep paths consistent
+    set(ref(db, STATE_PATH), state).catch(console.error);
+};
 window.resetState = () => window.saveState(defaultState);
