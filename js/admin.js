@@ -1398,3 +1398,94 @@ window.deleteMatch = (idx) => {
     });
 };
 
+
+// --- Download Overall Results Logic ---
+window.downloadOverallResults = () => {
+    const s = typeof getState === 'function' ? getState() : (window.getState ? window.getState() : null);
+    if (!s || !s.teams) {
+        Swal.fire('Error', 'No data available to download.', 'error');
+        return;
+    }
+
+    const rankings = s.tournamentRankings || {};
+    const POINT_TEMPLATE = {
+        "Cricket": { "1st": 100, "2nd": 70, "3rd": 50 },
+        "Badminton": { "1st": 70, "2nd": 50, "3rd": 30 },
+        "Volleyball": { "1st": 70, "2nd": 50, "3rd": 30 },
+        "Tug of War": { "1st": 40, "2nd": 25, "3rd": 15 }
+    };
+
+    // Calculate current RPL scores
+    let teamScores = [];
+    s.teams.forEach(t => {
+        let stats = {
+            name: t.name,
+            cricket: '-',
+            badminton: '-',
+            volleyball: '-',
+            tug: '-',
+            total: 0
+        };
+
+        // Check rankings for each sport
+        Object.keys(rankings).forEach(sport => {
+            const res = rankings[sport];
+            if (!res) return;
+            
+            let pos = '';
+            if (res['1st'] === t.name) pos = '1st';
+            else if (res['2nd'] === t.name) pos = '2nd';
+            else if (res['3rd'] === t.name) pos = '3rd';
+
+            if (pos) {
+                const pts = (POINT_TEMPLATE[sport] && POINT_TEMPLATE[sport][pos]) ? POINT_TEMPLATE[sport][pos] : 0;
+                stats.total += pts;
+                
+                if (sport === 'Cricket') stats.cricket = pos + ` (${pts})`;
+                if (sport === 'Badminton') stats.badminton = pos + ` (${pts})`;
+                if (sport === 'Volleyball') stats.volleyball = pos + ` (${pts})`;
+                if (sport === 'Tug of War') stats.tug = pos + ` (${pts})`;
+            }
+        });
+
+        teamScores.push(stats);
+    });
+
+    // Sort by total points
+    teamScores.sort((a,b) => b.total - a.total);
+
+    // Create CSV
+    let csvContent = "Rank,Team Name,Total Points,Cricket,Badminton,Volleyball,Tug of War\n";
+
+    teamScores.forEach((row, idx) => {
+        const line = [
+            idx + 1,
+            `"${row.name}"`,
+            row.total,
+            `"${row.cricket}"`,
+            `"${row.badminton}"`,
+            `"${row.volleyball}"`,
+            `"${row.tug}"`
+        ].join(",");
+        csvContent += line + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `RPL_2026_Overall_Standings_${new Date().toLocaleDateString().replace(/\//g, '-')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    Swal.fire({ title: 'Success!', text: 'Tournament summary downloaded successfully.', icon: 'success', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+};
+
+// Add listener for the button added in HTML
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('btn-download-overall-results');
+    if (btn) {
+        btn.addEventListener('click', () => window.downloadOverallResults());
+    }
+});
