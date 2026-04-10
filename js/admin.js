@@ -1038,15 +1038,18 @@ function setupTournamentListeners() {
 
         // Toggle Badminton specific options
         const badOptions = document.getElementById('badminton-options');
-        const playerSection = document.getElementById('match-players-section');
+        const playerAContainer = document.getElementById('playerA-container');
+        const playerBContainer = document.getElementById('playerB-container');
 
         if (selectedSport === 'Badminton') {
             if (badOptions) badOptions.classList.remove('hidden');
-            if (playerSection) playerSection.classList.remove('hidden');
+            if (playerAContainer) playerAContainer.classList.remove('hidden');
+            if (playerBContainer) playerBContainer.classList.remove('hidden');
         } else {
             if (badOptions) badOptions.classList.add('hidden');
             // Hide player name inputs for other sports as requested ("only team name is enough")
-            if (playerSection) playerSection.classList.add('hidden');
+            if (playerAContainer) playerAContainer.classList.add('hidden');
+            if (playerBContainer) playerBContainer.classList.add('hidden');
         }
     });
 
@@ -1100,7 +1103,14 @@ function setupTournamentListeners() {
     document.getElementById('teamA-selector')?.addEventListener('click', (e) => {
         const btn = e.target.closest('.teamA-btn');
         if (!btn) return;
-        selectedTeamA = btn.dataset.team;
+        const teamChosen = btn.dataset.team;
+
+        if (teamChosen === selectedTeamB) {
+            Swal.fire({ title: 'Invalid Selection', text: 'You cannot pick the same team for both slots!', icon: 'error', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+            return;
+        }
+
+        selectedTeamA = teamChosen;
         document.querySelectorAll('.teamA-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_TEAM_A)); b.classList.add(...splitClasses(INACTIVE_TEAM)); });
         btn.classList.remove(...splitClasses(INACTIVE_TEAM));
         btn.classList.add(...splitClasses(ACTIVE_TEAM_A));
@@ -1110,7 +1120,14 @@ function setupTournamentListeners() {
     document.getElementById('teamB-selector')?.addEventListener('click', (e) => {
         const btn = e.target.closest('.teamB-btn');
         if (!btn) return;
-        selectedTeamB = btn.dataset.team;
+        const teamChosen = btn.dataset.team;
+
+        if (teamChosen === selectedTeamA) {
+            Swal.fire({ title: 'Invalid Selection', text: 'You cannot pick the same team for both slots!', icon: 'error', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000 });
+            return;
+        }
+
+        selectedTeamB = teamChosen;
         document.querySelectorAll('.teamB-btn').forEach(b => { b.classList.remove(...splitClasses(ACTIVE_TEAM_B)); b.classList.add(...splitClasses(INACTIVE_TEAM)); });
         btn.classList.remove(...splitClasses(INACTIVE_TEAM));
         btn.classList.add(...splitClasses(ACTIVE_TEAM_B));
@@ -1186,7 +1203,9 @@ function setupTournamentListeners() {
             document.getElementById('playerA2-name').classList.add('hidden');
             document.getElementById('playerB2-name').classList.add('hidden');
             document.getElementById('badminton-options').classList.add('hidden');
-            document.getElementById('match-players-section').classList.add('hidden');
+            // Reset player visibility to hidden by default (only visible for badminton)
+            document.getElementById('playerA-container').classList.add('hidden');
+            document.getElementById('playerB-container').classList.add('hidden');
         });
     }
 
