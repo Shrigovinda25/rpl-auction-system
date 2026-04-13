@@ -272,7 +272,7 @@
                                                 <h4 id="live-match-details" class="text-primary font-bold text-sm text-gray-400">Match Details</h4>
                                             </div>
 
-                                            <div class="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+                                            <div id="generic-scoreboard" class="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
                                                 
                                                 <!-- Team A Box -->
                                                 <div class="flex-1 w-full bg-blue-900/20 border border-blue-500/20 rounded-2xl p-6 text-center shadow-lg shadow-blue-900/10 transition-all hover:bg-blue-900/30 group">
@@ -302,6 +302,198 @@
                                                 </div>
 
                                             </div>
+
+                                            <!-- Cricket Specific Scoreboard (Hide by default) -->
+                                            <div id="cricket-scoreboard" class="hidden flex flex-col gap-5 relative z-10 w-full">
+                                                <!-- Toss, Decision & Innings Controls -->
+                                                <div class="bg-black/30 border border-white/5 rounded-2xl p-4 space-y-3">
+                                                    <!-- Row 1: Toss + Decision -->
+                                                    <div class="grid grid-cols-2 gap-3">
+                                                        <div>
+                                                            <label class="block text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Toss Won By</label>
+                                                            <select id="cricket-toss-winner" class="w-full bg-black/60 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-bold focus:border-amber-500 outline-none transition-all">
+                                                                <option value="">Select</option>
+                                                            </select>
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-[9px] font-black uppercase tracking-widest text-gray-500 mb-1.5">Chose to</label>
+                                                            <select id="cricket-toss-decision" class="w-full bg-black/60 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-bold focus:border-amber-500 outline-none transition-all">
+                                                                <option value="">Select</option>
+                                                                <option value="Bat">Bat</option>
+                                                                <option value="Bowl">Bowl</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Row 2: Innings Toggle + Batting Team -->
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="flex bg-black/40 rounded-xl border border-white/10 overflow-hidden shrink-0">
+                                                            <button id="btn-innings-1" class="px-4 py-2 text-[10px] font-black uppercase tracking-wider bg-emerald-600 text-white transition-all" data-innings="1">1st Inn</button>
+                                                            <button id="btn-innings-2" class="px-4 py-2 text-[10px] font-black uppercase tracking-wider text-gray-500 hover:text-white transition-all" data-innings="2">2nd Inn</button>
+                                                        </div>
+                                                        <div class="flex items-center gap-2 flex-1">
+                                                            <i class="fas fa-gavel text-emerald-500 text-xs"></i>
+                                                            <span class="text-[9px] font-black uppercase tracking-widest text-emerald-500 shrink-0">Batting</span>
+                                                            <select id="cricket-batting-team" class="flex-1 bg-black/60 border border-white/10 rounded-xl px-3 py-2 text-xs text-white font-bold focus:border-emerald-500 outline-none transition-all">
+                                                                <option value="">Select Team</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Batsmen on Crease with Individual Scores -->
+                                                <div class="grid grid-cols-2 gap-3">
+                                                    <!-- Batsman 1 -->
+                                                    <div id="batsman1-card" class="bg-blue-900/20 border-2 border-blue-500/40 rounded-2xl p-4 transition-all relative">
+                                                        <div id="batsman1-strike-badge" class="absolute -top-2 -right-2 bg-yellow-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-lg">⚡ Strike</div>
+                                                        <div class="text-[9px] font-black uppercase tracking-widest text-blue-400 mb-2">Batsman 1</div>
+                                                        <input type="text" id="cricket-batsman1" placeholder="Striker Name" class="w-full bg-black/30 border border-white/5 rounded-xl px-3 py-2 text-xs text-white font-bold focus:border-blue-500 outline-none transition-all mb-3">
+                                                        <div class="flex items-baseline gap-1">
+                                                            <span id="batsman1-runs" class="text-4xl font-black font-mono text-white">0</span>
+                                                            <span class="text-lg text-gray-500 font-black">(<span id="batsman1-balls" class="text-xs">0</span>)</span>
+                                                        </div>
+                                                    </div>
+                                                    <!-- Batsman 2 -->
+                                                    <div id="batsman2-card" class="bg-white/5 border-2 border-white/10 rounded-2xl p-4 transition-all relative opacity-70">
+                                                        <div id="batsman2-strike-badge" class="absolute -top-2 -right-2 bg-yellow-400 text-black text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-lg hidden">⚡ Strike</div>
+                                                        <div class="text-[9px] font-black uppercase tracking-widest text-gray-400 mb-2">Batsman 2</div>
+                                                        <input type="text" id="cricket-batsman2" placeholder="Non-Striker Name" class="w-full bg-black/30 border border-white/5 rounded-xl px-3 py-2 text-xs text-white font-bold focus:border-white/20 outline-none transition-all mb-3">
+                                                        <div class="flex items-baseline gap-1">
+                                                            <span id="batsman2-runs" class="text-4xl font-black font-mono text-white">0</span>
+                                                            <span class="text-lg text-gray-500 font-black">(<span id="batsman2-balls" class="text-xs">0</span>)</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Bowler + Over Display -->
+                                                <div class="bg-amber-900/10 border border-amber-500/10 rounded-2xl p-4 flex items-center gap-4">
+                                                    <div class="flex-1">
+                                                        <label class="block text-[9px] font-black uppercase tracking-[0.2em] text-amber-500 mb-2">Current Bowler</label>
+                                                        <div class="relative">
+                                                            <i class="fas fa-baseball-ball absolute left-3 top-1/2 -translate-y-1/2 text-amber-500 opacity-40 text-[10px]"></i>
+                                                            <input type="text" id="cricket-bowler" placeholder="Bowler Name" class="w-full bg-black/30 border border-white/5 rounded-xl pl-9 pr-3 py-3 text-xs text-white font-bold focus:border-amber-500 outline-none transition-all">
+                                                        </div>
+                                                    </div>
+                                                    <div class="text-center shrink-0">
+                                                        <div class="text-[9px] font-bold text-gray-500 uppercase tracking-widest mb-1">Overs</div>
+                                                        <div class="text-3xl font-black text-white font-mono" id="cricket-current-over">0.0</div>
+                                                        <div class="text-xs text-gray-600" id="cricket-max-overs">/ 8</div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Ball-by-Ball Buttons -->
+                                                <div class="bg-black/30 rounded-2xl p-5 border border-white/5">
+                                                    <div class="flex justify-between items-center mb-4">
+                                                        <label class="text-[10px] font-black uppercase tracking-[0.2em] text-gray-500">Ball Outcomes</label>
+                                                        <div class="flex gap-2">
+                                                            <button id="btn-swap-strike" title="Swap strike manually" class="px-3 h-7 rounded-lg bg-yellow-500/10 hover:bg-yellow-500 text-yellow-400 hover:text-black font-bold text-[9px] uppercase transition-all border border-yellow-500/20 flex items-center gap-1">
+                                                                <i class="fas fa-exchange-alt"></i> Swap Strike
+                                                            </button>
+                                                            <button id="btn-undo-ball" title="Undo last ball" class="px-3 h-7 rounded-lg bg-gray-500/10 hover:bg-gray-500/30 text-gray-400 font-bold text-[9px] uppercase transition-all border border-white/10 flex items-center gap-1">
+                                                                <i class="fas fa-undo"></i> Undo
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex flex-wrap items-center justify-center gap-3">
+                                                        <!-- Run Buttons -->
+                                                        <div class="flex gap-2 border-r border-white/10 pr-4 mr-1">
+                                                            <button class="cricket-ball-btn w-11 h-11 rounded-full bg-white/5 hover:bg-white/20 text-white font-bold text-sm transition-all active:scale-90 border border-white/10" data-val="0">0</button>
+                                                            <button class="cricket-ball-btn w-11 h-11 rounded-full bg-white/5 hover:bg-white/20 text-white font-bold text-sm transition-all active:scale-90 border border-white/10" data-val="1">1</button>
+                                                            <button class="cricket-ball-btn w-11 h-11 rounded-full bg-white/5 hover:bg-white/20 text-white font-bold text-sm transition-all active:scale-90 border border-white/10" data-val="2">2</button>
+                                                            <button class="cricket-ball-btn w-11 h-11 rounded-full bg-white/5 hover:bg-white/20 text-white font-bold text-sm transition-all active:scale-90 border border-white/10" data-val="3">3</button>
+                                                            <button class="cricket-ball-btn w-11 h-13 rounded-xl bg-blue-600/20 hover:bg-blue-600 text-blue-300 hover:text-white font-black text-base transition-all active:scale-90 border border-blue-500/30 shadow shadow-blue-900/30" data-val="4">4</button>
+                                                            <button class="cricket-ball-btn w-11 h-13 rounded-xl bg-purple-600/20 hover:bg-purple-600 text-purple-300 hover:text-white font-black text-base transition-all active:scale-90 border border-purple-500/30 shadow shadow-purple-900/30" data-val="6">6</button>
+                                                        </div>
+                                                        <!-- Extras -->
+                                                        <div class="flex gap-2">
+                                                            <button class="cricket-ball-btn px-4 h-11 rounded-full bg-orange-600/10 hover:bg-orange-600 text-orange-400 hover:text-white font-bold text-[10px] uppercase transition-all active:scale-90 border border-orange-500/20" data-val="wd">Wide</button>
+                                                            <button class="cricket-ball-btn px-4 h-11 rounded-full bg-orange-600/10 hover:bg-orange-600 text-orange-400 hover:text-white font-bold text-[10px] uppercase transition-all active:scale-90 border border-orange-500/20" data-val="nb">No Ball</button>
+                                                            <button class="cricket-ball-btn px-4 h-11 rounded-full bg-cyan-600/10 hover:bg-cyan-600 text-cyan-400 hover:text-white font-bold text-[10px] uppercase transition-all active:scale-90 border border-cyan-500/20" data-val="bye">Bye</button>
+                                                            <button class="cricket-ball-btn px-4 h-11 rounded-full bg-red-600/10 hover:bg-red-600 text-red-400 hover:text-white font-bold text-[10px] uppercase transition-all active:scale-90 border border-red-500/20" data-val="w">Wicket</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Current Over Ball Tracker -->
+                                                <div class="bg-black/30 border border-white/5 rounded-2xl p-4">
+                                                    <!-- Header -->
+                                                    <div class="flex items-center justify-between mb-4">
+                                                        <div class="flex items-center gap-2">
+                                                            <i class="fas fa-circle text-[6px] text-amber-500 animate-pulse"></i>
+                                                            <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Over <span id="over-tracker-num">1</span></span>
+                                                        </div>
+                                                        <div class="flex items-center gap-3">
+                                                            <span id="free-hit-badge" class="hidden px-2 py-0.5 rounded bg-red-600 text-white text-[9px] font-black uppercase tracking-widest animate-pulse border border-red-400">Free Hit!</span>
+                                                            <span id="over-tracker-bowler" class="text-[10px] font-bold text-amber-400 truncate max-w-[120px]"></span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Current Over Circles -->
+                                                    <div id="over-ball-circles" class="flex items-center gap-2 flex-wrap min-h-[40px]">
+                                                        <!-- JS renders circles here -->
+                                                        <div class="w-10 h-10 rounded-full border-2 border-white/10 bg-transparent"></div>
+                                                        <div class="w-10 h-10 rounded-full border-2 border-white/10 bg-transparent"></div>
+                                                        <div class="w-10 h-10 rounded-full border-2 border-white/10 bg-transparent"></div>
+                                                        <div class="w-10 h-10 rounded-full border-2 border-white/10 bg-transparent"></div>
+                                                        <div class="w-10 h-10 rounded-full border-2 border-white/10 bg-transparent"></div>
+                                                        <div class="w-10 h-10 rounded-full border-2 border-white/10 bg-transparent"></div>
+                                                    </div>
+
+                                                    <!-- Previous Overs History -->
+                                                    <div id="prev-overs-list" class="mt-3 space-y-1.5"></div>
+                                                </div>
+
+                                                <!-- Live Team Score Bar -->
+                                                <div class="flex justify-between items-center px-5 py-3 bg-emerald-500/5 border border-emerald-500/15 rounded-xl">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                                        <span class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Innings Score</span>
+                                                    </div>
+                                                    <div class="text-2xl font-black text-white font-mono tracking-tighter">
+                                                        <span id="cricket-live-score">0</span><span class="text-emerald-500/50">/</span><span id="cricket-live-wickets" class="text-emerald-500">0</span>
+                                                        <span class="text-sm text-gray-500 ml-2 font-normal">(<span id="cricket-live-over-inline">0.0</span> ov)</span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Scorecard: Batting + Bowling side by side -->
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                                    <!-- Batting Scorecard -->
+                                                    <div class="bg-black/20 border border-white/5 rounded-2xl overflow-hidden">
+                                                        <div class="px-4 py-2.5 border-b border-white/5 flex items-center gap-2">
+                                                            <i class="fas fa-cricket text-blue-400 text-[10px]"></i>
+                                                            <span class="text-[10px] font-black uppercase tracking-widest text-blue-400">Batting Scorecard</span>
+                                                        </div>
+                                                        <div id="batting-stats-body" class="divide-y divide-white/5">
+                                                            <div class="px-4 py-3 text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">No batsmen yet</div>
+                                                        </div>
+                                                        <div class="grid grid-cols-4 px-4 py-1.5 bg-white/3 border-t border-white/5 text-[9px] font-black uppercase tracking-widest text-gray-600">
+                                                            <span>Batsman</span>
+                                                            <span class="text-center">R</span>
+                                                            <span class="text-center">B</span>
+                                                            <span class="text-center">SR</span>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Bowling Figures -->
+                                                    <div class="bg-black/20 border border-white/5 rounded-2xl overflow-hidden">
+                                                        <div class="px-4 py-2.5 border-b border-white/5 flex items-center gap-2">
+                                                            <i class="fas fa-baseball-ball text-amber-500 text-[10px]"></i>
+                                                            <span class="text-[10px] font-black uppercase tracking-widest text-amber-500">Bowling Figures</span>
+                                                        </div>
+                                                        <div id="bowler-stats-body" class="divide-y divide-white/5">
+                                                            <div class="px-4 py-3 text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">No bowlers yet</div>
+                                                        </div>
+                                                        <div class="grid grid-cols-4 px-4 py-1.5 bg-white/3 border-t border-white/5 text-[9px] font-black uppercase tracking-widest text-gray-600">
+                                                            <span>Bowler</span>
+                                                            <span class="text-center">O</span>
+                                                            <span class="text-center">R</span>
+                                                            <span class="text-center">W</span>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
 
                                             <!-- Controls -->
                                             <div class="mt-10 pt-8 border-t border-white/10 flex flex-col md:flex-row gap-4 justify-between items-center relative z-10">
