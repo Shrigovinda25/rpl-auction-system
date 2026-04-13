@@ -377,6 +377,11 @@
         }
 
         function buildMatchCard(m) {
+            const team1Data = state.teams.find(t => t.name === m.team1);
+            const team2Data = state.teams.find(t => t.name === m.team2);
+            const logo1 = team1Data ? team1Data.logo : '';
+            const logo2 = team2Data ? team2Data.logo : '';
+
             const t1Style = THEME_COLORS[m.team1] || 'text-gray-400 bg-gray-500/10 border-gray-500/20';
             const t2Style = THEME_COLORS[m.team2] || 'text-gray-400 bg-gray-500/10 border-gray-500/20';
             const isFinished = m.winner && m.winner !== '';
@@ -453,15 +458,21 @@
                         <span class="text-[9px] font-black uppercase text-gray-500 tracking-widest">${m.stage}</span>
                     </div>
                     <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-center relative z-10">
-                        <div class="font-black uppercase tracking-tighter ${!isFinished ? 'text-base sm:text-xl' : 'text-sm sm:text-lg'} border p-2 rounded-xl ${t1Style} shadow-lg break-words">
-                            ${m.team1}
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="font-black uppercase tracking-tighter ${!isFinished ? 'text-[10px] sm:text-xs' : 'text-[9px] sm:text-[11px]'} border-2 px-3 py-2 rounded-2xl ${t1Style} shadow-lg w-full min-h-[60px] flex flex-col items-center justify-center gap-2">
+                                ${logo1 ? `<img src="${logo1}" class="w-8 h-8 object-contain">` : ''}
+                                <span>${m.team1}</span>
+                            </div>
                         </div>
                         <div class="flex flex-col items-center justify-center">
                             <span class="text-[10px] text-gray-600 font-black mb-1 uppercase italic leading-none">${!isFinished ? 'MATCH GOING ON' : 'VS'}</span>
                             ${scoreTag}
                         </div>
-                        <div class="font-black uppercase tracking-tighter ${!isFinished ? 'text-base sm:text-xl' : 'text-sm sm:text-lg'} border p-2 rounded-xl ${t2Style} shadow-lg break-words">
-                            ${m.team2}
+                        <div class="flex flex-col items-center gap-3">
+                            <div class="font-black uppercase tracking-tighter ${!isFinished ? 'text-[10px] sm:text-xs' : 'text-[9px] sm:text-[11px]'} border-2 px-3 py-2 rounded-2xl ${t2Style} shadow-lg w-full min-h-[60px] flex flex-col items-center justify-center gap-2">
+                                ${logo2 ? `<img src="${logo2}" class="w-8 h-8 object-contain">` : ''}
+                                <span>${m.team2}</span>
+                            </div>
                         </div>
                     </div>
                     ${cricketDetails}
