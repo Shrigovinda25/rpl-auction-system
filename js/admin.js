@@ -2025,6 +2025,9 @@ async function handleCricketBall(val) {
     // Add runs to team total (except wickets)
     if (!isWicket) currentScoreA += runsThisBall;
 
+    // Final sync of batsman card before UI update and save
+    syncBattingCard();
+
     // Update UI
     updateCricketUI();
 
