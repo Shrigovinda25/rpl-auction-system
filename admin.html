@@ -448,9 +448,15 @@
                                                         <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
                                                         <span class="text-[10px] font-black uppercase tracking-widest text-emerald-500">Innings Score</span>
                                                     </div>
-                                                    <div class="text-2xl font-black text-white font-mono tracking-tighter">
-                                                        <span id="cricket-live-score">0</span><span class="text-emerald-500/50">/</span><span id="cricket-live-wickets" class="text-emerald-500">0</span>
-                                                        <span class="text-sm text-gray-500 ml-2 font-normal">(<span id="cricket-live-over-inline">0.0</span> ov)</span>
+                                                    <div class="flex items-center gap-4">
+                                                        <div class="text-2xl font-black text-white font-mono tracking-tighter">
+                                                            <span id="cricket-live-score">0</span><span class="text-emerald-500/50">/</span><span id="cricket-live-wickets" class="text-emerald-500">0</span>
+                                                            <span class="text-sm text-gray-500 ml-2 font-normal">(<span id="cricket-live-over-inline">0.0</span> ov)</span>
+                                                        </div>
+                                                        <div id="cricket-target-container" class="hidden px-3 py-1 bg-amber-500/10 border border-amber-500/20 rounded-lg flex items-center gap-2">
+                                                            <span class="text-[9px] font-black uppercase text-amber-500 tracking-widest">Target:</span>
+                                                            <span id="cricket-target-val" class="text-sm font-black text-amber-500 font-mono">0</span>
+                                                        </div>
                                                     </div>
                                                 </div>
 
@@ -463,14 +469,15 @@
                                                             <i class="fas fa-cricket text-blue-400 text-[10px]"></i>
                                                             <span class="text-[10px] font-black uppercase tracking-widest text-blue-400">Batting Scorecard</span>
                                                         </div>
-                                                        <div id="batting-stats-body" class="divide-y divide-white/5">
-                                                            <div class="px-4 py-3 text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">No batsmen yet</div>
-                                                        </div>
-                                                        <div class="grid grid-cols-4 px-4 py-1.5 bg-white/3 border-t border-white/5 text-[9px] font-black uppercase tracking-widest text-gray-600">
+                                                        <!-- Move Headers to Top -->
+                                                        <div class="grid grid-cols-4 px-4 py-1.5 bg-white/3 border-b border-white/5 text-[9px] font-black uppercase tracking-widest text-gray-400">
                                                             <span>Batsman</span>
                                                             <span class="text-center">R</span>
                                                             <span class="text-center">B</span>
                                                             <span class="text-center">SR</span>
+                                                        </div>
+                                                        <div id="batting-stats-body" class="divide-y divide-white/5">
+                                                            <div class="px-4 py-3 text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">No batsmen yet</div>
                                                         </div>
                                                     </div>
 
@@ -480,14 +487,15 @@
                                                             <i class="fas fa-baseball-ball text-amber-500 text-[10px]"></i>
                                                             <span class="text-[10px] font-black uppercase tracking-widest text-amber-500">Bowling Figures</span>
                                                         </div>
-                                                        <div id="bowler-stats-body" class="divide-y divide-white/5">
-                                                            <div class="px-4 py-3 text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">No bowlers yet</div>
-                                                        </div>
-                                                        <div class="grid grid-cols-4 px-4 py-1.5 bg-white/3 border-t border-white/5 text-[9px] font-black uppercase tracking-widest text-gray-600">
+                                                        <!-- Move Headers to Top -->
+                                                        <div class="grid grid-cols-4 px-4 py-1.5 bg-white/3 border-b border-white/5 text-[9px] font-black uppercase tracking-widest text-gray-400">
                                                             <span>Bowler</span>
                                                             <span class="text-center">O</span>
                                                             <span class="text-center">R</span>
                                                             <span class="text-center">W</span>
+                                                        </div>
+                                                        <div id="bowler-stats-body" class="divide-y divide-white/5">
+                                                            <div class="px-4 py-3 text-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">No bowlers yet</div>
                                                         </div>
                                                     </div>
 

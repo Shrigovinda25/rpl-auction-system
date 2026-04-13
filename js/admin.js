@@ -1430,8 +1430,6 @@ function setupLiveMatchListeners() {
     }
 }
 
-
-
 window.activateLiveMatch = async (idx) => {
     const s = getState();
     const m = s.matches[idx];
@@ -1439,116 +1437,106 @@ window.activateLiveMatch = async (idx) => {
 
     activeLiveMatchIndex = idx;
     const isCricket = m.sport === 'Cricket';
+    if (!m.cricketData) m.cricketData = {};
+    const cd = m.cricketData;
 
-    // Startup Wizard for new Cricket Matches
-    if (isCricket && (!m.cricketData || !m.cricketData.tossWinner)) {
-        // Step 1: Confirm/Enter Team Names
-        const { value: formTeams } = await Swal.fire({
-            title: 'Match Setup (1/5)',
-            text: 'Configure the Team Names',
-            html: `
-                <select id="swal-t1" class="swal2-select" style="display:flex; margin: 10px auto; max-width: 80%;">
-                    <option value="" disabled ${!m.team1 ? 'selected' : ''}>Select Team 1</option>
-                    ${s.teams.map(t => `<option value="${t.name}" ${m.team1 === t.name ? 'selected' : ''}>${t.name}</option>`).join('')}
-                </select>
-                <select id="swal-t2" class="swal2-select" style="display:flex; margin: 10px auto; max-width: 80%;">
-                    <option value="" disabled ${!m.team2 ? 'selected' : ''}>Select Team 2</option>
-                    ${s.teams.map(t => `<option value="${t.name}" ${m.team2 === t.name ? 'selected' : ''}>${t.name}</option>`).join('')}
-                </select>
-            `,
-            focusConfirm: false,
-            allowOutsideClick: false,
-            didOpen: () => {
-                const s1 = document.getElementById('swal-t1');
-                const s2 = document.getElementById('swal-t2');
-                const updateDisabled = () => {
-                    const v1 = s1.value;
-                    const v2 = s2.value;
-                    Array.from(s1.options).forEach(opt => { if (opt.value) opt.disabled = (opt.value === v2); });
-                    Array.from(s2.options).forEach(opt => { if (opt.value) opt.disabled = (opt.value === v1); });
-                };
-                s1.addEventListener('change', updateDisabled);
-                s2.addEventListener('change', updateDisabled);
-                updateDisabled();
-            },
-            preConfirm: () => {
-                const t1 = document.getElementById('swal-t1').value;
-                const t2 = document.getElementById('swal-t2').value;
-                if (!t1 || !t2) Swal.showValidationMessage('Both teams must be selected');
-                if (t1 === t2) Swal.showValidationMessage('Please select two different teams');
-                return { t1, t2 };
-            }
-        });
-        m.team1 = formTeams.t1;
-        m.team2 = formTeams.t2;
+    // Startup Wizard for Cricket Matches
+    if (isCricket) {
+        // Step 1-3: Toss & Teams (Only if not already set)
+        if (!cd.tossWinner) {
+            // Team confirmation
+            const { value: formTeams } = await Swal.fire({
+                title: 'Match Setup (1/5)',
+                text: 'Confirm Team Names',
+                html: `
+                    <select id="swal-t1" class="swal2-select" style="display:flex; margin: 10px auto; max-width: 80%;">
+                        <option value="" disabled ${!m.team1 ? 'selected' : ''}>Select Team 1</option>
+                        ${s.teams.map(t => `<option value="${t.name}" ${m.team1 === t.name ? 'selected' : ''}>${t.name}</option>`).join('')}
+                    </select>
+                    <select id="swal-t2" class="swal2-select" style="display:flex; margin: 10px auto; max-width: 80%;">
+                        <option value="" disabled ${!m.team2 ? 'selected' : ''}>Select Team 2</option>
+                        ${s.teams.map(t => `<option value="${t.name}" ${m.team2 === t.name ? 'selected' : ''}>${t.name}</option>`).join('')}
+                    </select>
+                `,
+                focusConfirm: false,
+                allowOutsideClick: false,
+                preConfirm: () => {
+                    const t1 = document.getElementById('swal-t1').value;
+                    const t2 = document.getElementById('swal-t2').value;
+                    if (!t1 || !t2) Swal.showValidationMessage('Both teams must be selected');
+                    return { t1, t2 };
+                }
+            });
+            m.team1 = formTeams.t1;
+            m.team2 = formTeams.t2;
 
-        // Step 2: Toss Winner
-        const { value: tossWin } = await Swal.fire({
-            title: 'Match Setup (2/5)',
-            text: 'Who won the toss?',
-            input: 'select',
-            inputOptions: { [m.team1]: m.team1, [m.team2]: m.team2 },
-            inputPlaceholder: 'Select Team',
-            allowOutsideClick: false,
-            inputValidator: (val) => !val ? 'You need to select a team!' : null
-        });
+            const { value: tossWin } = await Swal.fire({
+                title: 'Match Setup (2/5)',
+                text: 'Who won the toss?',
+                input: 'select',
+                inputOptions: { [m.team1]: m.team1, [m.team2]: m.team2 },
+                allowOutsideClick: false,
+                inputValidator: (val) => !val ? 'Select toss winner!' : null
+            });
+            cd.tossWinner = tossWin;
 
-        // Step 3: Toss Decision
-        const { value: tossDec } = await Swal.fire({
-            title: 'Match Setup (3/5)',
-            text: `What did ${tossWin} choose to do?`,
-            input: 'select',
-            inputOptions: { 'Bat': 'Bat', 'Bowl': 'Bowl' },
-            inputPlaceholder: 'Select Decision',
-            allowOutsideClick: false,
-            inputValidator: (val) => !val ? 'You need to select a decision!' : null
-        });
+            const { value: tossDec } = await Swal.fire({
+                title: 'Match Setup (3/5)',
+                text: `What did ${tossWin} choose to do?`,
+                input: 'select',
+                inputOptions: { 'Bat': 'Bat', 'Bowl': 'Bowl' },
+                allowOutsideClick: false,
+                inputValidator: (val) => !val ? 'Select decision!' : null
+            });
+            cd.tossDecision = tossDec;
+            cd.battingTeam = tossDec === 'Bat' ? tossWin : (tossWin === m.team1 ? m.team2 : m.team1);
+            cd.activeInnings = '1';
+        }
 
-        // Step 4: Opening Batsmen
-        const { value: formBatsmen } = await Swal.fire({
-            title: 'Match Setup (4/5)',
-            html: `
-                <input id="swal-b1" class="swal2-input" placeholder="Striker Name">
-                <input id="swal-b2" class="swal2-input" placeholder="Non-Striker Name">
-            `,
-            focusConfirm: false,
-            allowOutsideClick: false,
-            preConfirm: () => {
-                const b1 = document.getElementById('swal-b1').value.trim();
-                const b2 = document.getElementById('swal-b2').value.trim();
-                if (!b1 || !b2) Swal.showValidationMessage('Both batsmen names are required');
-                return { b1, b2 };
-            }
-        });
+        // Steps 4-5: Players (Prompt if missing, e.g. start of match or new innings)
+        if (!cd.batsman1 || !cd.bowler) {
+            const { value: formBatsmen } = await Swal.fire({
+                title: 'Opening Batsmen',
+                html: `
+                    <input id="swal-b1" class="swal2-input" placeholder="Striker Name">
+                    <input id="swal-b2" class="swal2-input" placeholder="Non-Striker Name">
+                `,
+                focusConfirm: false,
+                allowOutsideClick: false,
+                preConfirm: () => {
+                    const b1 = document.getElementById('swal-b1').value.trim();
+                    const b2 = document.getElementById('swal-b2').value.trim();
+                    if (!b1 || !b2) Swal.showValidationMessage('Both names are required');
+                    return { b1, b2 };
+                }
+            });
+            cd.batsman1 = formBatsmen.b1;
+            cd.batsman2 = formBatsmen.b2;
+            if (!cd.battingCard) cd.battingCard = [];
+            cd.battingCard.push({ name: cd.batsman1, runs: 0, balls: 0, out: false });
+            cd.battingCard.push({ name: cd.batsman2, runs: 0, balls: 0, out: false });
 
-        // Step 5: Opening Bowler
-        const { value: bowName } = await Swal.fire({
-            title: 'Match Setup (5/5)',
-            text: 'Opening Bowler Name:',
-            input: 'text',
-            allowOutsideClick: false,
-            inputValidator: (val) => !val ? 'Bowler name is required' : null
-        });
-
-        if (!m.cricketData) m.cricketData = {};
-        m.cricketData.tossWinner = tossWin;
-        m.cricketData.tossDecision = tossDec;
-        m.cricketData.battingTeam = tossDec === 'Bat' ? tossWin : (tossWin === m.team1 ? m.team2 : m.team1);
-        m.cricketData.batsman1 = formBatsmen.b1;
-        m.cricketData.batsman2 = formBatsmen.b2;
-        m.cricketData.bowler = bowName;
-        m.cricketData.activeInnings = '1';
-        saveStateSilent(s);
-        saveState(s); // Persist team name modifications strongly
+            const { value: bName } = await Swal.fire({
+                title: 'Opening Bowler',
+                text: 'Enter bowler name:',
+                input: 'text',
+                allowOutsideClick: false,
+                inputValidator: (val) => !val ? 'Name is required' : null
+            });
+            cd.bowler = bName;
+            if (!cd.bowlerStats) cd.bowlerStats = {};
+            if (!cd.bowlerStats[bName]) cd.bowlerStats[bName] = { balls: 0, runs: 0, wickets: 0 };
+        }
+        saveState(s);
     }
 
-    // Toggle UI panels
+    // Toggle Panels
     const genericUI = document.getElementById('generic-scoreboard');
     const cricketUI = document.getElementById('cricket-scoreboard');
     if (genericUI) genericUI.classList.toggle('hidden', isCricket);
-    if (cricketUI)  cricketUI.classList.toggle('hidden', !isCricket);
+    if (cricketUI) cricketUI.classList.toggle('hidden', !isCricket);
 
-    // Reset all counters
+    // Initial Scoring Logic
     currentScoreA = 0; currentScoreB = 0;
     currentWickets = 0; currentOvers = 0; currentBalls = 0;
     batsman1IsStriker = true;
@@ -1561,15 +1549,15 @@ window.activateLiveMatch = async (idx) => {
     isFreeHit = false;
     ballHistory = [];
 
-    // Restore existing score
+    // Restore Match State
     if (m.score) {
         if (isCricket) {
             const mt = m.score.match(/(\d+)\/(\d+)\s*\((\d+)\.(\d+)\)/);
             if (mt) {
-                currentScoreA  = parseInt(mt[1]) || 0;
+                currentScoreA = parseInt(mt[1]) || 0;
                 currentWickets = parseInt(mt[2]) || 0;
-                currentOvers   = parseInt(mt[3]) || 0;
-                currentBalls   = parseInt(mt[4]) || 0;
+                currentOvers = parseInt(mt[3]) || 0;
+                currentBalls = parseInt(mt[4]) || 0;
             }
         } else {
             const parts = m.score.split('-');
@@ -1580,48 +1568,48 @@ window.activateLiveMatch = async (idx) => {
         }
     }
 
-    // Restore per-batsman data if available
     if (isCricket) {
-        const cd = m.cricketData || {};
-        batsman1Runs       = cd.b1runs  || 0;
-        batsman1BallsFaced = cd.b1balls || 0;
-        batsman2Runs       = cd.b2runs  || 0;
-        batsman2BallsFaced = cd.b2balls || 0;
-        batsman1IsStriker  = cd.striker !== false; // default true
-        bowlerStats        = cd.bowlerStats || {};
-        battingCard        = cd.battingCard  || [];
-        overBallLog        = cd.overBallLog  || [];
-        allOversLog        = cd.allOversLog  || [];
-        isFreeHit          = cd.isFreeHit    || false;
-    }
+        // Correct naming sync
+        batsman1Runs       = cd.currentScoreA !== undefined ? (cd.batsman1Runs || 0) : (cd.b1runs || 0);
+        batsman1BallsFaced = cd.currentScoreA !== undefined ? (cd.batsman1Balls || 0) : (cd.b1balls || 0);
+        batsman2Runs       = cd.currentScoreA !== undefined ? (cd.batsman2Runs || 0) : (cd.b2runs || 0);
+        batsman2BallsFaced = cd.currentScoreA !== undefined ? (cd.batsman2Balls || 0) : (cd.b2balls || 0);
+        batsman1IsStriker  = cd.batsman1IsStriker !== false;
+        
+        bowlerStats = cd.bowlerStats || {};
+        battingCard = cd.battingCard || [];
+        overBallLog = cd.overBallLog || [];
+        allOversLog = cd.allOversLog || [];
+        isFreeHit   = cd.isFreeHit || false;
 
-    // Set over limit
-    maxOversLimit = (m.stage === 'Final') ? 10 : 8;
-    const maxOversEl = document.getElementById('cricket-max-overs');
-    if (maxOversEl) maxOversEl.textContent = `/ ${maxOversLimit}`;
+        // Target UI
+        const tCon = document.getElementById('cricket-target-container');
+        const tVal = document.getElementById('cricket-target-val');
+        if (cd.activeInnings === '2' && cd.targetScore) {
+            if (tCon && tVal) {
+                tCon.classList.remove('hidden');
+                tVal.textContent = cd.targetScore;
+            }
+        } else {
+            tCon?.classList.add('hidden');
+        }
 
-    // Common fields
-    document.getElementById('live-sport-badge').textContent   = `${m.sport} • ${m.stage}`;
-    document.getElementById('live-match-details').textContent = m.details || 'No Extra Details';
-    document.getElementById('live-teamA-name').textContent    = m.team1;
-    document.getElementById('live-teamB-name').textContent    = m.team2;
-    document.getElementById('live-playerA-name').textContent  = m.playerA || 'Player A';
-    document.getElementById('live-playerB-name').textContent  = m.playerB || 'Player B';
+        // Max Overs
+        maxOversLimit = (m.stage === 'Final') ? 10 : 8;
+        const maxOversEl = document.getElementById('cricket-max-overs');
+        if (maxOversEl) maxOversEl.textContent = `/ ${maxOversLimit}`;
 
-    if (isCricket) {
-        const cd = m.cricketData || {};
+        // Inputs
         document.getElementById('cricket-batsman1').value = cd.batsman1 || '';
         document.getElementById('cricket-batsman2').value = cd.batsman2 || '';
-        document.getElementById('cricket-bowler').value   = cd.bowler   || '';
+        document.getElementById('cricket-bowler').value   = cd.bowler || '';
         
-        // Populate Batting Team dropdown
         const battingSelect = document.getElementById('cricket-batting-team');
         if (battingSelect) {
             battingSelect.innerHTML = `<option value="">Select Team</option><option value="${m.team1}">${m.team1}</option><option value="${m.team2}">${m.team2}</option>`;
             battingSelect.value = cd.battingTeam || '';
         }
 
-        // Populate Toss
         const tossSelect = document.getElementById('cricket-toss-winner');
         if (tossSelect) {
             tossSelect.innerHTML = `<option value="">Select</option><option value="${m.team1}">${m.team1}</option><option value="${m.team2}">${m.team2}</option>`;
@@ -1643,14 +1631,21 @@ window.activateLiveMatch = async (idx) => {
         document.getElementById('live-score-teamB').textContent = currentScoreB;
     }
 
-    // Winner dropdown
+    // Common Text
+    document.getElementById('live-sport-badge').textContent   = `${m.sport} • ${m.stage}`;
+    document.getElementById('live-match-details').textContent = m.details || 'No Extra Details';
+    document.getElementById('live-teamA-name').textContent    = m.team1;
+    document.getElementById('live-teamB-name').textContent    = m.team2;
+
     const liveWinnerSelect = document.getElementById('live-winner-select');
-    liveWinnerSelect.innerHTML = `
-        <option value="auto">Auto (Higher score)</option>
-        <option value="Draw">Draw Match</option>
-        <option value="${m.team1}">${m.team1}</option>
-        <option value="${m.team2}">${m.team2}</option>
-    `;
+    if (liveWinnerSelect) {
+        liveWinnerSelect.innerHTML = `
+            <option value="auto">Auto (Higher score)</option>
+            <option value="Draw">Draw Match</option>
+            <option value="${m.team1}">${m.team1}</option>
+            <option value="${m.team2}">${m.team2}</option>
+        `;
+    }
 
     document.getElementById('live-scoreboard-panel').classList.remove('hidden');
     document.getElementById('live-empty-state').classList.add('hidden');
@@ -1862,23 +1857,30 @@ async function handleCricketBall(val) {
 
     if (isNoBall) {
         // No Ball: +1 penalty always; then ask for runs off the bat
-        const { value: nbRuns } = await Swal.fire({
+        let nbValue = '0';
+        const { value: selectedRun } = await Swal.fire({
             title: 'No Ball — Runs off the bat?',
-            html: `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px">
-                ${[0,1,2,3,4,6].map(r => `<button class="swal2-confirm" style="min-width:44px;font-size:1.1rem;padding:6px 10px" onclick="Swal.clickConfirm()" data-r="${r}">${r}</button>`).join('')}
+            html: `<div id="nb-run-btns" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px">
+                ${[0,1,2,3,4,6].map(r => `<button class="swal2-confirm swal2-styled" style="min-width:44px;font-size:1.1rem;padding:6px 10px; margin: 0;" data-r="${r}">${r}</button>`).join('')}
             </div>`,
             showConfirmButton: false,
             showCancelButton: true,
             cancelButtonText: 'Cancel',
             didOpen: () => {
-                document.querySelectorAll('[data-r]').forEach(btn => {
-                    btn.addEventListener('click', () => Swal.close({ value: btn.dataset.r }));
-                });
+                const container = document.getElementById('nb-run-btns');
+                container.onclick = (e) => {
+                    const btn = e.target.closest('[data-r]');
+                    if (btn) {
+                        nbValue = btn.dataset.r;
+                        Swal.clickConfirm();
+                    }
+                };
             },
-            preConfirm: () => '0'
+            preConfirm: () => nbValue
         });
-        if (nbRuns === undefined) { ballHistory.pop(); return; }
-        const selected = parseInt(nbRuns.value !== undefined ? nbRuns.value : nbRuns) || 0;
+
+        if (selectedRun === undefined) { ballHistory.pop(); return; }
+        const selected = parseInt(selectedRun) || 0;
         runsThisBall = 1 + selected;
         // No ball: ball not counted, but striker gets credit for their runs
         const batRuns = selected;
@@ -1894,23 +1896,30 @@ async function handleCricketBall(val) {
         runsThisBall = 1;
         // Wide: no runs to batsman, ball not counted
     } else if (isBye) {
-        const { value: byeRuns } = await Swal.fire({
+        let byeValue = '1';
+        const { value: selectedRun } = await Swal.fire({
             title: 'Byes?',
-            html: `<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px">
-                ${[1,2,3,4].map(r => `<button class="swal2-confirm" style="min-width:44px;font-size:1.1rem;padding:6px 10px" onclick="Swal.clickConfirm()" data-r="${r}">${r}</button>`).join('')}
+            html: `<div id="bye-run-btns" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px">
+                ${[1,2,3,4].map(r => `<button class="swal2-confirm swal2-styled" style="min-width:44px;font-size:1.1rem;padding:6px 10px; margin: 0;" data-r="${r}">${r}</button>`).join('')}
             </div>`,
             showConfirmButton: false,
             showCancelButton: true,
             cancelButtonText: 'Cancel',
             didOpen: () => {
-                document.querySelectorAll('[data-r]').forEach(btn => {
-                    btn.addEventListener('click', () => Swal.close({ value: btn.dataset.r }));
-                });
+                const container = document.getElementById('bye-run-btns');
+                container.onclick = (e) => {
+                    const btn = e.target.closest('[data-r]');
+                    if (btn) {
+                        byeValue = btn.dataset.r;
+                        Swal.clickConfirm();
+                    }
+                };
             },
-            preConfirm: () => '1'
+            preConfirm: () => byeValue
         });
-        if (byeRuns === undefined) { ballHistory.pop(); return; }
-        const selected = parseInt(byeRuns.value !== undefined ? byeRuns.value : byeRuns) || 1;
+
+        if (selectedRun === undefined) { ballHistory.pop(); return; }
+        const selected = parseInt(selectedRun) || 1;
         runsThisBall = selected; // No +1 penalty for byes, standard cricket rules
         
         // Count ball for batsman but NOT runs
@@ -2028,19 +2037,20 @@ async function handleCricketBall(val) {
     // Final sync of batsman card before UI update and save
     syncBattingCard();
 
-    // Update UI
-    updateCricketUI();
-
     // Persist to Firebase (also saves batsman & bowler data)
     const s = getState();
     const m = s.matches[activeLiveMatchIndex];
-    m.score = `${currentScoreA}/${currentWickets} (${currentOvers}.${currentBalls})`;
     if (!m.cricketData) m.cricketData = {};
-    m.cricketData.b1runs  = batsman1Runs;
-    m.cricketData.b1balls = batsman1BallsFaced;
-    m.cricketData.b2runs  = batsman2Runs;
-    m.cricketData.b2balls = batsman2BallsFaced;
-    m.cricketData.striker = batsman1IsStriker;
+    
+    m.cricketData.currentScoreA = currentScoreA;
+    m.cricketData.currentWickets = currentWickets;
+    m.cricketData.currentOvers  = currentOvers;
+    m.cricketData.currentBalls  = currentBalls;
+    m.cricketData.batsman1IsStriker = batsman1IsStriker;
+    m.cricketData.batsman1Runs  = batsman1Runs;
+    m.cricketData.batsman1Balls = batsman1BallsFaced;
+    m.cricketData.batsman2Runs  = batsman2Runs;
+    m.cricketData.batsman2Balls = batsman2BallsFaced;
     m.cricketData.bowlerStats = bowlerStats;
     syncBattingCard(); // ensure latest live values are written before save
     m.cricketData.battingCard = battingCard;
@@ -2051,17 +2061,57 @@ async function handleCricketBall(val) {
     m.cricketData.batsman1 = document.getElementById('cricket-batsman1').value;
     m.cricketData.batsman2 = document.getElementById('cricket-batsman2').value;
     m.cricketData.bowler = document.getElementById('cricket-bowler').value;
-    
     saveStateSilent(s);
+    
+    // Final UI update
+    updateCricketUI();
+    
+    // Check for Innings Over
+    checkInningsOverConditions(m, overCompleted);
+}
 
-    if (currentOvers >= maxOversLimit) {
-        Swal.fire({ title: 'Innings Complete!',
-            text: `${maxOversLimit} overs done. Score: ${currentScoreA}/${currentWickets}`,
-            icon: 'info', toast: true, position: 'top-end',
-            showConfirmButton: false, timer: 5000
+async function checkInningsOverConditions(match, overCompletedStatus) {
+    const cd = match.cricketData;
+    const isFirstInnings = (cd.activeInnings !== '2');
+    const matchFinished = (cd.activeInnings === '2' && (currentScoreA >= cd.targetScore || (currentWickets >= 10 || (currentOvers >= maxOversLimit && currentBalls === 0))));
+
+    if (isFirstInnings && (currentWickets >= 10 || (currentOvers >= maxOversLimit && currentBalls === 0))) {
+        const target = currentScoreA + 1;
+        const { isConfirmed } = await Swal.fire({
+            title: '1st Innings Complete!',
+            html: `<div class="text-center">
+                <p class="text-xl font-bold text-emerald-500 mb-2">Score: ${currentScoreA}/${currentWickets}</p>
+                <p class="text-lg font-black text-amber-500">Target: ${target} runs</p>
+                <p class="mt-4 text-sm text-gray-400">Would you like to switch to the 2nd Innings and interchange roles?</p>
+            </div>`,
+            icon: 'success',
+            showCancelButton: true,
+            confirmButtonText: 'Start 2nd Innings',
+            confirmButtonColor: '#10b981',
+            cancelButtonText: 'Stay here',
+            allowOutsideClick: false
         });
-    } else if (overCompleted) {
-        // Prompt for new bowler
+
+        if (isConfirmed) {
+            handleInningsTransition(match, target);
+        }
+    } else if (matchFinished) {
+        let winnerMsg = "";
+        if (currentScoreA >= cd.targetScore) {
+            winnerMsg = `${cd.battingTeam} won the match!`;
+        } else {
+            const bowlingTeam = (match.team1 === cd.battingTeam) ? match.team2 : match.team1;
+            winnerMsg = `${bowlingTeam} won the match!`;
+        }
+
+        Swal.fire({
+            title: 'Match Finished!',
+            text: winnerMsg,
+            icon: 'success',
+            confirmButtonText: 'View Summary'
+        });
+    } else if (overCompletedStatus) {
+        // Prompt for new bowler logic
         const { value: bowName } = await Swal.fire({
             title: 'End of Over',
             text: 'Enter next bowler name:',
@@ -2072,14 +2122,52 @@ async function handleCricketBall(val) {
         });
         if (bowName) {
             document.getElementById('cricket-bowler').value = bowName;
-            m.cricketData.bowler = bowName;
+            match.cricketData.bowler = bowName;
             if (!bowlerStats[bowName]) {
                 bowlerStats[bowName] = { balls: 0, runs: 0, wickets: 0 };
             }
-            saveStateSilent(s);
-            updateCricketUI(); // Render the new active bowler if needed
+            saveStateSilent(getState());
+            updateCricketUI();
         }
     }
+}
+
+async function handleInningsTransition(match, target) {
+    // Interchange Roles
+    const oldBattingTeam = match.cricketData.battingTeam;
+    const newBattingTeam = (match.team1 === oldBattingTeam) ? match.team2 : match.team1;
+    
+    // Update Firebase State
+    const s = getState();
+    const m = s.matches[activeLiveMatchIndex];
+    
+    m.cricketData.activeInnings = '2';
+    m.cricketData.targetScore = target;
+    m.cricketData.firstInningsScore = currentScoreA;
+    m.cricketData.battingTeam = newBattingTeam;
+    
+    // Reset Counters
+    m.cricketData.currentScoreA = 0;
+    m.cricketData.currentWickets = 0;
+    m.cricketData.currentOvers = 0;
+    m.cricketData.currentBalls = 0;
+    m.cricketData.isFreeHit = false;
+    m.cricketData.overBallLog = [];
+    m.cricketData.allOversLog = [];
+    m.cricketData.bowlerStats = {};
+    m.cricketData.battingCard = [];
+    
+    m.score = `0/0 (0.0)`;
+    
+    await saveState(s);
+    
+    Swal.fire({
+        title: 'Roles Interchanged!',
+        text: `${newBattingTeam} is now batting. Please set the new Opening Batsmen and Bowler.`,
+        icon: 'info'
+    }).then(() => {
+        activateLiveMatch(activeLiveMatchIndex); // Re-init wizard for 2nd innings setup
+    });
 }
 
 window.deleteMatch = (idx) => {
