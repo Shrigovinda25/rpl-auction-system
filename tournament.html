@@ -19,22 +19,68 @@
             }
         }
     </script>
+    <style>
+        .glass-morphism {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1.5rem;
+        }
+        .tab-pane.hidden { display: none; }
+        .sport-history-container { transition: all 0.3s ease; }
+        
+        /* Expandable Match Cards */
+        .match-card-detailed { 
+            max-height: 0; 
+            overflow: hidden; 
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            opacity: 0;
+            margin-top: 0;
+        }
+        .match-card.expanded .match-card-detailed { 
+            max-height: 2000px; 
+            opacity: 1; 
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .match-card { cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .match-card:hover { transform: translateY(-2px); border-color: rgba(255, 255, 255, 0.1); }
+        .match-card.expanded { border-color: rgba(59, 130, 246, 0.3); background: rgba(59, 130, 246, 0.03) !important; }
+        
+        /* Team Members List */
+        .team-members-list { 
+            display: grid; 
+            grid-template-cols: repeat(auto-fill, minmax(140px, 1fr)); 
+            gap: 0.75rem; 
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 0;
+        }
+        .team-card.expanded .team-members-list { 
+            max-height: 1000px; 
+            opacity: 1;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .member-pill { 
+            background: rgba(255, 255, 255, 0.03); 
+            border: 1px solid rgba(255, 255, 255, 0.05); 
+            padding: 0.5rem 0.75rem; 
+            border-radius: 0.75rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .member-pill:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.1); transform: scale(1.02); }
+        .member-pill img { width: 1.25rem; height: 1.25rem; border-radius: 50%; object-fit: cover; background: #222; }
+    </style>
 </head>
 <body class="bg-darkBg text-white min-h-screen">
 
-    <!-- Navbar -->
-    <nav class="bg-cardBg border-b border-gray-800 p-4 sticky top-0 z-50 shadow-xl">
-        <div class="max-w-7xl mx-auto flex justify-between items-center px-4">
-            <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center font-black italic text-sm text-black">R</div>
-                <h1 class="text-xl font-black uppercase tracking-tighter text-white">RPL Tournament <span class="text-amber-500 hidden md:inline">2026</span></h1>
-            </div>
-            <div class="flex space-x-4">
-                <a href="index.html" class="text-xs font-bold text-gray-400 hover:text-white transition uppercase tracking-widest flex items-center gap-2"><i class="fas fa-home"></i><span class="hidden md:inline"> Home</span></a>
-                <a href="players.html" class="text-xs font-bold text-gray-400 hover:text-white transition uppercase tracking-widest flex items-center gap-2"><i class="fas fa-users"></i><span class="hidden md:inline"> Strategy</span></a>
-            </div>
-        </div>
-    </nav>
 
     <!-- Navbar -->
     <nav class="bg-cardBg border-b border-gray-800 p-4 sticky top-0 z-50 shadow-xl">
@@ -51,9 +97,6 @@
                     </button>
                     <button class="nav-tab px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-gray-500" data-tab="tab-teams">
                         <i class="fas fa-users mr-2"></i>Teams
-                    </button>
-                    <button class="nav-tab px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all text-gray-500" data-tab="tab-rules">
-                        <i class="fas fa-scroll mr-2"></i>Rules
                     </button>
                 </div>
                 <a href="index.html" class="text-xs font-bold text-gray-400 hover:text-white transition uppercase tracking-widest flex items-center gap-2"><i class="fas fa-home"></i><span class="hidden md:inline"> Home</span></a>
@@ -81,14 +124,6 @@
                     </div>
                 </div>
 
-                <!-- RIGHT COLUMN: Quick Stats or Ads (Optional) -->
-                <div class="lg:col-span-1 space-y-6">
-                    <div class="bg-gradient-to-br from-amber-600/20 to-orange-800/20 p-6 rounded-2xl border border-amber-500/20 shadow-xl relative overflow-hidden">
-                        <h2 class="text-lg font-black uppercase tracking-tighter text-amber-400 mb-2">🏆 RPL Trophy Target</h2>
-                        <p class="text-amber-200/60 font-medium text-xs">Points needed to secure the 2026 title.</p>
-                        <div class="text-4xl font-black text-white mt-4 tracking-tighter">230+ <span class="text-sm text-amber-500 uppercase tracking-widest">Points</span></div>
-                    </div>
-                </div>
             </div>
 
             <!-- LEADERBOARD AT THE BOTTOM -->
@@ -112,122 +147,80 @@
             </div>
         </div>
 
+
         <!-- TAB: TEAMS -->
-        <div id="tab-teams" class="tab-pane hidden space-y-8">
+        <div id="tab-teams" class="tab-pane hidden space-y-12">
             <div class="text-center space-y-2">
-                <h2 class="text-3xl font-black uppercase tracking-tighter text-white">RPL Teams</h2>
-                <p class="text-gray-500 uppercase tracking-widest text-[10px] font-black">Select a team to view their match results</p>
+                <h2 class="text-4xl font-black uppercase tracking-tighter text-white">Team Performance Hub</h2>
+                <p class="text-gray-500 uppercase tracking-[0.3em] text-[10px] font-black">Detailed match history and sport-specific statistics</p>
             </div>
 
-            <!-- Team Selection Grid -->
-            <div id="team-cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Team cards populated via JS -->
+            <!-- Points Table Summary -->
+            <div id="points-table-section" class="max-w-4xl mx-auto bg-black/40 rounded-3xl border border-white/10 overflow-hidden shadow-2xl">
+                <div class="px-6 py-4 bg-white/5 border-b border-white/5 flex justify-between items-center">
+                    <h3 class="text-sm font-black uppercase tracking-widest text-emerald-400">Tournament Standings</h3>
+                    <div class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Real-time stats sync</div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-[11px]">
+                        <thead class="bg-black/20 text-gray-500 font-black uppercase tracking-widest border-b border-white/5">
+                            <tr>
+                                <th class="px-6 py-4 w-16 text-center">Rank</th>
+                                <th class="px-4 py-4">Team</th>
+                                <th class="px-4 py-4 text-center">P</th>
+                                <th class="px-4 py-4 text-center">W</th>
+                                <th class="px-4 py-4 text-center">L</th>
+                                <th class="px-4 py-4 text-center">NRR</th>
+                            </tr>
+                        </thead>
+                        <tbody id="standings-table-body" class="divide-y divide-white/5">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            <!-- Team Match History -->
-            <div id="team-match-history" class="space-y-6 hidden">
-                <div class="flex items-center justify-between border-b border-white/10 pb-4">
-                    <h3 id="selected-team-title" class="text-xl font-black uppercase tracking-tighter text-white flex items-center gap-3">
-                        Match History
-                    </h3>
-                    <button onclick="document.getElementById('team-match-history').classList.add('hidden')" class="text-[10px] font-black uppercase tracking-widest text-gray-500 hover:text-white transition">
-                        <i class="fas fa-times mr-1"></i>Close
-                    </button>
-                </div>
-                <div id="team-matches-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Matches populated via JS -->
-                </div>
+            <!-- Vertical Team Profiles Container -->
+            <div id="team-profiles-container" class="space-y-10 max-w-5xl mx-auto pb-12">
+                <!-- Team profiles populated via JS -->
             </div>
         </div>
 
-        <!-- TAB: RULES -->
-        <div id="tab-rules" class="tab-pane hidden space-y-6">
-            <div class="bg-cardBg p-8 rounded-3xl border border-white/5 shadow-2xl">
-                <h2 class="text-3xl font-black uppercase tracking-tighter text-white mb-2">Official Rules</h2>
-                <p class="text-gray-500 uppercase tracking-widest text-[10px] font-black mb-8">RPL Tournament 2026 Guidelines</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-6">
-                        <div class="bg-black/20 p-6 rounded-2xl border border-blue-500/20">
-                            <h3 class="text-sm font-black text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-sitemap"></i> League Format</h3>
-                            <ul class="text-xs text-gray-400 space-y-3 list-disc pl-4 font-medium leading-relaxed">
-                                <li>Round Robin between Team A, B, and C.</li>
-                                <li><strong class="text-emerald-400 font-black">WIN:</strong> 2 points | <strong class="text-red-400 font-black">LOSS:</strong> 0 points</li>
-                                <li><strong class="text-blue-400 font-bold underline">1st PLACE:</strong> Direct Final entry 🏆</li>
-                                <li><strong class="text-amber-400 font-bold underline">2nd vs 3rd:</strong> Semi-Final Match. Winner advances to the Final.</li>
-                                <li>In case of point ties, Net Run Rate (NRR) or Sport Ranking will determine placement.</li>
-                            </ul>
-                        </div>
-                        
-                        <div class="bg-black/20 p-6 rounded-2xl border border-pink-500/20">
-                            <h3 class="text-sm font-black text-pink-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-table-tennis"></i> Badminton Category Rules</h3>
-                            <ul class="text-xs text-gray-400 space-y-3 list-disc pl-4 font-medium leading-relaxed">
-                                <li><strong>Best of 5 Format:</strong> First team to win 3 matches wins the overall tie.</li>
-                                <li><strong>Categories:</strong> Boys Singles, Girls Singles, Boys Doubles, Girls Doubles, Mixed Doubles.</li>
-                                <li><strong>Limit:</strong> One player can participate in max 1 Singles and 1 Doubles match.</li>
-                                <li>Players must be members of the original squad reported to the admin.</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="space-y-6">
-                        <div class="bg-black/20 p-6 rounded-2xl border border-orange-500/20">
-                            <h3 class="text-sm font-black text-orange-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-volleyball-ball"></i> Volleyball Match Rules</h3>
-                            <ul class="text-xs text-gray-400 space-y-3 list-disc pl-4 font-medium leading-relaxed">
-                                <li><strong>League & Semi:</strong> 15 points target (Single Set).</li>
-                                <li><strong>Final:</strong> 25 points target (Single Set).</li>
-                                <li><strong>Technicality:</strong> Both teams must rotate based on serving order.</li>
-                                <li>Rotation faults will result in points awarded to the opponent.</li>
-                            </ul>
-                        </div>
+        <!-- Reference Area (Global Bottom) -->
+        <div class="mt-20 space-y-8 border-t border-white/5 pt-12 max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Trophy Points System Reference -->
+                <div class="bg-cardBg p-6 rounded-3xl border border-white/5 shadow-xl">
+                    <h2 class="text-xs font-black uppercase tracking-[0.2em] mb-6 text-gray-500">🏆 Points System</h2>
+                    <table class="w-full text-left text-xs font-medium text-gray-300 uppercase tracking-widest">
+                        <thead class="border-b border-white/10 text-gray-500">
+                            <tr>
+                                <th class="pb-3 px-2">Sport</th>
+                                <th class="pb-3 text-center text-amber-400"><i class="fas fa-medal"></i> 1st</th>
+                                <th class="pb-3 text-center text-gray-300"><i class="fas fa-medal"></i> 2nd</th>
+                                <th class="pb-3 text-center text-orange-400"><i class="fas fa-medal"></i> 3rd</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-white/5">
+                            <tr class="hover:bg-white/5 transition"><td class="py-4 px-2 font-bold text-white">Cricket</td><td class="text-center font-black text-amber-500 text-sm">100</td><td class="text-center">70</td><td class="text-center">50</td></tr>
+                            <tr class="hover:bg-white/5 transition"><td class="py-4 px-2 font-bold text-white">Badminton</td><td class="text-center font-black text-white text-sm">70</td><td class="text-center">50</td><td class="text-center">30</td></tr>
+                            <tr class="hover:bg-white/5 transition"><td class="py-4 px-2 font-bold text-white">Volleyball</td><td class="text-center font-black text-white text-sm">70</td><td class="text-center">50</td><td class="text-center">30</td></tr>
+                            <tr class="hover:bg-white/5 transition"><td class="py-4 px-2 font-bold text-white text-[10px]">Tug of War</td><td class="text-center font-black text-white text-sm">40</td><td class="text-center">25</td><td class="text-center">15</td></tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                        <div class="bg-black/20 p-6 rounded-2xl border border-emerald-500/20">
-                            <h3 class="text-sm font-black text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2"><i class="fas fa-baseball-ball"></i> Cricket Over Rules</h3>
-                            <ul class="text-xs text-gray-400 space-y-3 list-disc pl-4 font-medium leading-relaxed">
-                                <li><strong>League Games:</strong> 8 overs per inning.</li>
-                                <li><strong>Post-League:</strong> Semi-Finals & Finals will be 10 overs.</li>
-                                <li><strong>Powerplay:</strong> 2 Overs (League) / 3 Overs (Finals). Only 2 players allowed outside 30-yard circle.</li>
-                                <li>Fair play rules apply. Umpires' decision is final.</li>
-                            </ul>
-                        </div>
-                    </div>
+                <!-- Tie Breakers -->
+                <div class="bg-black/30 p-8 rounded-3xl border border-white/5 border-dashed flex flex-col justify-center">
+                    <h3 class="text-sm font-black uppercase tracking-[0.2em] text-gray-400 mb-6 flex items-center gap-3"><i class="fas fa-balance-scale text-amber-500"></i>Tie Breakers</h3>
+                    <ul class="text-[11px] text-gray-500 space-y-4 font-bold uppercase tracking-widest list-none">
+                        <li class="flex items-center gap-3"><span class="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-white">1</span> Cricket Rank / Net Run Rate</li>
+                        <li class="flex items-center gap-3"><span class="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-white">2</span> Total Wins 🥇</li>
+                        <li class="flex items-center gap-3"><span class="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-white">3</span> Head-to-Head ⚔️</li>
+                        <li class="flex items-center gap-3"><span class="w-6 h-6 rounded-lg bg-white/5 flex items-center justify-center text-white">4</span> Fair Play 🎯 / Points Diff</li>
+                    </ul>
                 </div>
             </div>
-        </div>
-    </div>
-
-            <!-- Trophy Points System Reference -->
-            <div class="bg-cardBg p-5 rounded-2xl border border-white/5 shadow-xl">
-                <h2 class="text-xs font-black uppercase tracking-[0.2em] mb-4 text-gray-500">Points System</h2>
-                <table class="w-full text-left text-xs font-medium text-gray-300 uppercase tracking-widest">
-                    <thead class="border-b border-white/10 text-gray-500">
-                        <tr>
-                            <th class="pb-2">Sport</th>
-                            <th class="pb-2 text-center text-amber-400"><i class="fas fa-medal"></i> 1st</th>
-                            <th class="pb-2 text-center text-gray-300"><i class="fas fa-medal"></i> 2nd</th>
-                            <th class="pb-2 text-center text-orange-400"><i class="fas fa-medal"></i> 3rd</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-white/5">
-                        <tr><td class="py-3">Cricket</td><td class="text-center font-bold text-white">100</td><td class="text-center">70</td><td class="text-center">50</td></tr>
-                        <tr><td class="py-3">Badminton</td><td class="text-center font-bold text-white">70</td><td class="text-center">50</td><td class="text-center">30</td></tr>
-                        <tr><td class="py-3">Volleyball</td><td class="text-center font-bold text-white">70</td><td class="text-center">50</td><td class="text-center">30</td></tr>
-                        <tr><td class="py-3 text-[10px]">Tug of War</td><td class="text-center font-bold text-white">40</td><td class="text-center">25</td><td class="text-center">15</td></tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Tie Breakers -->
-            <div class="bg-black/30 p-5 rounded-2xl border border-white/5 border-dashed">
-                <h3 class="text-xs font-black uppercase tracking-widest text-gray-500 mb-3"><i class="fas fa-balance-scale mr-2 text-gray-400"></i>Tie Breakers</h3>
-                <ul class="text-[10px] text-gray-400 space-y-1 font-medium list-inside list-decimal">
-                    <li>Cricket Rank 🏏 / Net Run Rate</li>
-                    <li>Total Wins 🥇</li>
-                    <li>Head-to-Head ⚔️</li>
-                    <li>Fair Play 🎯 / Points Diff</li>
-                </ul>
-            </div>
-
         </div>
     </div>
 
@@ -256,21 +249,26 @@
         };
 
         const THEME_COLORS = {
-            "ROBO KNIGHTS": "text-blue-400 bg-blue-500/10 border-blue-500/20",
-            "FLASHING BOTS 🤖": "text-pink-400 bg-pink-500/10 border-pink-500/20",
-            "TECH TITANS 🤖": "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+            "ROBO": "text-blue-400 bg-blue-500/10 border-blue-500/20",
+            "FLASHING": "text-pink-400 bg-pink-500/10 border-pink-500/20",
+            "TECH": "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
         };
         const THEME_ACCENTS = {
-            "ROBO KNIGHTS": "from-blue-600 to-blue-900 border-blue-400/30",
-            "FLASHING BOTS 🤖": "from-pink-600 to-purple-900 border-pink-400/30",
-            "TECH TITANS 🤖": "from-emerald-600 to-teal-900 border-emerald-400/30"
+            "ROBO": "from-blue-600 to-blue-900 border-blue-400/30",
+            "FLASHING": "from-pink-600 to-purple-900 border-pink-400/30",
+            "TECH": "from-emerald-600 to-teal-900 border-emerald-400/30"
         };
 
         let state = null;
         
         onValue(ref(db, 'rpl_auction/state'), (snapshot) => {
-            state = snapshot.val();
-            if (state) {
+            const raw = snapshot.val();
+            if (raw) {
+                // Simplified normalization
+                state = raw;
+                if (!state.matches) state.matches = [];
+                if (!state.teams) state.teams = [];
+                
                 renderStandings();
                 renderMatches();
                 renderTeams();
@@ -308,33 +306,133 @@
 
         function renderStandings() {
             const container = document.getElementById('trophy-standings');
+            const tableBody = document.getElementById('standings-table-body');
             if(!container || !state || !state.teams) return;
 
-            // Calculate current RPL scores
-            let scores = {};
-            state.teams.forEach(t => scores[t.name] = 0);
+            // Calculate RPL scores and Cricket NRR
+            let statsData = {};
+            state.teams.forEach(t => {
+                statsData[t.name] = {
+                    pts: 0,
+                    played: 0,
+                    won: 0,
+                    lost: 0,
+                    runsScored: 0,
+                    ballsFaced: 0,
+                    runsConceded: 0,
+                    ballsBowled: 0,
+                    nrr: 0
+                };
+            });
 
+            // 1. Calculate RPL Trophy Points (Rankings)
             const rankings = state.tournamentRankings || {};
             Object.keys(rankings).forEach(sport => {
                 const results = rankings[sport];
                 if (!results) return;
-                
                 ["1st", "2nd", "3rd"].forEach(place => {
                     const team = results[place];
-                    if (team && scores[team] !== undefined && POINT_TEMPLATE[sport]) {
-                        scores[team] += POINT_TEMPLATE[sport][place];
+                    if (team && statsData[team] && POINT_TEMPLATE[sport]) {
+                        statsData[team].pts += POINT_TEMPLATE[sport][place];
                     }
                 });
             });
 
-            const sortedTeams = Object.keys(scores).map(t => ({ name: t, pts: scores[t] })).sort((a,b) => b.pts - a.pts);
+            // 2. Calculate Cricket Match Stats & NRR
+            const MAX_OVERS = 10;
+            (state.matches || []).forEach(m => {
+                if (m.sport !== 'Cricket' || !m.winner) return;
+
+                const t1 = m.team1;
+                const t2 = m.team2;
+                if (!statsData[t1] || !statsData[t2]) return;
+
+                statsData[t1].played++;
+                statsData[t2].played++;
+                if (cleanName(m.winner) === cleanName(t1)) { statsData[t1].won++; statsData[t2].lost++; }
+                else if (cleanName(m.winner) === cleanName(t2)) { statsData[t2].won++; statsData[t1].lost++; }
+
+                const cd = m.cricketData;
+                if (cd && cd.firstInningsScore !== undefined) {
+                    const parseOversToBalls = (ovStr) => {
+                        const parts = String(ovStr || '0.0').split('.');
+                        const ov = parseInt(parts[0]) || 0;
+                        const bl = parseInt(parts[1]) || 0;
+                        return (ov * 6) + bl;
+                    };
+
+                    const i1Runs = parseInt(cd.firstInningsScore) || 0;
+                    const i1Balls = (cd.firstInningsWickets >= 10) ? (MAX_OVERS * 6) : parseOversToBalls(cd.firstInningsOvers);
+                    
+                    const i2Runs = parseInt(cd.secondInningsRuns) || 0;
+                    const i2Balls = (cd.secondInningsWickets >= 10) ? (MAX_OVERS * 6) : parseOversToBalls(cd.secondInningsOvers);
+
+                    // T1 (Innings 1 Batting)
+                    statsData[t1].runsScored += i1Runs;
+                    statsData[t1].ballsFaced += i1Balls;
+                    statsData[t1].runsConceded += i2Runs;
+                    statsData[t1].ballsBowled += i2Balls;
+
+                    // T2 (Innings 2 Batting)
+                    statsData[t2].runsScored += i2Runs;
+                    statsData[t2].ballsFaced += i2Balls;
+                    statsData[t2].runsConceded += i1Runs;
+                    statsData[t2].ballsBowled += i1Balls;
+                }
+            });
+
+            // Finalizing NRR Calculation
+            Object.keys(statsData).forEach(team => {
+                const s = statsData[team];
+                const batRate = s.ballsFaced > 0 ? (s.runsScored / (s.ballsFaced / 6)) : 0;
+                const bowlRate = s.ballsBowled > 0 ? (s.runsConceded / (s.ballsBowled / 6)) : 0;
+                s.nrr = (batRate - bowlRate).toFixed(3);
+                if (parseFloat(s.nrr) === 0) s.nrr = "0.000";
+            });
+
+            // Sort by RPL Points (PTS), then NRR
+            const sortedTeams = Object.keys(statsData).map(name => ({ name, ...statsData[name] }))
+                .sort((a,b) => (b.pts - a.pts) || (parseFloat(b.nrr) - parseFloat(a.nrr)));
+
+            // Populate Standings Table
+            if (tableBody) {
+                tableBody.innerHTML = '';
+                sortedTeams.forEach((item, idx) => {
+                    const teamData = state.teams.find(t => t.name === item.name);
+                    const stats = calculateStatsForTeam(item.name);
+                    const matches = (state.matches || []).filter(m => {
+                        const cn = cleanName(item.name);
+                        return cleanName(m.team1) === cn || cleanName(m.team2) === cn;
+                    });
+                    
+                    const played = matches.length;
+                    const won = stats.totalWins || 0;
+                    const lost = Math.max(0, played - won);
+
+                    tableBody.innerHTML += `
+                        <tr class="hover:bg-white/5 transition border-white/5 font-bold uppercase tracking-widest text-[10px]">
+                            <td class="px-6 py-4 text-center text-gray-500">#${idx + 1}</td>
+                            <td class="px-4 py-4">
+                                <div class="flex items-center gap-3">
+                                    <img src="${teamData ? teamData.logo : ''}" class="w-8 h-8 rounded-lg object-contain bg-white/5 p-1">
+                                    <div class="text-white whitespace-nowrap">${item.name}</div>
+                                </div>
+                            </td>
+                            <td class="px-4 py-4 text-center font-mono text-gray-400">${item.played}</td>
+                            <td class="px-4 py-4 text-center font-mono text-emerald-400 font-bold">${item.won}</td>
+                            <td class="px-4 py-4 text-center font-mono text-rose-500/40">${item.lost}</td>
+                            <td class="px-4 py-4 text-center font-mono ${item.nrr >= 0 ? 'text-blue-400' : 'text-rose-400'}">${item.nrr >= 0 ? '+' : ''}${item.nrr}</td>
+                        </tr>
+                    `;
+                });
+            }
 
             container.innerHTML = '';
             sortedTeams.forEach((item, idx) => {
                 const isFirst = idx === 0 && item.pts > 0;
                 const teamData = state.teams.find(t => t.name === item.name);
                 const logo = teamData && teamData.logo ? `<img src="${teamData.logo}" class="w-10 h-10 rounded-lg object-cover shadow-lg bg-white/10 hidden sm:block">` : `<div class="w-10 h-10 rounded-lg bg-white/10 hidden sm:flex items-center justify-center font-bold text-xl">${item.name.charAt(0)}</div>`;
-                const accent = THEME_ACCENTS[item.name] || 'from-gray-700 to-gray-900 border-gray-600';
+                const accent = THEME_ACCENTS[cleanName(item.name)] || 'from-gray-700 to-gray-900 border-gray-600';
 
                 container.innerHTML += `
                     <div class="relative bg-gradient-to-r ${accent} p-4 rounded-xl border flex items-center justify-between overflow-hidden shadow-lg transform transition hover:scale-[1.02]">
@@ -357,10 +455,11 @@
 
         function renderMatches() {
             const container = document.getElementById('tournament-matches');
-            if(!container || !state) return;
+            container.innerHTML = '';
+            
+            const allMatches = state.matches || [];
 
-            const matches = state.matches || [];
-            if (matches.length === 0) {
+            if (allMatches.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-10 bg-black/20 rounded-2xl border border-dashed border-white/5">
                         <i class="fas fa-calendar-times text-3xl text-gray-600 mb-2"></i>
@@ -370,8 +469,8 @@
             }
 
             container.innerHTML = '';
-            // Display newest first
-            [...matches].reverse().forEach(m => {
+            // Display all matches, newest first
+            [...allMatches].reverse().forEach(m => {
                 container.innerHTML += buildMatchCard(m);
             });
         }
@@ -379,23 +478,52 @@
         function buildMatchCard(m) {
             const team1Data = state.teams.find(t => t.name === m.team1);
             const team2Data = state.teams.find(t => t.name === m.team2);
-            const logo1 = team1Data ? team1Data.logo : '';
-            const logo2 = team2Data ? team2Data.logo : '';
+            const logo1 = m.team1Logo || (team1Data ? team1Data.logo : '');
+            const logo2 = m.team2Logo || (team2Data ? team2Data.logo : '');
 
-            const t1Style = THEME_COLORS[m.team1] || 'text-gray-400 bg-gray-500/10 border-gray-500/20';
-            const t2Style = THEME_COLORS[m.team2] || 'text-gray-400 bg-gray-500/10 border-gray-500/20';
+            const t1Style = THEME_COLORS[cleanName(m.team1)] || 'text-gray-400 bg-gray-500/10 border-gray-500/20';
+            const t2Style = THEME_COLORS[cleanName(m.team2)] || 'text-gray-400 bg-gray-500/10 border-gray-500/20';
             const isFinished = m.winner && m.winner !== '';
             const isCricket = m.sport === 'Cricket';
             const cd = m.cricketData || {};
 
             // Score styling
             let scoreTag = '';
-            if (!m.score) {
-                scoreTag = `<div class="text-[10px] uppercase font-bold text-gray-500 tracking-widest py-1 border border-dashed border-gray-600 px-2 rounded">Pending</div>`;
+            if (!m.score || m.score === 'Pending') {
+                if (isCricket && cd.currentScoreA !== undefined) {
+                    scoreTag = `
+                        <div class="flex flex-col items-center animate-pulse">
+                            <div class="bg-blue-600/20 text-blue-400 font-mono px-4 py-1.5 rounded-xl border border-blue-500/30 font-black text-2xl tracking-tighter shadow-[0_0_20px_rgba(37,99,235,0.2)]">${cd.currentScoreA}/${cd.currentWickets || 0}</div>
+                            <div class="text-[10px] font-black text-blue-400/60 mt-1 uppercase tracking-[0.2em]">(${cd.currentOvers || 0}.${cd.currentBalls || 0})</div>
+                        </div>
+                    `;
+                } else {
+                    scoreTag = `<div class="text-[10px] uppercase font-bold text-gray-500 tracking-widest py-1 border border-dashed border-gray-600 px-2 rounded">Pending</div>`;
+                }
             } else if (!isFinished) {
-                scoreTag = `<div class="bg-blue-600/20 text-blue-400 font-mono px-5 py-2 rounded-xl border border-blue-500/30 font-black text-2xl tracking-tighter shadow-[0_0_20px_rgba(37,99,235,0.2)] animate-pulse">${m.score}</div>`;
+                if (isCricket && m.score.includes('(')) {
+                    const parts = m.score.split(' ');
+                    scoreTag = `
+                        <div class="flex flex-col items-center animate-pulse">
+                            <div class="bg-blue-600/20 text-blue-400 font-mono px-4 py-1.5 rounded-xl border border-blue-500/30 font-black text-2xl tracking-tighter shadow-[0_0_20px_rgba(37,99,235,0.2)]">${parts[0]}</div>
+                            <div class="text-[10px] font-black text-blue-400/60 mt-1 uppercase tracking-[0.2em]">${parts[1]}</div>
+                        </div>
+                    `;
+                } else {
+                    scoreTag = `<div class="bg-blue-600/20 text-blue-400 font-mono px-5 py-2 rounded-xl border border-blue-500/30 font-black text-2xl tracking-tighter shadow-[0_0_20px_rgba(37,99,235,0.2)] animate-pulse">${m.score}</div>`;
+                }
             } else {
-                scoreTag = `<div class="bg-gray-800 text-white font-mono px-3 py-1 rounded-md border border-white/10 font-bold tracking-widest shadow-inner opacity-60">${m.score}</div>`;
+                if (isCricket && m.score.includes('(')) {
+                    const parts = m.score.split(' ');
+                    scoreTag = `
+                        <div class="flex flex-col items-center opacity-60">
+                            <div class="bg-gray-800 text-white font-mono px-4 py-1.5 rounded-xl border border-white/10 font-black text-xl tracking-widest shadow-inner">${parts[0]}</div>
+                            <div class="text-[9px] font-bold text-gray-500 mt-1 uppercase tracking-widest">${parts[1]}</div>
+                        </div>
+                    `;
+                } else {
+                    scoreTag = `<div class="bg-gray-800 text-white font-mono px-3 py-1 rounded-md border border-white/10 font-bold tracking-widest shadow-inner opacity-60">${m.score}</div>`;
+                }
             }
 
             // Cricket Specific Details
@@ -420,9 +548,25 @@
                        </div>` 
                     : '';
 
+                // Over Ball Log Rendering
+                const overCircles = (cd.overBallLog || []).map(ball => {
+                    let style = 'bg-emerald-600/20 border-emerald-500/40 text-emerald-400'; // Default run
+                    const type = ball.type || 'run';
+                    const label = ball.label || '?';
+
+                    if (type === 'dot') style = 'bg-white/5 border-white/10 text-gray-500';
+                    else if (type === 'four') style = 'bg-blue-600/20 border-blue-500/40 text-blue-400 font-black';
+                    else if (type === 'six') style = 'bg-purple-600/20 border-purple-500/40 text-purple-400 font-black';
+                    else if (type === 'wicket') style = 'bg-red-600/20 border-red-500/40 text-red-400 font-black';
+                    else if (['wide', 'nb', 'bye'].includes(type) || ['wd', 'nb', 'bye'].includes(label.toLowerCase())) 
+                        style = 'bg-orange-600/10 border-orange-500/30 text-orange-400';
+
+                    return `<div class="w-6 h-6 rounded-full border ${style} flex items-center justify-center text-[8px] font-bold uppercase">${label}</div>`;
+                }).join('');
+
                 cricketDetails = `
                     <div class="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 gap-4">
-                        <div class="space-y-2">
+                        <div class="space-y-2 text-left">
                             <div class="flex items-center justify-between bg-white/5 p-2 rounded-xl transition ${s1 ? 'border border-emerald-500/40 bg-emerald-500/5' : 'border border-transparent'}">
                                 <span class="text-[11px] font-bold ${s1 ? 'text-white' : 'text-gray-400'}">${b1}${s1 ? '*' : ''}</span>
                                 <span class="text-[11px] font-black font-mono text-emerald-400">${b1Runs}<span class="text-[9px] opacity-50 ml-0.5">(${b1Balls})</span></span>
@@ -435,7 +579,10 @@
                         <div class="flex flex-col justify-center items-end text-right pr-2 border-l border-white/5">
                             <span class="text-[9px] font-black uppercase text-gray-500 tracking-widest mb-1">Current Bowler</span>
                             <span class="text-[11px] font-black text-amber-400">${currentBowler}</span>
-                            <span class="text-[10px] font-bold text-gray-400 font-mono mt-1">${bowlerData.wickets}-${bowlerData.runs} <span class="text-[9px] opacity-50">(${Math.floor(bowlerData.balls/6)}.${bowlerData.balls%6})</span></span>
+                            <span class="text-[10px] font-bold text-gray-400 font-mono mt-0.5 mb-2">${bowlerData.wickets}-${bowlerData.runs} <span class="text-[9px] opacity-50">(${Math.floor(bowlerData.balls/6)}.${bowlerData.balls%6})</span></span>
+                            <div class="flex gap-1 flex-wrap justify-end">
+                                ${overCircles || '<div class="text-[8px] uppercase font-bold text-gray-700 tracking-widest">New Over</div>'}
+                            </div>
                         </div>
                     </div>
                     ${targetTag}
@@ -448,20 +595,23 @@
             if(m.winner === 'Draw') winBadge = `<span class="bg-gray-500/20 text-gray-400 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border border-gray-500/20 mt-2 block w-max mx-auto">Draw</span>`;
 
             return `
-                <div class="bg-black/30 p-5 rounded-2xl border ${!isFinished ? 'border-blue-500/20 bg-blue-500/5 shadow-lg shadow-blue-900/10' : 'border-white/5'} hover:border-white/10 transition group relative overflow-hidden">
+                <div class="match-card bg-black/30 p-5 rounded-2xl border ${!isFinished ? 'border-blue-500/20 bg-blue-500/5 shadow-lg shadow-blue-900/10' : 'border-white/5'} hover:border-white/10 transition group relative overflow-hidden" onclick="this.classList.toggle('expanded')">
                     ${!isFinished ? '<div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl"></div>' : ''}
                     <div class="flex justify-between items-center mb-4 relative z-10">
                         <span class="text-[9px] font-black uppercase ${!isFinished ? 'text-blue-400 bg-blue-500/10' : 'text-amber-500 bg-amber-500/10'} px-2 py-0.5 rounded border ${!isFinished ? 'border-blue-500/20' : 'border-amber-500/20'}">
                             <i class="fas ${!isFinished ? 'fa-signal text-blue-400 animate-pulse' : 'fa-check-circle'} mr-1"></i>
                             ${!isFinished ? 'Live: ' + m.sport : m.sport}
                         </span>
-                        <span class="text-[9px] font-black uppercase text-gray-500 tracking-widest">${m.stage}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[9px] font-black uppercase text-gray-500 tracking-widest">${m.stage}</span>
+                            <i class="fas fa-chevron-down text-[10px] text-gray-600 group-[.expanded]:rotate-180 transition-transform"></i>
+                        </div>
                     </div>
                     <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-center relative z-10">
                         <div class="flex flex-col items-center gap-3">
-                            <div class="font-black uppercase tracking-tighter ${!isFinished ? 'text-[10px] sm:text-xs' : 'text-[9px] sm:text-[11px]'} border-2 px-3 py-2 rounded-2xl ${t1Style} shadow-lg w-full min-h-[60px] flex flex-col items-center justify-center gap-2">
-                                ${logo1 ? `<img src="${logo1}" class="w-8 h-8 object-contain">` : ''}
-                                <span>${m.team1}</span>
+                            <div class="font-black uppercase tracking-tighter ${!isFinished ? 'text-[10px] sm:text-xs' : 'text-[9px] sm:text-[11px]'} border-2 px-3 py-2 rounded-2xl ${t1Style} shadow-lg w-full min-h-[70px] flex flex-col items-center justify-center gap-2">
+                                ${logo1 ? `<img src="${logo1}" class="w-10 h-10 object-contain drop-shadow-lg">` : ''}
+                                <span class="leading-none">${m.team1}</span>
                             </div>
                         </div>
                         <div class="flex flex-col items-center justify-center">
@@ -469,83 +619,481 @@
                             ${scoreTag}
                         </div>
                         <div class="flex flex-col items-center gap-3">
-                            <div class="font-black uppercase tracking-tighter ${!isFinished ? 'text-[10px] sm:text-xs' : 'text-[9px] sm:text-[11px]'} border-2 px-3 py-2 rounded-2xl ${t2Style} shadow-lg w-full min-h-[60px] flex flex-col items-center justify-center gap-2">
-                                ${logo2 ? `<img src="${logo2}" class="w-8 h-8 object-contain">` : ''}
-                                <span>${m.team2}</span>
+                            <div class="font-black uppercase tracking-tighter ${!isFinished ? 'text-[10px] sm:text-xs' : 'text-[9px] sm:text-[11px]'} border-2 px-3 py-2 rounded-2xl ${t2Style} shadow-lg w-full min-h-[70px] flex flex-col items-center justify-center gap-2">
+                                ${logo2 ? `<img src="${logo2}" class="w-10 h-10 object-contain drop-shadow-lg">` : ''}
+                                <span class="leading-none">${m.team2}</span>
                             </div>
                         </div>
                     </div>
                     ${cricketDetails}
                     ${winBadge}
                     ${m.details ? `<div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-gray-400 text-center font-medium italic"><i class="fas fa-info-circle mr-1 opacity-50"></i>${m.details}</div>` : ''}
+                    
+                    <!-- Detailed Match View (Expanded) -->
+                    <div class="match-card-detailed">
+                        ${isCricket ? renderCricketDetailedScorecard(m) : renderGenericDetailedView(m)}
+                    </div>
                 </div>
             `;
         }
 
 
         function renderTeams() {
-            const container = document.getElementById('team-cards-container');
+            const container = document.getElementById('team-profiles-container');
             if(!container || !state || !state.teams) return;
 
             container.innerHTML = '';
             state.teams.forEach(team => {
-                const accent = THEME_ACCENTS[team.name] || 'from-gray-700 to-gray-900 border-gray-600';
-                const textColor = THEME_COLORS[team.name] ? THEME_COLORS[team.name].split(' ')[0] : 'text-white';
+                const accent = THEME_ACCENTS[cleanName(team.name)] || 'from-gray-700 to-gray-900 border-gray-600';
                 
-                // Count wins
-                const wins = (state.matches || []).filter(m => m.winner === team.name).length;
-                const matchesCount = (state.matches || []).filter(m => m.team1 === team.name || m.team2 === team.name).length;
+                // Calculate Stats
+                const stats = calculateStatsForTeam(team.name);
+                const teamPlayers = team.players || [];
 
                 container.innerHTML += `
-                    <div onclick="showTeamResults('${team.name}')" class="bg-gradient-to-br ${accent} p-6 rounded-3xl border cursor-pointer transform transition hover:scale-[1.05] hover:shadow-2xl group relative overflow-hidden">
-                        <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
-                        <div class="relative z-10 flex flex-col items-center text-center">
-                            <div class="w-16 h-16 rounded-2xl bg-white/10 p-2 mb-4">
-                                <img src="${team.logo}" class="w-full h-full object-contain rounded-lg shadow-lg">
-                            </div>
-                            <h3 class="text-xl font-black uppercase tracking-tighter text-white mb-2">${team.name}</h3>
-                            <div class="flex gap-4">
-                                <div class="text-center">
-                                    <div class="text-xs font-black text-white/40 uppercase tracking-widest">Matches</div>
-                                    <div class="text-lg font-black text-white">${matchesCount}</div>
+                    <div class="team-card bg-cardBg rounded-[2rem] border border-white/5 shadow-2xl overflow-hidden relative group transition-all duration-500">
+                        <!-- Header Banner -->
+                        <div class="h-32 bg-gradient-to-r ${accent} opacity-20 absolute top-0 left-0 w-full"></div>
+                        
+                        <div class="p-8 relative z-10">
+                            <!-- Top Profile Row -->
+                            <div class="flex flex-col md:flex-row gap-8 items-start mb-10">
+                                <div class="w-24 h-24 rounded-2xl bg-white/10 p-2 shadow-2xl shrink-0 group-hover:scale-110 transition-transform duration-500 cursor-pointer" onclick="this.closest('.team-card').classList.toggle('expanded')">
+                                    <img src="${team.logo}" class="w-full h-full object-contain rounded-lg">
                                 </div>
-                                <div class="text-center">
-                                    <div class="text-xs font-black text-white/40 uppercase tracking-widest text-emerald-400">Wins</div>
-                                    <div class="text-lg font-black text-emerald-400">${wins}</div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h3 class="text-4xl font-black uppercase tracking-tighter text-white mb-2">${team.name}</h3>
+                                            <div class="flex flex-wrap gap-3">
+                                                <span class="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-400 border border-white/10"><i class="fas fa-user-tie mr-1.5 text-amber-500"></i>Captain: ${team.captain}</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Final Squad Expanded list removed -->
+
+                            <!-- Sport Summaries Grid -->
+                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10 mt-10">
+                                ${renderSportStatBox('Cricket', 'fa-baseball-ball', 'text-amber-500', stats.cricket, team.name)}
+                                ${renderSportStatBox('Badminton', 'fa-table-tennis', 'text-pink-500', stats.badminton, team.name)}
+                                ${renderSportStatBox('Volleyball', 'fa-volleyball-ball', 'text-orange-500', stats.volleyball, team.name)}
+                                ${renderSportStatBox('Tug of War', 'fa-anchor', 'text-blue-500', stats.tugOfWar, team.name)}
+                            </div>
+
+                            <!-- Detailed Match History Section -->
+                            <div class="space-y-4">
+                                <div id="history-Badminton-${cleanName(team.name)}" class="sport-history-container">
+                                    ${renderBadmintonHistory(team.name)}
+                                </div>
+
+                                <div id="history-Volleyball-${cleanName(team.name)}" class="sport-history-container" style="display: none;">
+                                    ${renderVolleyballResults(team.name)}
+                                </div>
+
+                                <div id="history-Cricket-${cleanName(team.name)}" class="sport-history-container" style="display: none;">
+                                    ${renderCricketHistory(team.name)}
+                                </div>
+                                <div id="history-TugofWar-${cleanName(team.name)}" class="sport-history-container" style="display: none;">
+                                    ${renderGenericSportHistory(team.name, 'Tug of War', 'fa-anchor')}
                                 </div>
                             </div>
                         </div>
                     </div>
                 `;
             });
+
+            // Set default active state for Badminton
+            setTimeout(() => {
+                const teams = state.teams || [];
+                teams.forEach(t => {
+                    const clean = cleanName(t.name);
+                    const btn = document.getElementById(`stat-Badminton-${clean}`);
+                    if (btn) btn.classList.add('border-pink-500/50', 'bg-white/5');
+                });
+            }, 100);
+        }
+
+        // --- NEW HELPERS FOR EXPANDED VIEWS ---
+
+        function renderCricketDetailedScorecard(m) {
+            const cd = m.cricketData || {};
+            const batting = cd.battingCard || [];
+            const bowling = cd.bowlerStats ? Object.entries(cd.bowlerStats) : [];
+            let squadA = cd.teamA_XI || [];
+            let squadB = cd.teamB_XI || [];
+            
+            // Fallback for squads if structured data is missing (legacy matches)
+            if (squadA.length === 0 && m.details && m.details.includes('Squad:')) {
+                const parts = m.details.split(' vs ');
+                if (parts.length === 2) {
+                    squadA = parts[0].replace('Squad: ', '').split(', ').map(s => s.trim());
+                    squadB = parts[1].split(', ').map(s => s.trim());
+                }
+            }
+            
+            return `
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
+                    <!-- Batting Table -->
+                    <div class="bg-black/40 rounded-2xl border border-white/5 overflow-hidden">
+                        <div class="px-4 py-2 border-b border-white/5 bg-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-blue-400">
+                            <span>Batting Scorecard</span>
+                            <span class="text-gray-500">${m.team1}</span>
+                        </div>
+                        <div class="p-0">
+                            <table class="w-full text-left text-[10px]">
+                                <thead class="border-b border-white/5 text-gray-500 font-bold uppercase">
+                                    <tr>
+                                        <th class="px-4 py-2">Batsman</th>
+                                        <th class="px-2 py-2 text-center">R</th>
+                                        <th class="px-2 py-2 text-center">B</th>
+                                        <th class="px-2 py-2 text-center">4s</th>
+                                        <th class="px-2 py-2 text-center">6s</th>
+                                        <th class="px-2 py-2 text-center">SR</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5">
+                                    ${batting.length > 0 ? batting.map(b => `
+                                        <tr class="hover:bg-white/5 transition">
+                                            <td class="px-4 py-2">
+                                                <div class="font-bold text-white flex items-center">${b.name} ${b.out ? '<span class="text-[7px] text-red-500/80 ml-1.5 font-black">OUT</span>' : '<span class="text-[7px] text-emerald-500 ml-1.5 font-black animate-pulse">LIVE</span>'}</div>
+                                                ${b.out ? `<div class="text-[8px] text-gray-500 italic lowercase font-medium mt-0.5">${b.howOut || ''}</div>` : ''}
+                                            </td>
+                                            <td class="px-2 py-2 text-center font-mono text-white">${b.runs}</td>
+                                            <td class="px-2 py-2 text-center font-mono text-gray-400">${b.balls}</td>
+                                            <td class="px-2 py-2 text-center font-mono text-gray-500">${b.fours || 0}</td>
+                                            <td class="px-2 py-2 text-center font-mono text-gray-500">${b.sixes || 0}</td>
+                                            <td class="px-2 py-2 text-center font-mono text-blue-400/60">${b.balls > 0 ? ((b.runs/b.balls)*100).toFixed(2) : '0.00'}</td>
+                                        </tr>
+                                    `).join('') : '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-600 font-bold uppercase">No batting records</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Bowling Table -->
+                    <div class="bg-black/40 rounded-2xl border border-white/5 overflow-hidden">
+                        <div class="px-4 py-2 border-b border-white/5 bg-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-amber-500">
+                            <span>Bowling Figures</span>
+                            <span class="text-gray-500">${m.team2}</span>
+                        </div>
+                        <div class="p-0">
+                            <table class="w-full text-left text-[10px]">
+                                <thead class="border-b border-white/5 text-gray-500 font-bold uppercase">
+                                    <tr>
+                                        <th class="px-4 py-2">Bowler</th>
+                                        <th class="px-2 py-2 text-center">O</th>
+                                        <th class="px-2 py-2 text-center">R</th>
+                                        <th class="px-2 py-2 text-center">W</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-white/5">
+                                    ${bowling.length > 0 ? bowling.map(([name, s]) => `
+                                        <tr class="hover:bg-white/5 transition">
+                                            <td class="px-4 py-2 font-bold text-white">${name}</td>
+                                            <td class="px-2 py-2 text-center font-mono">${Math.floor(s.balls/6)}.${s.balls%6}</td>
+                                            <td class="px-2 py-2 text-center font-mono">${s.runs}</td>
+                                            <td class="px-2 py-2 text-center font-mono text-amber-500">${s.wickets}</td>
+                                        </tr>
+                                    `).join('') : '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-600 font-bold uppercase">No bowling records</td></tr>'}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Playing XIs -->
+                    <div class="lg:col-span-2 grid grid-cols-2 gap-4 mt-2">
+                        <div class="p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
+                            <div class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3">${m.team1} Playing XI</div>
+                            <div class="flex flex-col gap-1.5">
+                                ${squadA.map(name => `<span class="px-2 py-1.5 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-300 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500/50"></span>${name}</span>`).join('') || '<span class="text-[8px] italic text-gray-600">Squad not listed</span>'}
+                            </div>
+                        </div>
+                        <div class="p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
+                            <div class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3">${m.team2} Playing XI</div>
+                            <div class="flex flex-col gap-1.5">
+                                ${squadB.map(name => `<span class="px-2 py-1.5 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-300 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500/50"></span>${name}</span>`).join('') || '<span class="text-[8px] italic text-gray-600">Squad not listed</span>'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGenericDetailedView(m) {
+            return `
+                <div class="p-6 bg-white/[0.02] border border-white/5 rounded-2xl text-center">
+                    <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Match Intelligence</div>
+                    <div class="text-sm text-gray-300 italic font-medium">"${m.details || 'No additional telemetry data for this match stage.'}"</div>
+                    
+                    <div class="grid grid-cols-2 gap-4 mt-6">
+                        <div class="p-3 bg-black/20 rounded-xl border border-white/5">
+                            <div class="text-[8px] font-black text-blue-500 uppercase mb-1">Roster Team A</div>
+                            <div class="text-xs font-bold text-white">${m.playerA || 'TBD'} ${m.playerA2 ? ` & ${m.playerA2}` : ''}</div>
+                        </div>
+                        <div class="p-3 bg-black/20 rounded-xl border border-white/5">
+                            <div class="text-[8px] font-black text-pink-500 uppercase mb-1">Roster Team B</div>
+                            <div class="text-xs font-bold text-white">${m.playerB || 'TBD'} ${m.playerB2 ? ` & ${m.playerB2}` : ''}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.toggleSportHistory = (teamId, sport) => {
+            // Find the team card container
+            const btn = document.getElementById(`stat-${sport}-${teamId}`);
+            if (!btn) return;
+            const cardP = btn.closest('.p-8');
+            
+            // Hide all history for this team
+            const histories = cardP.querySelectorAll('.sport-history-container');
+            histories.forEach(h => h.style.display = 'none');
+
+            // Show selected
+            const selected = document.getElementById(`history-${sport}-${teamId}`);
+            if (selected) {
+                selected.style.display = 'block';
+            }
+
+            // Update button styles
+            const buttons = cardP.querySelectorAll('.sport-stat-box');
+            buttons.forEach(b => b.classList.remove('border-pink-500/50', 'bg-white/5', 'border-orange-500/50', 'border-amber-500/50', 'border-blue-500/50'));
+            
+            const colorClass = sport === 'Badminton' ? 'border-pink-500/50' : 
+                             sport === 'Volleyball' ? 'border-orange-500/50' : 
+                             sport === 'Cricket' ? 'border-amber-500/50' : 'border-blue-500/50';
+            btn.classList.add(colorClass, 'bg-white/5');
+        }
+
+        function cleanName(n) {
+            if(!n) return "";
+            const s = n.toUpperCase();
+            if (s.includes("ROBO")) return "ROBO";
+            if (s.includes("FLASHING")) return "FLASHING";
+            if (s.includes("TECH")) return "TECH";
+            return s.trim();
+        }
+
+        function renderSportStatBox(label, icon, color, data, teamName) {
+            const cleanTarget = cleanName(teamName);
+            const sportId = label.replace(/\s+/g, '');
+            return `
+                <div id="stat-${sportId}-${cleanTarget}" 
+                     onclick="toggleSportHistory('${cleanTarget}', '${sportId}')"
+                     class="sport-stat-box bg-black/20 p-5 rounded-2xl border border-white/5 flex items-center gap-4 cursor-pointer hover:bg-white/5 hover:border-white/20 transition-all group">
+                    <div class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center ${color} shadow-lg group-hover:scale-110 transition-transform"><i class="fas ${icon}"></i></div>
+                    <div>
+                        <div class="text-[9px] font-black uppercase tracking-widest text-gray-500">${label}</div>
+                        <div class="text-lg font-black text-white">${data.wins} <span class="text-[9px] text-gray-600 font-bold uppercase ml-1">Wins</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function calculateStatsForTeam(teamName) {
+            const matches = (state.matches || []);
+            const cleanTarget = cleanName(teamName);
+
+            const stats = {
+                totalWins: matches.filter(m => cleanName(m.winner) === cleanTarget).length,
+                cricket: { wins: matches.filter(m => m.sport === 'Cricket' && cleanName(m.winner) === cleanTarget).length },
+                badminton: { wins: 0 },
+                volleyball: { wins: matches.filter(m => m.sport === 'Volleyball' && cleanName(m.winner) === cleanTarget).length },
+                tugOfWar: { wins: matches.filter(m => m.sport === 'Tug of War' && cleanName(m.winner) === cleanTarget).length }
+            };
+
+            // Calculate Badminton Tie Wins
+            const ties = groupBadmintonIntoTies(teamName);
+            stats.badminton.wins = ties.filter(t => cleanName(t.winner) === cleanTarget).length;
+
+            return stats;
+        }
+
+        function renderBadmintonHistory(teamName) {
+            const ties = groupBadmintonIntoTies(teamName);
+            if (ties.length === 0) return '<div class="py-8 text-center text-gray-600 text-[10px] font-black uppercase border border-white/5 border-dashed rounded-2xl">No Badminton ties recorded</div>';
+
+            return `
+                <h4 class="text-xs font-black uppercase tracking-[0.3em] text-gray-500 mb-4 flex items-center gap-2">
+                    <i class="fas fa-history"></i> Badminton Tie History
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    ${ties.map(tie => buildTieCard(tie, teamName)).join('')}
+                </div>
+            `;
+        }
+
+        function renderVolleyballResults(teamName) {
+            const cleanTarget = cleanName(teamName);
+            const vMatches = (state.matches || []).filter(m => m.sport === 'Volleyball' && (cleanName(m.team1) === cleanTarget || cleanName(m.team2) === cleanTarget));
+            
+            if (vMatches.length === 0) return '<div class="py-12 text-center text-gray-600 text-[10px] font-black uppercase border border-white/5 border-dashed rounded-2xl">No Volleyball matches recorded</div>';
+
+            return `
+                <div class="mt-2">
+                    <div class="flex items-center gap-2 mb-4 text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">
+                        <i class="fas fa-volleyball-ball text-orange-400"></i> VOLLEYBALL MATCH HISTORY
+                    </div>
+                    <div class="space-y-3">
+                        ${vMatches.map(m => buildCompactMatchHistoryItem(m, cleanTarget)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCricketHistory(teamName) {
+            const cleanTarget = cleanName(teamName);
+            const matches = (state.matches || []).filter(m => m.sport === 'Cricket' && (cleanName(m.team1) === cleanTarget || cleanName(m.team2) === cleanTarget));
+            
+            if (matches.length === 0) return '<div class="py-12 text-center text-gray-600 text-[10px] font-black uppercase border border-white/5 border-dashed rounded-2xl">No Cricket matches recorded</div>';
+
+            return `
+                <div class="mt-2">
+                    <div class="flex items-center gap-2 mb-4 text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">
+                        <i class="fas fa-baseball-ball text-amber-500"></i> CRICKET MATCH HISTORY
+                    </div>
+                    <div class="space-y-3">
+                        ${matches.map(m => buildCompactMatchHistoryItem(m, cleanTarget)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderGenericSportHistory(teamName, sport, icon) {
+            const cleanTarget = cleanName(teamName);
+            const matches = (state.matches || []).filter(m => m.sport === sport && (cleanName(m.team1) === cleanTarget || cleanName(m.team2) === cleanTarget));
+            if (matches.length === 0) return `<div class="py-12 text-center text-gray-600 text-[10px] font-black uppercase border border-white/5 border-dashed rounded-2xl">No ${sport} matches recorded</div>`;
+            return `
+                <div class="mt-2">
+                    <div class="flex items-center gap-2 mb-4 text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">
+                        <i class="fas ${icon} text-blue-400"></i> ${sport.toUpperCase()} HISTORY
+                    </div>
+                    <div class="space-y-3">
+                        ${matches.map(m => buildCompactMatchHistoryItem(m, cleanTarget)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function buildCompactMatchHistoryItem(m, cleanTarget) {
+            const isWin = cleanName(m.winner) === cleanTarget;
+            const isDraw = m.winner === 'Draw';
+            const isPending = !m.winner || m.winner === '' || m.winner === 'Pending';
+            const opponent = cleanName(m.team1) === cleanTarget ? m.team2 : m.team1;
+
+            let statusLabel = isWin ? 'Victory' : 'Defeat';
+            if (isDraw) statusLabel = 'Draw';
+            if (isPending) statusLabel = 'In-Progress';
+
+            let statusColor = isWin ? 'text-emerald-400' : 'text-rose-400';
+            if (isDraw) statusColor = 'text-gray-400';
+            if (isPending) statusColor = 'text-amber-400';
+
+            const borderColor = isWin ? 'border-emerald-500/30' : (isPending ? 'border-amber-500/30' : (isDraw ? 'border-gray-500/30' : 'border-rose-500/30'));
+
+            return `
+                <div class="glass-morphism p-4 border ${borderColor} flex justify-between items-center bg-white/[0.02]">
+                    <div>
+                        <div class="text-[10px] text-white/40 font-bold mb-1">${m.stage.toUpperCase()}</div>
+                        <div class="text-sm font-bold text-white uppercase tracking-tight">VS ${opponent}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs font-black ${statusColor} uppercase mb-1">${statusLabel}</div>
+                        <div class="text-xs text-white/60 font-mono tracking-tighter">${m.score || '-'}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function groupBadmintonIntoTies(teamName) {
+            const cleanTarget = cleanName(teamName);
+            let bMatches = (state.matches || []).filter(m => m.sport === 'Badminton' && (cleanName(m.team1) === cleanTarget || cleanName(m.team2) === cleanTarget));
+            
+            // EMERGENCY CLEANUP: Force remove Girls Doubles from Semi-Final in UI
+            bMatches = bMatches.filter(m => {
+                const isSemi = cleanName(m.stage).includes('SEMI');
+                const isGirlsDoubles = cleanName(m.details).includes('GIRLSDOUBLES');
+                return !(isSemi && isGirlsDoubles);
+            });
+
+            const ties = {};
+
+            bMatches.forEach(m => {
+                const isT1 = cleanName(m.team1) === cleanTarget;
+                const opponent = isT1 ? m.team2 : m.team1;
+                const tieKey = `${m.stage}-${cleanName(opponent)}`;
+                
+                if (!ties[tieKey]) {
+                    ties[tieKey] = {
+                        stage: m.stage,
+                        opponent: opponent,
+                        matches: [],
+                        teamWins: 0,
+                        opponentWins: 0
+                    };
+                }
+                
+                ties[tieKey].matches.push(m);
+                if (cleanName(m.winner) === cleanTarget) ties[tieKey].teamWins++;
+                else if (cleanName(m.winner) === cleanName(opponent)) ties[tieKey].opponentWins++;
+            });
+
+            return Object.values(ties).map(t => ({
+                ...t,
+                winner: t.teamWins > t.opponentWins ? teamName : t.opponentWins > t.teamWins ? t.opponent : 'Pending'
+            }));
+        }
+
+        function buildTieCard(tie, teamName) {
+            const cleanTarget = cleanName(teamName);
+            const isWin = cleanName(tie.winner) === cleanTarget;
+            const statusColor = tie.winner === 'Pending' ? 'bg-gray-500/10 text-gray-500 border-gray-500/20' : (isWin ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20');
+            const oppData = state.teams.find(t => cleanName(t.name) === cleanName(tie.opponent));
+
+            return `
+                    <div onclick="this.classList.toggle('is-expanded')" class="bg-black/40 border border-white/5 p-5 rounded-2xl relative overflow-hidden group/tie hover:border-white/20 transition-all cursor-pointer select-none">
+                        <div class="flex justify-between items-center mb-4 relative z-10">
+                            <span class="text-[9px] font-black uppercase tracking-widest text-gray-500 bg-white/5 px-2 py-0.5 rounded border border-white/10">${tie.stage}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[9px] font-black uppercase tracking-widest ${statusColor} px-2 py-0.5 rounded border">${tie.winner === 'Pending' ? 'On-going' : (isWin ? 'Victory' : 'Defeat')}</span>
+                                <i class="fas fa-chevron-down text-[8px] text-gray-600 transition-transform [.is-expanded_&]:rotate-180"></i>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between relative z-10">
+                            <div class="flex items-center gap-3">
+                                <img src="${oppData ? oppData.logo : ''}" class="w-10 h-10 object-contain bg-white/5 rounded-xl p-1.5 border border-white/10">
+                                <div>
+                                    <div class="text-[9px] font-black uppercase tracking-widest text-gray-500 mb-0.5">vs Opponent</div>
+                                    <div class="text-sm font-black text-white uppercase tracking-tighter">${tie.opponent}</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-2xl font-black text-white font-mono leading-none tracking-tighter">${tie.teamWins}<span class="text-gray-600 px-1.5">-</span>${tie.opponentWins}</div>
+                                <div class="text-[8px] font-black uppercase tracking-widest text-gray-600 mt-1">Best of 5</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Breakdown (Toggled on click) -->
+                        <div class="mt-4 pt-4 border-t border-white/5 space-y-2 hidden [.is-expanded_&]:block animate-in slide-in-from-top-2 duration-300">
+                            ${tie.matches.map(m => `
+                                <div class="flex justify-between text-[8px] font-bold uppercase tracking-wider ${cleanName(m.winner) === cleanTarget ? 'text-emerald-400' : 'text-gray-500'}">
+                                    <span>${m.details}</span>
+                                    <span class="font-mono">${m.score || 'No Score'}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+            `;
         }
 
         window.showTeamResults = (teamName) => {
-            const historyPanel = document.getElementById('team-match-history');
-            const listContainer = document.getElementById('team-matches-list');
-            const title = document.getElementById('selected-team-title');
-            
-            if (!historyPanel || !listContainer || !state) return;
-
-            const matches = (state.matches || []).filter(m => m.team1 === teamName || m.team2 === teamName);
-            const teamData = state.teams.find(t => t.name === teamName);
-            
-            title.innerHTML = `
-                <img src="${teamData.logo}" class="w-8 h-8 object-contain bg-white/10 rounded-lg">
-                ${teamName} History
-            `;
-
-            listContainer.innerHTML = '';
-            if (matches.length === 0) {
-                listContainer.innerHTML = `<div class="col-span-full py-10 text-center text-gray-500 uppercase tracking-widest text-xs font-black border border-dashed border-white/5 rounded-2xl">No Matches Played Yet</div>`;
-            } else {
-                [...matches].reverse().forEach(m => {
-                    listContainer.innerHTML += buildMatchCard(m);
-                });
-            }
-
-            historyPanel.classList.remove('hidden');
-            historyPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Deprecated in favor of vertical profiles, but kept for compatibility
+            console.log("Viewing results for:", teamName);
         };
     </script>
 </body>

@@ -136,7 +136,7 @@
                             <div class="mb-8">
                                 <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Match Stage</label>
                                 <div id="stage-selector" class="flex flex-wrap gap-3">
-                                    <button type="button" class="stage-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-amber-500/50 hover:text-white" data-stage="League">League</button>
+                                    <button type="button" class="stage-btn active bg-amber-600 border-amber-400 text-white px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95" data-stage="League">League</button>
                                     <button type="button" class="stage-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-amber-500/50 hover:text-white" data-stage="Semi-Final">Semi-Final</button>
                                     <button type="button" class="stage-btn px-6 py-3 rounded-2xl font-black text-xs uppercase tracking-widest border transition-all active:scale-95 bg-white/5 border-white/10 text-gray-400 hover:border-amber-500/50 hover:text-white" data-stage="Final">Final</button>
                                 </div>
@@ -144,16 +144,14 @@
                                       <!-- Teams & Player Names (Dynamic) -->
                             <div class="mb-8" id="match-players-section">
                                 <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-gray-500 mb-4">Teams & Players</label>
-                                <div class="grid grid-cols-[1fr_auto_1fr] gap-4 items-start">
+                                
+                                <!-- 1st: Team Selection Buttons -->
+                                <div class="grid grid-cols-[1fr_auto_1fr] gap-4 items-start mb-8">
                                     <!-- Team A -->
                                     <div class="space-y-3">
                                         <p class="text-[9px] font-black uppercase tracking-widest text-blue-400 text-center border-b border-blue-500/20 pb-2">Team A Selection</p>
                                         <div id="teamA-selector" class="flex flex-col gap-2">
                                             <!-- Team buttons rendered by JS -->
-                                        </div>
-                                        <div id="playerA-container" class="space-y-2 mt-2 hidden">
-                                            <input type="text" id="playerA-name" placeholder="Team A Player 1" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-blue-500 transition-all">
-                                            <input type="text" id="playerA2-name" placeholder="Team A Player 2 (Doubles)" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-blue-500 transition-all hidden">
                                         </div>
                                     </div>
 
@@ -168,13 +166,72 @@
                                         <div id="teamB-selector" class="flex flex-col gap-2">
                                             <!-- Team buttons rendered by JS -->
                                         </div>
-                                        <div id="playerB-container" class="space-y-2 mt-2 hidden">
-                                            <input type="text" id="playerB-name" placeholder="Team B Player 1" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-pink-500 transition-all">
-                                            <input type="text" id="playerB2-name" placeholder="Team B Player 2 (Doubles)" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-pink-500 transition-all hidden">
+                                    </div>
+                                </div>
+
+                                <!-- 2nd: Squad Management (Cricket Only) -->
+                                <div id="squad-toggle-container" class="hidden">
+                                    <div class="mb-6">
+                                        <button type="button" id="btn-toggle-squads" class="w-full py-4 rounded-2xl border-2 border-dashed border-white/5 bg-white/5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:border-blue-500/40 hover:text-white transition-all flex items-center justify-center gap-3">
+                                            <i class="fas fa-users text-amber-500"></i> Manage Playing 11 Squads
+                                        </button>
+                                    </div>
+
+                                    <div class="grid grid-cols-[1fr_auto_1fr] gap-4 items-start mb-8">
+                                        <div id="playerA-container" class="space-y-4 hidden">
+                                            <p class="text-[9px] font-black uppercase tracking-widest text-blue-400 mb-2">Team A Squad (11 Players)</p>
+                                            <div id="teamA-squad-inputs" class="grid grid-cols-1 gap-2">
+                                                <input type="text" id="playerA-1" list="teamA-players-list" placeholder="1. Captain / Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                                <input type="text" id="playerA-2" list="teamA-players-list" placeholder="2. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                                <input type="text" id="playerA-3" list="teamA-players-list" placeholder="3. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                                <input type="text" id="playerA-4" list="teamA-players-list" placeholder="4. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                                <input type="text" id="playerA-5" list="teamA-players-list" placeholder="5. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                                <input type="text" id="playerA-6" list="teamA-players-list" placeholder="6. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                                <input type="text" id="playerA-7" list="teamA-players-list" placeholder="7. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                                <input type="text" id="playerA-8" list="teamA-players-list" placeholder="8. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                                <input type="text" id="playerA-9" list="teamA-players-list" placeholder="9. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                                <input type="text" id="playerA-10" list="teamA-players-list" placeholder="10. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                                <input type="text" id="playerA-11" list="teamA-players-list" placeholder="11. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-blue-500 transition-all">
+                                            </div>
+                                        </div>
+                                        <div></div> <!-- Spacer for VS -->
+                                        <div id="playerB-container" class="space-y-4 hidden">
+                                            <p class="text-[9px] font-black uppercase tracking-widest text-pink-400 mb-2">Team B Squad (11 Players)</p>
+                                            <div id="teamB-squad-inputs" class="grid grid-cols-1 gap-2">
+                                                <input type="text" id="playerB-1" list="teamB-players-list" placeholder="1. Captain / Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                                <input type="text" id="playerB-2" list="teamB-players-list" placeholder="2. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                                <input type="text" id="playerB-3" list="teamB-players-list" placeholder="3. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                                <input type="text" id="playerB-4" list="teamB-players-list" placeholder="4. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                                <input type="text" id="playerB-5" list="teamB-players-list" placeholder="5. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                                <input type="text" id="playerB-6" list="teamB-players-list" placeholder="6. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                                <input type="text" id="playerB-7" list="teamB-players-list" placeholder="7. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                                <input type="text" id="playerB-8" list="teamB-players-list" placeholder="8. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                                <input type="text" id="playerB-9" list="teamB-players-list" placeholder="9. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                                <input type="text" id="playerB-10" list="teamB-players-list" placeholder="10. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                                <input type="text" id="playerB-11" list="teamB-players-list" placeholder="11. Player" class="w-full bg-black/40 border border-white/5 rounded-xl px-4 py-2 text-xs text-white font-bold focus:border-pink-500 transition-all">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Singles/Doubles inputs for non-cricket are always needed -->
+                                <div id="non-cricket-player-inputs" class="grid grid-cols-[1fr_auto_1fr] gap-4 items-start">
+                                    <div id="playerA-simple" class="space-y-2">
+                                        <input type="text" id="playerA-name-simple" list="teamA-players-list" placeholder="Team A Player 1" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-blue-500 transition-all">
+                                        <input type="text" id="playerA2-name" list="teamA-players-list" placeholder="Player 2 (Doubles)" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-blue-500 transition-all hidden">
+                                    </div>
+                                    <div></div>
+                                    <div id="playerB-simple" class="space-y-2">
+                                        <input type="text" id="playerB-name-simple" list="teamB-players-list" placeholder="Team B Player 1" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-pink-500 transition-all">
+                                        <input type="text" id="playerB2-name" list="teamB-players-list" placeholder="Player 2 (Doubles)" class="w-full bg-black/40 border border-white/5 rounded-2xl px-4 py-3 text-sm text-white font-bold focus:border-pink-500 transition-all hidden">
+                                    </div>
+                                </div>
+
+                                <!-- Dynamic Datalists for player suggestions -->
+                                <datalist id="teamA-players-list"></datalist>
+                                <datalist id="teamB-players-list"></datalist>
                             </div>
+
 
                             <!-- Details -->
                             <div class="mb-8">
@@ -195,9 +252,37 @@
                             </div>
 
                             <!-- Submit -->
-                            <button id="btn-submit-match" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black font-black py-5 rounded-2xl shadow-xl shadow-amber-500/20 transition-all active:scale-[0.98] uppercase tracking-widest text-sm flex items-center justify-center gap-3">
-                                <i class="fas fa-calendar-check"></i> Add to Ongoing Calendar
-                            </button>
+                            <div class="flex gap-4">
+                                <button id="btn-submit-match" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-black font-black py-5 rounded-2xl shadow-xl shadow-amber-500/20 transition-all active:scale-[0.98] uppercase tracking-widest text-sm flex items-center justify-center gap-3">
+                                    <i class="fas fa-calendar-check"></i> Add to Fixtures
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Bulk Import Modal (Hidden) -->
+                        <div id="bulk-import-modal" class="hidden fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                            <div class="bg-cardBg w-full max-w-2xl p-8 rounded-3xl border border-white/10 shadow-3xl relative animate-scale-in">
+                                <div class="flex justify-between items-center mb-6">
+                                    <div>
+                                        <h2 class="text-2xl font-black uppercase tracking-tighter text-white">Smart Bulk Importer</h2>
+                                        <p class="text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mt-1">Paste match text results below</p>
+                                    </div>
+                                    <button id="btn-close-bulk" class="text-gray-500 hover:text-white transition-colors"><i class="fas fa-times text-xl"></i></button>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="bg-blue-500/5 border border-blue-500/20 p-4 rounded-xl">
+                                        <p class="text-[10px] font-bold text-blue-400 leading-relaxed uppercase tracking-widest">
+                                            <i class="fas fa-info-circle mr-2"></i> Format: Match X: Team A vs Team B followed by category results.
+                                        </p>
+                                    </div>
+                                    <textarea id="bulk-import-text" class="w-full h-80 bg-black/40 border border-white/5 rounded-2xl p-6 text-sm text-gray-300 font-mono focus:border-blue-500 outline-none transition-all placeholder:text-gray-700 custom-scrollbar" placeholder="MATCH 1 -- TEAM A vs TEAM B&#10;Boys Singles: Player A vs Player B | 15-12 | Winner: Team A..."></textarea>
+                                    <div class="flex gap-4">
+                                        <button id="btn-process-bulk" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98] uppercase tracking-widest text-xs">
+                                            Parse & Import Records
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Match Feed & Rankings Side by Side -->
@@ -470,10 +555,12 @@
                                                             <span class="text-[10px] font-black uppercase tracking-widest text-blue-400">Batting Scorecard</span>
                                                         </div>
                                                         <!-- Move Headers to Top -->
-                                                        <div class="grid grid-cols-4 px-4 py-1.5 bg-white/3 border-b border-white/5 text-[9px] font-black uppercase tracking-widest text-gray-400">
-                                                            <span>Batsman</span>
+                                                        <div class="grid grid-cols-6 px-4 py-1.5 bg-white/3 border-b border-white/5 text-[9px] font-black uppercase tracking-widest text-gray-400">
+                                                            <span class="col-span-2">Batsman</span>
                                                             <span class="text-center">R</span>
                                                             <span class="text-center">B</span>
+                                                            <span class="text-center">4s</span>
+                                                            <span class="text-center">6s</span>
                                                             <span class="text-center">SR</span>
                                                         </div>
                                                         <div id="batting-stats-body" class="divide-y divide-white/5">

@@ -78,11 +78,51 @@ const defaultState = {
     { name: "TECH TITANS 🤖", captain: "Aditya B", viceCaptain: "Abhay Patil", purse: 10000, players: [], maleCount: 0, femaleCount: 0, logo: "assets/logos/tech_titans.jpeg" }
   ],
   auctionState: { isLive: false, currentPlayerIndex: 0, currentBid: 0, leadingTeam: null, selectedTeamIndex: null, status: "Waiting" },
-  matches: [],
+  matches: [
+    // MATCH 1: ROBO vs TECH
+    { sport: 'Badminton', stage: 'League', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', playerA: 'Akshay', playerB: 'Harsha', score: '12 - 15', winner: 'TECH', details: 'Boys Singles' },
+    { sport: 'Badminton', stage: 'League', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', playerA: 'Varsha', playerB: 'Shrushti', score: '15 - 9', winner: 'ROBO', details: 'Girls Singles' },
+    { sport: 'Badminton', stage: 'League', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', playerA: 'Shashank & Hitarth', playerB: 'Gaurav & Abhay', score: '15 - 13', winner: 'ROBO', details: 'Boys Doubles' },
+    { sport: 'Badminton', stage: 'League', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', playerA: 'Varsha & Bhoomika', playerB: 'Lakshmi & Farah', score: '4 - 15', winner: 'TECH', details: 'Girls Doubles' },
+    { sport: 'Badminton', stage: 'League', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', playerA: 'Shashank & Bhoomika', playerB: 'Gaurav & Shrushti', score: '14 - 16', winner: 'TECH', details: 'Mixed Doubles' },
+    
+    // MATCH 2: TECH vs FLASHING
+    { sport: 'Badminton', stage: 'League', team1: 'TECH TITANS 🤖', team2: 'FLASHING BOTS 🤖', playerA: 'Harsh', playerB: 'Mallik', score: '15 - 13', winner: 'TECH', details: 'Boys Singles' },
+    { sport: 'Badminton', stage: 'League', team1: 'TECH TITANS 🤖', team2: 'FLASHING BOTS 🤖', playerA: 'Ilaf', playerB: 'Farsha', score: '12 - 15', winner: 'FLASHING', details: 'Girls Singles' },
+    { sport: 'Badminton', stage: 'League', team1: 'TECH TITANS 🤖', team2: 'FLASHING BOTS 🤖', playerA: 'Gaurav & Abhay', playerB: 'Chidanand & Anup', score: '15 - 5', winner: 'TECH', details: 'Boys Doubles' },
+    { sport: 'Badminton', stage: 'League', team1: 'TECH TITANS 🤖', team2: 'FLASHING BOTS 🤖', playerA: 'Priyal & Ilaf', playerB: 'Shrushti & Lakshmi', score: '5 - 15', winner: 'FLASHING', details: 'Girls Doubles' },
+    { sport: 'Badminton', stage: 'League', team1: 'TECH TITANS 🤖', team2: 'FLASHING BOTS 🤖', playerA: 'Gaurav & Farah', playerB: 'Priya & Mallik', score: '5 - 15', winner: 'FLASHING', details: 'Mixed Doubles' },
+
+    // MATCH 3: FLASHING vs ROBO
+    { sport: 'Badminton', stage: 'League', team1: 'FLASHING BOTS 🤖', team2: 'ROBO KNIGHTS', playerA: 'Akshay', playerB: 'Mallik', score: '8 - 15', winner: 'ROBO', details: 'Boys Singles' },
+    { sport: 'Badminton', stage: 'League', team1: 'FLASHING BOTS 🤖', team2: 'ROBO KNIGHTS', playerA: 'Ilaf', playerB: 'Bhoomika', score: '15 - 5', winner: 'FLASHING', details: 'Girls Singles' },
+    { sport: 'Badminton', stage: 'League', team1: 'FLASHING BOTS 🤖', team2: 'ROBO KNIGHTS', playerA: 'Chidanand & Anup', playerB: 'Godwin & Shashank', score: '9 - 15', winner: 'ROBO', details: 'Boys Doubles' },
+    { sport: 'Badminton', stage: 'League', team1: 'FLASHING BOTS 🤖', team2: 'ROBO KNIGHTS', playerA: 'Priya & Ilaf', playerB: 'Bhoomika & Varsha', score: '15 - 3', winner: 'FLASHING', details: 'Girls Doubles' },
+    { sport: 'Badminton', stage: 'League', team1: 'FLASHING BOTS 🤖', team2: 'ROBO KNIGHTS', playerA: 'Priya & Mallik', playerB: 'Shashank & Varsha', score: '15 - 11', winner: 'FLASHING', details: 'Mixed Doubles' },
+
+    // SEMI FINAL: ROBO vs TECH
+    { sport: 'Badminton', stage: 'Semi-Final', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', playerA: 'Akshay', playerB: 'Harsh', score: '15 - 3', winner: 'ROBO', details: 'Boys Singles' },
+    { sport: 'Badminton', stage: 'Semi-Final', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', playerA: 'Varsha', playerB: 'Farah', score: '18 - 16', winner: 'ROBO', details: 'Girls Singles' },
+    { sport: 'Badminton', stage: 'Semi-Final', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', playerA: 'Shashank & Hitarth', playerB: 'Abhay & Gaurav', score: '15 - 5', winner: 'ROBO', details: 'Boys Doubles' },
+
+    // FINALS: ROBO vs FLASHING
+    { sport: 'Badminton', stage: 'Final', team1: 'ROBO KNIGHTS', team2: 'FLASHING BOTS 🤖', playerA: 'Akshay', playerB: 'Chidanand', score: '15 - 13', winner: 'ROBO', details: 'Boys Singles' },
+    { sport: 'Badminton', stage: 'Final', team1: 'ROBO KNIGHTS', team2: 'FLASHING BOTS 🤖', playerA: 'Varsha', playerB: 'Ilaf', score: '15 - 12', winner: 'ROBO', details: 'Girls Singles' },
+    { sport: 'Badminton', stage: 'Final', team1: 'ROBO KNIGHTS', team2: 'FLASHING BOTS 🤖', playerA: 'Shashank & Hitarth', playerB: 'Mallik & Anup', score: '15 - 11', winner: 'ROBO', details: 'Boys Doubles' },
+
+    // VOLLEYBALL LEAGUE
+    { sport: 'Volleyball', stage: 'League', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', score: '8 - 15', winner: 'TECH', details: 'League Match' },
+    { sport: 'Volleyball', stage: 'League', team1: 'TECH TITANS 🤖', team2: 'FLASHING BOTS 🤖', score: '15 - 8', winner: 'TECH', details: 'League Match' },
+    { sport: 'Volleyball', stage: 'League', team1: 'ROBO KNIGHTS', team2: 'FLASHING BOTS 🤖', score: '-', winner: 'FLASHING', details: 'League Match' },
+
+    // VOLLEYBALL PLAYOFFS
+    { sport: 'Volleyball', stage: 'Semi-Final', team1: 'ROBO KNIGHTS', team2: 'FLASHING BOTS 🤖', score: '-', winner: 'FLASHING', details: 'Semi-Final' },
+    { sport: 'Volleyball', stage: 'Final', team1: 'FLASHING BOTS 🤖', team2: 'TECH TITANS 🤖', score: '-', winner: 'TECH', details: 'Grand Final' }
+  ],
   tournamentRankings: {
       "Cricket": { "1st": null, "2nd": null, "3rd": null },
-      "Badminton": { "1st": null, "2nd": null, "3rd": null },
-      "Volleyball": { "1st": null, "2nd": null, "3rd": null },
+      "Badminton": { "1st": "ROBO KNIGHTS", "2nd": "FLASHING BOTS 🤖", "3rd": "TECH TITANS 🤖" },
+      "Volleyball": { "1st": "TECH TITANS 🤖", "2nd": "FLASHING BOTS 🤖", "3rd": "ROBO KNIGHTS" },
       "Tug of War": { "1st": null, "2nd": null, "3rd": null }
   }
 };
@@ -99,6 +139,15 @@ function normalizeState(s) {
     if (!s) return defaultState;
     if (!s.players) s.players = [];
     if (!s.teams) s.teams = [];
+    if (!s.matches) s.matches = [];
+
+    // DATA CLEANUP: Explicitly remove Girls Doubles from Semi-Final as requested
+    s.matches = s.matches.filter(m => {
+        const stage = (m.stage || "").toUpperCase();
+        const details = (m.details || "").toUpperCase();
+        return !(stage.includes('SEMI') && details.includes('GIRLS DOUBLES'));
+    });
+
     s.teams.forEach(t => {
         if (!t.players) t.players = [];
         if (t.maleCount === undefined) t.maleCount = 0;
@@ -115,7 +164,6 @@ function normalizeState(s) {
         }
     });
     if (!s.auctionState) s.auctionState = defaultState.auctionState;
-    if (!s.matches) s.matches = [];
     if (!s.tournamentRankings) s.tournamentRankings = defaultState.tournamentRankings;
     return s;
 }
