@@ -353,7 +353,33 @@
                 else if (cleanName(m.winner) === cleanName(t2)) { statsData[t2].won++; statsData[t1].lost++; }
 
                 const cd = m.cricketData;
-                if (cd && cd.firstInningsScore !== undefined) {
+                if (cd && cd.innings1 && cd.innings2) {
+                    const parseOversToBalls = (ovStr) => {
+                        const parts = String(ovStr || '0.0').split('.');
+                        const ov = parseInt(parts[0]) || 0;
+                        const bl = parseInt(parts[1]) || 0;
+                        return (ov * 6) + bl;
+                    };
+
+                    const i1Runs = parseInt(cd.innings1.score) || 0;
+                    const i1Balls = (cd.innings1.wickets >= 10) ? (MAX_OVERS * 6) : parseOversToBalls(cd.innings1.overs);
+                    
+                    const i2Runs = parseInt(cd.innings2.score) || 0;
+                    const i2Balls = (cd.innings2.wickets >= 10) ? (MAX_OVERS * 6) : parseOversToBalls(cd.innings2.overs);
+
+                    // T1 (Innings 1 Batting)
+                    statsData[t1].runsScored += i1Runs;
+                    statsData[t1].ballsFaced += i1Balls;
+                    statsData[t1].runsConceded += i2Runs;
+                    statsData[t1].ballsBowled += i2Balls;
+
+                    // T2 (Innings 2 Batting)
+                    statsData[t2].runsScored += i2Runs;
+                    statsData[t2].ballsFaced += i2Balls;
+                    statsData[t2].runsConceded += i1Runs;
+                    statsData[t2].ballsBowled += i1Balls;
+                } else if (cd && cd.firstInningsScore !== undefined) {
+                    // Fallback for legacy format
                     const parseOversToBalls = (ovStr) => {
                         const parts = String(ovStr || '0.0').split('.');
                         const ov = parseInt(parts[0]) || 0;
@@ -475,6 +501,15 @@
             });
         }
 
+        function parseScores(fullScore) {
+            if (!fullScore || typeof fullScore !== 'string') return { main: fullScore, sets: '' };
+            const match = fullScore.match(/^(.*?)\s*\((.*)\)$/);
+            if (match) {
+                return { main: match[1].trim(), sets: match[2].trim() };
+            }
+            return { main: fullScore, sets: '' };
+        }
+
         function buildMatchCard(m) {
             const team1Data = state.teams.find(t => t.name === m.team1);
             const team2Data = state.teams.find(t => t.name === m.team2);
@@ -486,153 +521,86 @@
             const isFinished = m.winner && m.winner !== '';
             const isCricket = m.sport === 'Cricket';
             const cd = m.cricketData || {};
-
-            // Score styling
             let scoreTag = '';
-            if (!m.score || m.score === 'Pending') {
-                if (isCricket && cd.currentScoreA !== undefined) {
-                    scoreTag = `
-                        <div class="flex flex-col items-center animate-pulse">
-                            <div class="bg-blue-600/20 text-blue-400 font-mono px-4 py-1.5 rounded-xl border border-blue-500/30 font-black text-2xl tracking-tighter shadow-[0_0_20px_rgba(37,99,235,0.2)]">${cd.currentScoreA}/${cd.currentWickets || 0}</div>
-                            <div class="text-[10px] font-black text-blue-400/60 mt-1 uppercase tracking-[0.2em]">(${cd.currentOvers || 0}.${cd.currentBalls || 0})</div>
+            if (isCricket) {
+                const total1 = cd.innings1?.score !== undefined ? `${cd.innings1.score}/${cd.innings1.wickets || 0}` : (cd.currentScoreA || '0/0');
+                const overs1 = cd.innings1?.overs || `${cd.currentOvers || 0}.${cd.currentBalls || 0}`;
+                const total2 = cd.innings2?.score !== undefined ? `${cd.innings2.score}/${cd.innings2.wickets || 0}` : (isFinished ? '0/0' : 'Pending');
+                const overs2 = cd.innings2?.overs || (isFinished ? '0.0' : '');
+
+                scoreTag = `
+                    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 w-full max-w-md mx-auto">
+                        <div class="flex flex-col items-center">
+                            <div class="text-2xl font-black text-white font-mono tracking-tighter">${total1}</div>
+                            <div class="text-[10px] font-bold text-gray-500 font-mono mt-0.5">(${overs1})</div>
                         </div>
-                    `;
-                } else {
-                    scoreTag = `<div class="text-[10px] uppercase font-bold text-gray-500 tracking-widest py-1 border border-dashed border-gray-600 px-2 rounded">Pending</div>`;
-                }
-            } else if (!isFinished) {
-                if (isCricket && m.score.includes('(')) {
-                    const parts = m.score.split(' ');
-                    scoreTag = `
-                        <div class="flex flex-col items-center animate-pulse">
-                            <div class="bg-blue-600/20 text-blue-400 font-mono px-4 py-1.5 rounded-xl border border-blue-500/30 font-black text-2xl tracking-tighter shadow-[0_0_20px_rgba(37,99,235,0.2)]">${parts[0]}</div>
-                            <div class="text-[10px] font-black text-blue-400/60 mt-1 uppercase tracking-[0.2em]">${parts[1]}</div>
-                        </div>
-                    `;
-                } else {
-                    scoreTag = `<div class="bg-blue-600/20 text-blue-400 font-mono px-5 py-2 rounded-xl border border-blue-500/30 font-black text-2xl tracking-tighter shadow-[0_0_20px_rgba(37,99,235,0.2)] animate-pulse">${m.score}</div>`;
-                }
-            } else {
-                if (isCricket && m.score.includes('(')) {
-                    const parts = m.score.split(' ');
-                    scoreTag = `
-                        <div class="flex flex-col items-center opacity-60">
-                            <div class="bg-gray-800 text-white font-mono px-4 py-1.5 rounded-xl border border-white/10 font-black text-xl tracking-widest shadow-inner">${parts[0]}</div>
-                            <div class="text-[9px] font-bold text-gray-500 mt-1 uppercase tracking-widest">${parts[1]}</div>
-                        </div>
-                    `;
-                } else {
-                    scoreTag = `<div class="bg-gray-800 text-white font-mono px-3 py-1 rounded-md border border-white/10 font-bold tracking-widest shadow-inner opacity-60">${m.score}</div>`;
-                }
-            }
-
-            // Cricket Specific Details
-            let cricketDetails = '';
-            if (isCricket && !isFinished) {
-                const b1 = cd.batsman1 || 'Batsman 1';
-                const b2 = cd.batsman2 || 'Batsman 2';
-                const s1 = cd.batsman1IsStriker !== false;
-                
-                const b1Runs = cd.batsman1Runs || 0;
-                const b1Balls = cd.batsman1Balls || 0;
-                const b2Runs = cd.batsman2Runs || 0;
-                const b2Balls = cd.batsman2Balls || 0;
-                
-                const currentBowler = cd.bowler || 'TBA';
-                const bowlerData = (cd.bowlerStats && cd.bowlerStats[currentBowler]) ? cd.bowlerStats[currentBowler] : { balls: 0, runs: 0, wickets: 0 };
-                
-                const targetTag = (cd.activeInnings === '2' && cd.targetScore) 
-                    ? `<div class="bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-lg flex items-center gap-2 mt-4 mx-auto w-max">
-                        <span class="text-[9px] font-black uppercase text-amber-500 tracking-widest">Target:</span>
-                        <span class="text-sm font-black text-amber-500 font-mono">${cd.targetScore}</span>
-                       </div>` 
-                    : '';
-
-                // Over Ball Log Rendering
-                const overCircles = (cd.overBallLog || []).map(ball => {
-                    let style = 'bg-emerald-600/20 border-emerald-500/40 text-emerald-400'; // Default run
-                    const type = ball.type || 'run';
-                    const label = ball.label || '?';
-
-                    if (type === 'dot') style = 'bg-white/5 border-white/10 text-gray-500';
-                    else if (type === 'four') style = 'bg-blue-600/20 border-blue-500/40 text-blue-400 font-black';
-                    else if (type === 'six') style = 'bg-purple-600/20 border-purple-500/40 text-purple-400 font-black';
-                    else if (type === 'wicket') style = 'bg-red-600/20 border-red-500/40 text-red-400 font-black';
-                    else if (['wide', 'nb', 'bye'].includes(type) || ['wd', 'nb', 'bye'].includes(label.toLowerCase())) 
-                        style = 'bg-orange-600/10 border-orange-500/30 text-orange-400';
-
-                    return `<div class="w-6 h-6 rounded-full border ${style} flex items-center justify-center text-[8px] font-bold uppercase">${label}</div>`;
-                }).join('');
-
-                cricketDetails = `
-                    <div class="mt-4 pt-4 border-t border-white/5 grid grid-cols-2 gap-4">
-                        <div class="space-y-2 text-left">
-                            <div class="flex items-center justify-between bg-white/5 p-2 rounded-xl transition ${s1 ? 'border border-emerald-500/40 bg-emerald-500/5' : 'border border-transparent'}">
-                                <span class="text-[11px] font-bold ${s1 ? 'text-white' : 'text-gray-400'}">${b1}${s1 ? '*' : ''}</span>
-                                <span class="text-[11px] font-black font-mono text-emerald-400">${b1Runs}<span class="text-[9px] opacity-50 ml-0.5">(${b1Balls})</span></span>
-                            </div>
-                            <div class="flex items-center justify-between bg-white/5 p-2 rounded-xl transition ${!s1 ? 'border border-emerald-500/40 bg-emerald-500/5' : 'border border-transparent'}">
-                                <span class="text-[11px] font-bold ${!s1 ? 'text-white' : 'text-gray-400'}">${b2}${!s1 ? '*' : ''}</span>
-                                <span class="text-[11px] font-black font-mono text-emerald-400">${b2Runs}<span class="text-[9px] opacity-50 ml-0.5">(${b2Balls})</span></span>
-                            </div>
-                        </div>
-                        <div class="flex flex-col justify-center items-end text-right pr-2 border-l border-white/5">
-                            <span class="text-[9px] font-black uppercase text-gray-500 tracking-widest mb-1">Current Bowler</span>
-                            <span class="text-[11px] font-black text-amber-400">${currentBowler}</span>
-                            <span class="text-[10px] font-bold text-gray-400 font-mono mt-0.5 mb-2">${bowlerData.wickets}-${bowlerData.runs} <span class="text-[9px] opacity-50">(${Math.floor(bowlerData.balls/6)}.${bowlerData.balls%6})</span></span>
-                            <div class="flex gap-1 flex-wrap justify-end">
-                                ${overCircles || '<div class="text-[8px] uppercase font-bold text-gray-700 tracking-widest">New Over</div>'}
-                            </div>
+                        <div class="h-8 w-px bg-white/10"></div>
+                        <div class="flex flex-col items-center">
+                            <div class="text-2xl font-black text-white font-mono tracking-tighter">${total2}</div>
+                            ${overs2 ? `<div class="text-[10px] font-bold text-gray-500 font-mono mt-0.5">(${overs2})</div>` : ''}
                         </div>
                     </div>
-                    ${targetTag}
                 `;
+            } else if (!m.score || m.score === 'Pending') {
+                scoreTag = `<div class="text-[10px] uppercase font-bold text-gray-500 tracking-widest py-1 border border-dashed border-gray-600 px-2 rounded">Pending</div>`;
+            } else {
+                const parsed = parseScores(m.score);
+                if (!isFinished) {
+                    scoreTag = `<div class="bg-blue-600/20 text-blue-400 font-mono px-5 py-2 rounded-xl border border-blue-500/30 font-black text-2xl tracking-tighter shadow-[0_0_20px_rgba(37,99,235,0.2)] animate-pulse">${parsed.main}</div>`;
+                } else {
+                    scoreTag = `<div class="bg-gray-800 text-white font-mono px-3 py-1 rounded-md border border-white/10 font-bold tracking-widest shadow-inner opacity-60">${parsed.main}</div>`;
+                }
             }
 
+            // Win Badge
             let winBadge = m.winner && m.winner !== 'Draw' && m.winner !== ''
-                ? `<span class="bg-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border border-emerald-500/20 mt-2 block w-max mx-auto"><i class="fas fa-check mr-1"></i>${m.winner}</span>`
+                ? `<span class="bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-emerald-500/20 mt-6 block w-max mx-auto shadow-lg shadow-emerald-500/10"><i class="fas fa-trophy mr-2"></i>${m.winner} WON</span>`
                 : '';
             if(m.winner === 'Draw') winBadge = `<span class="bg-gray-500/20 text-gray-400 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border border-gray-500/20 mt-2 block w-max mx-auto">Draw</span>`;
 
+            const isExpandable = m.stage !== 'League';
+
             return `
-                <div class="match-card bg-black/30 p-5 rounded-2xl border ${!isFinished ? 'border-blue-500/20 bg-blue-500/5 shadow-lg shadow-blue-900/10' : 'border-white/5'} hover:border-white/10 transition group relative overflow-hidden" onclick="this.classList.toggle('expanded')">
+                <div class="match-card bg-black/30 p-6 rounded-[2rem] border ${!isFinished ? 'border-blue-500/30 bg-blue-500/5 shadow-2xl shadow-blue-900/20' : 'border-white/5'} hover:border-white/10 transition group relative overflow-hidden ${isExpandable ? 'cursor-pointer' : 'cursor-default'}" 
+                     ${isExpandable ? 'onclick="this.classList.toggle(\'expanded\')"' : ''}>
                     ${!isFinished ? '<div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl"></div>' : ''}
-                    <div class="flex justify-between items-center mb-4 relative z-10">
-                        <span class="text-[9px] font-black uppercase ${!isFinished ? 'text-blue-400 bg-blue-500/10' : 'text-amber-500 bg-amber-500/10'} px-2 py-0.5 rounded border ${!isFinished ? 'border-blue-500/20' : 'border-amber-500/20'}">
-                            <i class="fas ${!isFinished ? 'fa-signal text-blue-400 animate-pulse' : 'fa-check-circle'} mr-1"></i>
+                    <div class="flex justify-between items-center mb-6 relative z-10">
+                        <span class="text-[10px] font-black uppercase ${!isFinished ? 'text-blue-400 bg-blue-500/10 border-blue-500/20' : 'text-amber-500 bg-amber-500/10 border-amber-500/20'} px-3 py-1 rounded-full border">
+                            <i class="fas ${!isFinished ? 'fa-signal text-blue-400 animate-pulse' : 'fa-check-circle'} mr-1.5"></i>
                             ${!isFinished ? 'Live: ' + m.sport : m.sport}
                         </span>
                         <div class="flex items-center gap-2">
-                            <span class="text-[9px] font-black uppercase text-gray-500 tracking-widest">${m.stage}</span>
-                            <i class="fas fa-chevron-down text-[10px] text-gray-600 group-[.expanded]:rotate-180 transition-transform"></i>
+                            <span class="text-[10px] font-black uppercase text-gray-500 tracking-widest">${m.stage}</span>
+                            ${isExpandable ? '<i class="fas fa-chevron-down text-[10px] text-gray-600 group-[.expanded]:rotate-180 transition-transform"></i>' : ''}
                         </div>
                     </div>
-                    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-4 text-center relative z-10">
+
+                    <div class="grid grid-cols-[1fr_auto_1fr] items-end gap-2 text-center relative z-10">
                         <div class="flex flex-col items-center gap-3">
-                            <div class="font-black uppercase tracking-tighter ${!isFinished ? 'text-[10px] sm:text-xs' : 'text-[9px] sm:text-[11px]'} border-2 px-3 py-2 rounded-2xl ${t1Style} shadow-lg w-full min-h-[70px] flex flex-col items-center justify-center gap-2">
-                                ${logo1 ? `<img src="${logo1}" class="w-10 h-10 object-contain drop-shadow-lg">` : ''}
-                                <span class="leading-none">${m.team1}</span>
-                            </div>
+                            ${logo1 ? `<img src="${logo1}" class="w-16 h-16 object-contain drop-shadow-2xl hover:scale-110 transition-transform duration-500">` : `<div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-2xl">${m.team1.charAt(0)}</div>`}
+                            <div class="text-[10px] font-black uppercase tracking-tighter ${t1Style} border-b-2 pb-0.5">${m.team1}</div>
                         </div>
-                        <div class="flex flex-col items-center justify-center">
-                            <span class="text-[10px] text-gray-600 font-black mb-1 uppercase italic leading-none">${!isFinished ? 'MATCH GOING ON' : 'VS'}</span>
+                        
+                        <div class="flex flex-col items-center justify-center mb-6">
                             ${scoreTag}
                         </div>
+
                         <div class="flex flex-col items-center gap-3">
-                            <div class="font-black uppercase tracking-tighter ${!isFinished ? 'text-[10px] sm:text-xs' : 'text-[9px] sm:text-[11px]'} border-2 px-3 py-2 rounded-2xl ${t2Style} shadow-lg w-full min-h-[70px] flex flex-col items-center justify-center gap-2">
-                                ${logo2 ? `<img src="${logo2}" class="w-10 h-10 object-contain drop-shadow-lg">` : ''}
-                                <span class="leading-none">${m.team2}</span>
-                            </div>
+                            ${logo2 ? `<img src="${logo2}" class="w-16 h-16 object-contain drop-shadow-2xl hover:scale-110 transition-transform duration-500">` : `<div class="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center font-black text-2xl">${m.team2.charAt(0)}</div>`}
+                            <div class="text-[10px] font-black uppercase tracking-tighter ${t2Style} border-b-2 pb-0.5">${m.team2}</div>
                         </div>
                     </div>
-                    ${cricketDetails}
+
                     ${winBadge}
-                    ${m.details ? `<div class="mt-4 pt-3 border-t border-white/5 text-[11px] text-gray-400 text-center font-medium italic"><i class="fas fa-info-circle mr-1 opacity-50"></i>${m.details}</div>` : ''}
                     
+                    <!-- Details Subtext -->
+                    ${m.details ? `<div class="mt-4 text-[10px] text-gray-600 text-center font-bold uppercase tracking-widest opacity-60">${m.details}</div>` : ''}
+
                     <!-- Detailed Match View (Expanded) -->
+                    ${isExpandable ? `
                     <div class="match-card-detailed">
                         ${isCricket ? renderCricketDetailedScorecard(m) : renderGenericDetailedView(m)}
-                    </div>
+                    </div>` : ''}
                 </div>
             `;
         }
@@ -646,6 +614,32 @@
             state.teams.forEach(team => {
                 const accent = THEME_ACCENTS[cleanName(team.name)] || 'from-gray-700 to-gray-900 border-gray-600';
                 
+                function getChampionsBadges(teamName) {
+                    const rankings = state.tournamentRankings || {};
+                    const cleanTarget = cleanName(teamName);
+                    let badges = '';
+                    
+                    const sportIcons = {
+                        'Cricket': { icon: 'fa-baseball-ball', color: 'text-amber-400', bg: 'bg-amber-400/20', border: 'border-amber-400/30' },
+                        'Badminton': { icon: 'fa-table-tennis', color: 'text-pink-400', bg: 'bg-pink-400/20', border: 'border-pink-400/30' },
+                        'Volleyball': { icon: 'fa-volleyball-ball', color: 'text-orange-400', bg: 'bg-orange-400/20', border: 'border-orange-400/30' }
+                    };
+
+                    Object.keys(rankings).forEach(sport => {
+                        if (sport === 'Tug of War') return;
+                        if (cleanName(rankings[sport]['1st']) === cleanTarget) {
+                            const style = sportIcons[sport] || { icon: 'fa-trophy', color: 'text-yellow-400', bg: 'bg-yellow-400/20', border: 'border-yellow-400/30' };
+                            badges += `
+                                <div class="flex items-center gap-1.5 px-3 py-1.5 ${style.bg} ${style.border} border rounded-xl animate-in zoom-in duration-500">
+                                    <i class="fas ${style.icon} ${style.color} text-[10px]"></i>
+                                    <span class="text-[9px] font-black uppercase tracking-widest ${style.color}">${sport} Champions</span>
+                                </div>
+                            `;
+                        }
+                    });
+                    return badges;
+                }
+
                 // Calculate Stats
                 const stats = calculateStatsForTeam(team.name);
                 const teamPlayers = team.players || [];
@@ -664,7 +658,12 @@
                                 <div class="flex-1">
                                     <div class="flex justify-between items-start">
                                         <div>
-                                            <h3 class="text-4xl font-black uppercase tracking-tighter text-white mb-2">${team.name}</h3>
+                                            <div class="flex items-center gap-4 mb-3 flex-wrap">
+                                                <h3 class="text-4xl font-black uppercase tracking-tighter text-white">${team.name}</h3>
+                                                <div class="flex gap-2">
+                                                    ${getChampionsBadges(team.name)}
+                                                </div>
+                                            </div>
                                             <div class="flex flex-wrap gap-3">
                                                 <span class="px-3 py-1 bg-white/5 rounded-lg text-[10px] font-black uppercase tracking-widest text-gray-400 border border-white/10"><i class="fas fa-user-tie mr-1.5 text-amber-500"></i>Captain: ${team.captain}</span>
                                             </div>
@@ -677,12 +676,10 @@
 
                             <!-- Final Squad Expanded list removed -->
 
-                            <!-- Sport Summaries Grid -->
-                            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-10 mt-10">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10 mt-10">
                                 ${renderSportStatBox('Cricket', 'fa-baseball-ball', 'text-amber-500', stats.cricket, team.name)}
                                 ${renderSportStatBox('Badminton', 'fa-table-tennis', 'text-pink-500', stats.badminton, team.name)}
                                 ${renderSportStatBox('Volleyball', 'fa-volleyball-ball', 'text-orange-500', stats.volleyball, team.name)}
-                                ${renderSportStatBox('Tug of War', 'fa-anchor', 'text-blue-500', stats.tugOfWar, team.name)}
                             </div>
 
                             <!-- Detailed Match History Section -->
@@ -697,9 +694,6 @@
 
                                 <div id="history-Cricket-${cleanName(team.name)}" class="sport-history-container" style="display: none;">
                                     ${renderCricketHistory(team.name)}
-                                </div>
-                                <div id="history-TugofWar-${cleanName(team.name)}" class="sport-history-container" style="display: none;">
-                                    ${renderGenericSportHistory(team.name, 'Tug of War', 'fa-anchor')}
                                 </div>
                             </div>
                         </div>
@@ -722,31 +716,24 @@
 
         function renderCricketDetailedScorecard(m) {
             const cd = m.cricketData || {};
-            const batting = cd.battingCard || [];
-            const bowling = cd.bowlerStats ? Object.entries(cd.bowlerStats) : [];
-            let squadA = cd.teamA_XI || [];
-            let squadB = cd.teamB_XI || [];
-            
-            // Fallback for squads if structured data is missing (legacy matches)
-            if (squadA.length === 0 && m.details && m.details.includes('Squad:')) {
-                const parts = m.details.split(' vs ');
-                if (parts.length === 2) {
-                    squadA = parts[0].replace('Squad: ', '').split(', ').map(s => s.trim());
-                    squadB = parts[1].split(', ').map(s => s.trim());
-                }
-            }
-            
-            return `
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-4">
-                    <!-- Batting Table -->
-                    <div class="bg-black/40 rounded-2xl border border-white/5 overflow-hidden">
-                        <div class="px-4 py-2 border-b border-white/5 bg-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-blue-400">
-                            <span>Batting Scorecard</span>
-                            <span class="text-gray-500">${m.team1}</span>
+            const innings1 = cd.innings1 || {};
+            const innings2 = cd.innings2 || {};
+
+            const renderInnings = (inn, teamName, innNum) => {
+                if (!inn.batting && !inn.bowling) return '';
+                const batting = inn.batting || [];
+                const bowling = inn.bowling || [];
+                return `
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                            <h5 class="text-xs font-black uppercase tracking-widest text-amber-500">${innNum}. ${teamName} Innings</h5>
+                            <div class="text-[10px] font-mono text-gray-500">${inn.score}/${inn.wickets} (${inn.overs})</div>
                         </div>
-                        <div class="p-0">
-                            <table class="w-full text-left text-[10px]">
-                                <thead class="border-b border-white/5 text-gray-500 font-bold uppercase">
+                        
+                        <!-- Batting -->
+                        <div class="bg-white/[0.02] rounded-xl border border-white/5 overflow-hidden">
+                            <table class="w-full text-left text-[9px]">
+                                <thead class="bg-white/5 text-gray-500 font-black uppercase border-b border-white/5">
                                     <tr>
                                         <th class="px-4 py-2">Batsman</th>
                                         <th class="px-2 py-2 text-center">R</th>
@@ -757,89 +744,79 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-white/5">
-                                    ${batting.length > 0 ? batting.map(b => `
-                                        <tr class="hover:bg-white/5 transition">
+                                    ${batting.map(b => `
+                                        <tr class="hover:bg-white/5">
                                             <td class="px-4 py-2">
-                                                <div class="font-bold text-white flex items-center">${b.name} ${b.out ? '<span class="text-[7px] text-red-500/80 ml-1.5 font-black">OUT</span>' : '<span class="text-[7px] text-emerald-500 ml-1.5 font-black animate-pulse">LIVE</span>'}</div>
-                                                ${b.out ? `<div class="text-[8px] text-gray-500 italic lowercase font-medium mt-0.5">${b.howOut || ''}</div>` : ''}
+                                                <div class="font-bold text-white">${b.name}</div>
+                                                <div class="text-[7px] text-gray-600 italic mt-0.5">${b.howOut || 'not out'}</div>
                                             </td>
-                                            <td class="px-2 py-2 text-center font-mono text-white">${b.runs}</td>
-                                            <td class="px-2 py-2 text-center font-mono text-gray-400">${b.balls}</td>
-                                            <td class="px-2 py-2 text-center font-mono text-gray-500">${b.fours || 0}</td>
-                                            <td class="px-2 py-2 text-center font-mono text-gray-500">${b.sixes || 0}</td>
-                                            <td class="px-2 py-2 text-center font-mono text-blue-400/60">${b.balls > 0 ? ((b.runs/b.balls)*100).toFixed(2) : '0.00'}</td>
+                                            <td class="px-2 py-2 text-center font-black">${b.runs}</td>
+                                            <td class="px-2 py-2 text-center text-gray-500">${b.balls}</td>
+                                            <td class="px-2 py-2 text-center text-gray-600">${b.fours || 0}</td>
+                                            <td class="px-2 py-2 text-center text-gray-600">${b.sixes || 0}</td>
+                                            <td class="px-2 py-2 text-center text-blue-400/50">${b.balls > 0 ? ((b.runs/b.balls)*100).toFixed(1) : '0.0'}</td>
                                         </tr>
-                                    `).join('') : '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-600 font-bold uppercase">No batting records</td></tr>'}
+                                    `).join('')}
                                 </tbody>
                             </table>
                         </div>
-                    </div>
 
-                    <!-- Bowling Table -->
-                    <div class="bg-black/40 rounded-2xl border border-white/5 overflow-hidden">
-                        <div class="px-4 py-2 border-b border-white/5 bg-white/5 flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-amber-500">
-                            <span>Bowling Figures</span>
-                            <span class="text-gray-500">${m.team2}</span>
-                        </div>
-                        <div class="p-0">
-                            <table class="w-full text-left text-[10px]">
-                                <thead class="border-b border-white/5 text-gray-500 font-bold uppercase">
+                        <!-- Bowling -->
+                        <div class="bg-white/[0.02] rounded-xl border border-white/5 overflow-hidden">
+                            <table class="w-full text-left text-[9px]">
+                                <thead class="bg-white/5 text-gray-500 font-black uppercase border-b border-white/5">
                                     <tr>
                                         <th class="px-4 py-2">Bowler</th>
                                         <th class="px-2 py-2 text-center">O</th>
+                                        <th class="px-2 py-2 text-center">M</th>
                                         <th class="px-2 py-2 text-center">R</th>
                                         <th class="px-2 py-2 text-center">W</th>
+                                        <th class="px-2 py-2 text-center">ER</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-white/5">
-                                    ${bowling.length > 0 ? bowling.map(([name, s]) => `
-                                        <tr class="hover:bg-white/5 transition">
-                                            <td class="px-4 py-2 font-bold text-white">${name}</td>
-                                            <td class="px-2 py-2 text-center font-mono">${Math.floor(s.balls/6)}.${s.balls%6}</td>
-                                            <td class="px-2 py-2 text-center font-mono">${s.runs}</td>
-                                            <td class="px-2 py-2 text-center font-mono text-amber-500">${s.wickets}</td>
+                                    ${bowling.map(bow => `
+                                        <tr class="hover:bg-white/5">
+                                            <td class="px-4 py-2 font-bold text-white">${bow.name}</td>
+                                            <td class="px-2 py-2 text-center font-mono">${bow.overs}</td>
+                                            <td class="px-2 py-2 text-center text-gray-600">${bow.maidens || 0}</td>
+                                            <td class="px-2 py-2 text-center">${bow.runs}</td>
+                                            <td class="px-2 py-2 text-center font-black text-amber-500">${bow.wickets}</td>
+                                            <td class="px-2 py-2 text-center text-gray-600">${bow.overs > 0 ? (bow.runs / parseFloat(bow.overs)).toFixed(2) : '0.00'}</td>
                                         </tr>
-                                    `).join('') : '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-600 font-bold uppercase">No bowling records</td></tr>'}
+                                    `).join('')}
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                `;
+            };
 
-                    <!-- Playing XIs -->
-                    <div class="lg:col-span-2 grid grid-cols-2 gap-4 mt-2">
-                        <div class="p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
-                            <div class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3">${m.team1} Playing XI</div>
-                            <div class="flex flex-col gap-1.5">
-                                ${squadA.map(name => `<span class="px-2 py-1.5 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-300 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500/50"></span>${name}</span>`).join('') || '<span class="text-[8px] italic text-gray-600">Squad not listed</span>'}
-                            </div>
-                        </div>
-                        <div class="p-4 bg-white/[0.02] border border-white/5 rounded-2xl">
-                            <div class="text-[9px] font-black text-gray-500 uppercase tracking-widest mb-3">${m.team2} Playing XI</div>
-                            <div class="flex flex-col gap-1.5">
-                                ${squadB.map(name => `<span class="px-2 py-1.5 bg-white/5 border border-white/5 rounded-lg text-[10px] font-bold text-gray-300 flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-blue-500/50"></span>${name}</span>`).join('') || '<span class="text-[8px] italic text-gray-600">Squad not listed</span>'}
-                            </div>
-                        </div>
-                    </div>
+            return `
+                <div class="mt-8 space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    ${renderInnings(innings1, m.team1, '1st')}
+                    ${renderInnings(innings2, m.team2, '2nd')}
                 </div>
             `;
         }
 
         function renderGenericDetailedView(m) {
+            const parsed = parseScores(m.score);
+            const verticalSets = parsed.sets ? parsed.sets.split(',').map(s => `<div class="py-1">${s.trim()}</div>`).join('') : '';
+
             return `
                 <div class="p-6 bg-white/[0.02] border border-white/5 rounded-2xl text-center">
                     <div class="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Match Intelligence</div>
                     <div class="text-sm text-gray-300 italic font-medium">"${m.details || 'No additional telemetry data for this match stage.'}"</div>
                     
-                    <div class="grid grid-cols-2 gap-4 mt-6">
-                        <div class="p-3 bg-black/20 rounded-xl border border-white/5">
-                            <div class="text-[8px] font-black text-blue-500 uppercase mb-1">Roster Team A</div>
-                            <div class="text-xs font-bold text-white">${m.playerA || 'TBD'} ${m.playerA2 ? ` & ${m.playerA2}` : ''}</div>
-                        </div>
-                        <div class="p-3 bg-black/20 rounded-xl border border-white/5">
-                            <div class="text-[8px] font-black text-pink-500 uppercase mb-1">Roster Team B</div>
-                            <div class="text-xs font-bold text-white">${m.playerB || 'TBD'} ${m.playerB2 ? ` & ${m.playerB2}` : ''}</div>
+                    ${parsed.sets ? `
+                    <div class="mt-6 p-4 bg-emerald-500/5 border border-emerald-500/20 rounded-xl">
+                        <div class="text-[9px] font-black text-emerald-400 uppercase tracking-widest mb-2">Detailed Set Scores</div>
+                        <div class="text-xl font-black text-white font-mono tracking-wider flex flex-col gap-1">
+                            ${verticalSets}
                         </div>
                     </div>
+                    ` : ''}
                 </div>
             `;
         }
@@ -903,8 +880,7 @@
                 totalWins: matches.filter(m => cleanName(m.winner) === cleanTarget).length,
                 cricket: { wins: matches.filter(m => m.sport === 'Cricket' && cleanName(m.winner) === cleanTarget).length },
                 badminton: { wins: 0 },
-                volleyball: { wins: matches.filter(m => m.sport === 'Volleyball' && cleanName(m.winner) === cleanTarget).length },
-                tugOfWar: { wins: matches.filter(m => m.sport === 'Tug of War' && cleanName(m.winner) === cleanTarget).length }
+                volleyball: { wins: matches.filter(m => m.sport === 'Volleyball' && cleanName(m.winner) === cleanTarget).length }
             };
 
             // Calculate Badminton Tie Wins

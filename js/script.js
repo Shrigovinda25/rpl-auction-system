@@ -113,14 +113,186 @@ const defaultState = {
     // VOLLEYBALL LEAGUE
     { sport: 'Volleyball', stage: 'League', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', score: '8 - 15', winner: 'TECH', details: 'League Match' },
     { sport: 'Volleyball', stage: 'League', team1: 'TECH TITANS 🤖', team2: 'FLASHING BOTS 🤖', score: '15 - 8', winner: 'TECH', details: 'League Match' },
-    { sport: 'Volleyball', stage: 'League', team1: 'ROBO KNIGHTS', team2: 'FLASHING BOTS 🤖', score: '-', winner: 'FLASHING', details: 'League Match' },
 
     // VOLLEYBALL PLAYOFFS
-    { sport: 'Volleyball', stage: 'Semi-Final', team1: 'ROBO KNIGHTS', team2: 'FLASHING BOTS 🤖', score: '-', winner: 'FLASHING', details: 'Semi-Final' },
-    { sport: 'Volleyball', stage: 'Final', team1: 'FLASHING BOTS 🤖', team2: 'TECH TITANS 🤖', score: '-', winner: 'TECH', details: 'Grand Final' }
+    { sport: 'Volleyball', stage: 'Semi-Final', team1: 'ROBO KNIGHTS', team2: 'FLASHING BOTS 🤖', score: '0 - 2 (11-15, 3-15)', winner: 'FLASHING', details: 'Semi-Final' },
+    { sport: 'Volleyball', stage: 'Final', team1: 'FLASHING BOTS 🤖', team2: 'TECH TITANS 🤖', score: '1 - 2 (15-25, 25-24, 23-25)', winner: 'TECH', details: 'Grand Final' },
+
+    // CRICKET MATCHES
+    { 
+      sport: 'Cricket', stage: 'League', team1: 'ROBO KNIGHTS', team2: 'TECH TITANS 🤖', 
+      score: '91/3 (10.0) - 92/4 (8.5)', winner: 'TECH', details: 'League match 01',
+      cricketData: {
+        innings1: {
+          score: 91, wickets: 3, overs: '10.0',
+          batting: [
+            { name: 'Vijay Kumar', runs: 11, balls: 9, fours: 0, sixes: 1, howOut: 'b Vicky' },
+            { name: 'Shrigovinda K', runs: 26, balls: 19, fours: 3, sixes: 0, howOut: 'c & b Harsh' },
+            { name: 'Akshay S', runs: 41, balls: 25, fours: 2, sixes: 4, howOut: 'c Vicky b Harsh' },
+            { name: 'Ravindra', runs: 1, balls: 7, fours: 0, sixes: 0, howOut: 'not out' },
+            { name: 'Shreyas K', runs: 0, balls: 2, fours: 0, sixes: 0, howOut: 'not out' }
+          ],
+          bowling: [
+            { name: 'Chinmay', overs: '3.0', maidens: 0, runs: 9, wickets: 0 },
+            { name: 'Vinayak', overs: '2.0', maidens: 0, runs: 16, wickets: 0 },
+            { name: 'Vicky', overs: '2.0', maidens: 0, runs: 30, wickets: 1 },
+            { name: 'Dakash', overs: '1.0', maidens: 0, runs: 17, wickets: 0 },
+            { name: 'Harsh', overs: '2.0', maidens: 0, runs: 19, wickets: 2 }
+          ]
+        },
+        innings2: {
+          score: 92, wickets: 4, overs: '8.5',
+          batting: [
+            { name: 'Faroz', runs: 4, balls: 4, fours: 1, sixes: 0, howOut: 'c Ravindra b Tanmay H' },
+            { name: 'Abhay', runs: 1, balls: 2, fours: 0, sixes: 0, howOut: 'c Shrigovinda K b Shrigovinda' },
+            { name: 'Aditya', runs: 6, balls: 3, fours: 1, sixes: 0, howOut: 'b Shrigovinda' },
+            { name: 'Chinmay', runs: 46, balls: 29, fours: 4, sixes: 2, howOut: 'not out' },
+            { name: 'Dakash', runs: 12, balls: 11, fours: 2, sixes: 0, howOut: 'b Vijay Kumar' },
+            { name: 'Vinayak', runs: 2, balls: 4, fours: 0, sixes: 0, howOut: 'not out' }
+          ],
+          bowling: [
+            { name: 'Tanmay H', overs: '2.0', maidens: 0, runs: 23, wickets: 1 },
+            { name: 'Shrigovinda', overs: '1.0', maidens: 0, runs: 7, wickets: 2 },
+            { name: 'Shrigovinda K', overs: '1.0', maidens: 0, runs: 19, wickets: 0 },
+            { name: 'Shreyas K', overs: '1.0', maidens: 0, runs: 14, wickets: 0 },
+            { name: 'Vijay Kumar', overs: '2.0', maidens: 0, runs: 10, wickets: 1 },
+            { name: 'Shrigovinda', overs: '1.0', maidens: 0, runs: 13, wickets: 0 }
+          ]
+        }
+      }
+    },
+    { 
+      sport: 'Cricket', stage: 'League', team1: 'FLASHING BOTS 🤖', team2: 'TECH TITANS 🤖', 
+      score: '83/3 (8.0) - 85/2 (6.5)', winner: 'TECH', details: 'League match 02',
+      cricketData: {
+        innings1: {
+          score: 83, wickets: 3, overs: '8.0',
+          batting: [
+            { name: 'Darshan', runs: 22, balls: 10, fours: 1, sixes: 2, howOut: 'c Nisar b Vinayak' },
+            { name: 'Sushrut', runs: 0, balls: 1, fours: 0, sixes: 0, howOut: 'c Fairoz b Vinayak' },
+            { name: 'Shiv', runs: 20, balls: 20, fours: 2, sixes: 0, howOut: 'not out' },
+            { name: 'Aditya', runs: 14, balls: 8, fours: 1, sixes: 1, howOut: 'c Fairoz b Vinayak' },
+            { name: 'Sudev', runs: 17, balls: 10, fours: 1, sixes: 1, howOut: 'not out' }
+          ],
+          bowling: [
+            { name: 'Vinayak', overs: '3.0', maidens: 0, runs: 33, wickets: 2 },
+            { name: 'Vinayak', overs: '2.0', maidens: 0, runs: 18, wickets: 0 },
+            { name: 'Vicky', overs: '1.0', maidens: 0, runs: 17, wickets: 0 },
+            { name: 'Vinayak', overs: '2.0', maidens: 0, runs: 15, wickets: 1 }
+          ]
+        },
+        innings2: {
+          score: 85, wickets: 2, overs: '6.5',
+          batting: [
+            { name: 'Fairoz', runs: 54, balls: 26, fours: 5, sixes: 4, howOut: 'not out' },
+            { name: 'Abhay', runs: 14, balls: 8, fours: 1, sixes: 1, howOut: 'c Darshan b Aditya' },
+            { name: 'Aditya', runs: 1, balls: 2, fours: 0, sixes: 0, howOut: 'c Anup b Aditya' },
+            { name: 'Nisar', runs: 3, balls: 5, fours: 0, sixes: 0, howOut: 'not out' }
+          ],
+          bowling: [
+            { name: 'Shiv', overs: '2.0', maidens: 0, runs: 22, wickets: 0 },
+            { name: 'Darshan', overs: '1.5', maidens: 0, runs: 32, wickets: 0 },
+            { name: 'Aditya', overs: '2.0', maidens: 0, runs: 13, wickets: 2 },
+            { name: 'Sudev', overs: '1.0', maidens: 0, runs: 18, wickets: 0 }
+          ]
+        }
+      }
+    },
+    { 
+      sport: 'Cricket', stage: 'Semi-Final', team1: 'ROBO KNIGHTS', team2: 'FLASHING BOTS 🤖', 
+      score: '71/10 (9.2) - 75/4 (5.7)', winner: 'FLASHING', details: 'Semi-Finals',
+      cricketData: {
+        innings1: {
+          score: 71, wickets: 10, overs: '9.2',
+          batting: [
+            { name: 'Akshay', runs: 8, balls: 8, fours: 1, sixes: 0, howOut: 'c Darshan b Aditya' },
+            { name: 'Vijay Kumar', runs: 12, balls: 9, fours: 1, sixes: 0, howOut: 'c Sushrut b Aditya' },
+            { name: 'Shrigovinda', runs: 14, balls: 5, fours: 2, sixes: 1, howOut: 'c Aditya b Shiv' },
+            { name: 'Ravindra', runs: 6, balls: 4, fours: 1, sixes: 0, howOut: 'c & b Aditya' },
+            { name: 'Shashank', runs: 7, balls: 9, fours: 1, sixes: 0, howOut: 'c Shiv b Anup' },
+            { name: 'Shreyas', runs: 0, balls: 2, fours: 0, sixes: 0, howOut: 'b Aditya' },
+            { name: 'Prajwal', runs: 0, balls: 2, fours: 0, sixes: 0, howOut: 'st Abhishek D b Aditya' },
+            { name: 'Navdeep', runs: 5, balls: 7, fours: 0, sixes: 0, howOut: 'c & b Anup' },
+            { name: 'Rohit P', runs: 3, balls: 4, fours: 0, sixes: 0, howOut: 'not out' },
+            { name: 'Tanmay', runs: 0, balls: 4, fours: 0, sixes: 0, howOut: 'c Mallik b Shiv' },
+            { name: 'Nagraj', runs: 0, balls: 2, fours: 0, sixes: 0, howOut: 'b Aditya' }
+          ],
+          bowling: [
+            { name: 'Shiv', overs: '3.0', maidens: 0, runs: 19, wickets: 2 },
+            { name: 'Aditya', overs: '2.2', maidens: 0, runs: 29, wickets: 3 },
+            { name: 'Aditya', overs: '2.0', maidens: 0, runs: 8, wickets: 3 },
+            { name: 'Sudev', overs: '1.0', maidens: 0, runs: 7, wickets: 0 },
+            { name: 'Anup', overs: '1.0', maidens: 0, runs: 7, wickets: 2 }
+          ]
+        },
+        innings2: {
+          score: 75, wickets: 4, overs: '5.7',
+          batting: [
+            { name: 'Darshan', runs: 40, balls: 13, fours: 4, sixes: 3, howOut: 'b Akshay' },
+            { name: 'Sushrut', runs: 6, balls: 12, fours: 1, sixes: 0, howOut: 'c Vijay Kumar b Akshay' },
+            { name: 'Sudev', runs: 6, balls: 7, fours: 1, sixes: 0, howOut: 'c Vijay Kumar b Akshay' },
+            { name: 'Vinayak B', runs: 0, balls: 1, fours: 0, sixes: 0, howOut: 'b Vijay Kumar' },
+            { name: 'Shiv', runs: 6, balls: 3, fours: 1, sixes: 0, howOut: 'not out' },
+            { name: 'Aditya', runs: 1, balls: 1, fours: 0, sixes: 0, howOut: 'not out' }
+          ],
+          bowling: [
+            { name: 'Tanmay', overs: '1.0', maidens: 0, runs: 17, wickets: 0 },
+            { name: 'Nagraj', overs: '1.0', maidens: 0, runs: 30, wickets: 0 },
+            { name: 'Vijay Kumar', overs: '2.0', maidens: 0, runs: 7, wickets: 1 },
+            { name: 'Akshay', overs: '1.4', maidens: 0, runs: 21, wickets: 3 }
+          ]
+        }
+      }
+    },
+    { 
+      sport: 'Cricket', stage: 'Final', team1: 'FLASHING BOTS 🤖', team2: 'TECH TITANS 🤖', 
+      score: '104/6 (10.0) - 108/5 (9.4)', winner: 'TECH', details: 'Finals',
+      cricketData: {
+        innings1: {
+          score: 104, wickets: 6, overs: '10.0',
+          batting: [
+            { name: 'Darshan', runs: 21, balls: 16, fours: 2, sixes: 1, howOut: 'b Vinayak' },
+            { name: 'Shiv', runs: 10, balls: 4, fours: 2, sixes: 0, howOut: 'b Vinayak' },
+            { name: 'Aditya', runs: 25, balls: 19, fours: 2, sixes: 1, howOut: 'b Vicky' },
+            { name: 'Sushrut', runs: 14, balls: 11, fours: 1, sixes: 0, howOut: 'b Vinayak' },
+            { name: 'Sudev', runs: 4, balls: 3, fours: 1, sixes: 0, howOut: 'b Vicky' },
+            { name: 'Abhishek D', runs: 10, balls: 6, fours: 1, sixes: 0, howOut: 'not out' },
+            { name: 'Aditya', runs: 4, balls: 4, fours: 0, sixes: 0, howOut: 'b Vicky' },
+            { name: 'Anup', runs: 0, balls: 0, fours: 0, sixes: 0, howOut: 'not out' }
+          ],
+          bowling: [
+            { name: 'Vinayak', overs: '1.0', maidens: 0, runs: 16, wickets: 1 },
+            { name: 'Vinayak', overs: '3.0', maidens: 0, runs: 25, wickets: 1 },
+            { name: 'Vicky', overs: '2.0', maidens: 0, runs: 23, wickets: 2 },
+            { name: 'Vinayak', overs: '1.0', maidens: 0, runs: 9, wickets: 1 },
+            { name: 'Vicky', overs: '2.0', maidens: 0, runs: 23, wickets: 1 },
+            { name: 'Harsh', overs: '1.0', maidens: 0, runs: 8, wickets: 0 }
+          ]
+        },
+        innings2: {
+          score: 108, wickets: 5, overs: '9.4',
+          batting: [
+            { name: 'Abhay', runs: 18, balls: 12, fours: 2, sixes: 0, howOut: 'b Aditya' },
+            { name: 'Fairoz', runs: 26, balls: 15, fours: 4, sixes: 0, howOut: 'b Aditya' },
+            { name: 'Chinmay', runs: 34, balls: 16, fours: 3, sixes: 2, howOut: 'not out' },
+            { name: 'Daksh', runs: 4, balls: 6, fours: 0, sixes: 0, howOut: 'b Aditya' },
+            { name: 'Aditya', runs: 13, balls: 6, fours: 2, sixes: 0, howOut: 'b Shiv' },
+            { name: 'Vinayak', runs: 4, balls: 2, fours: 1, sixes: 0, howOut: 'b Shiv' },
+            { name: 'Nisar', runs: 0, balls: 1, fours: 0, sixes: 0, howOut: 'not out' }
+          ],
+          bowling: [
+            { name: 'Shiv', overs: '3.0', maidens: 0, runs: 32, wickets: 2 },
+            { name: 'Aditya', overs: '3.0', maidens: 0, runs: 31, wickets: 2 },
+            { name: 'Aditya', overs: '1.0', maidens: 0, runs: 4, wickets: 1 },
+            { name: 'Sudev', overs: '2.0', maidens: 0, runs: 24, wickets: 0 },
+            { name: 'Shivkumar', overs: '0.3', maidens: 0, runs: 17, wickets: 0 }
+          ]
+        }
+      }
+    }
   ],
   tournamentRankings: {
-      "Cricket": { "1st": null, "2nd": null, "3rd": null },
+      "Cricket": { "1st": "TECH TITANS 🤖", "2nd": "FLASHING BOTS 🤖", "3rd": "ROBO KNIGHTS" },
       "Badminton": { "1st": "ROBO KNIGHTS", "2nd": "FLASHING BOTS 🤖", "3rd": "TECH TITANS 🤖" },
       "Volleyball": { "1st": "TECH TITANS 🤖", "2nd": "FLASHING BOTS 🤖", "3rd": "ROBO KNIGHTS" },
       "Tug of War": { "1st": null, "2nd": null, "3rd": null }
